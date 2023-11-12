@@ -56,7 +56,7 @@ const { error, log } = console;
 
 log();
 log(pink("/======================================\\"));
-log(pink(`| Tobey's Guided Installer for BepInEx |`));
+log(pink(`| tobey's Guided Installer for BepInEx |`));
 log(pink("\\======================================/"));
 log();
 
@@ -69,7 +69,7 @@ log(chalk.gray(new TextDecoder().decode(stdout)));
 // TODO: warn the user if they're not on macOS
 // currently only macOS is supported
 
-log("This script will:");
+log("gib will:");
 log();
 log("  •", chalk.green("install BepInEx to the game folder specified"));
 log("  •", chalk.green("take care of macOS permissions issues"));
