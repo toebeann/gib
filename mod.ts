@@ -113,7 +113,7 @@ log(
   "Additionally, if you don't own the game with Steam, make sure to add it to",
 );
 log("Steam as a non-Steam game. Instructions can be found here:");
-log("  ", chalk.underline("https://yadayadayadaya"));
+log("  ", chalk.underline("https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam"));
 
 pressHeartToContinue();
 
