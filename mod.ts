@@ -105,7 +105,7 @@ log();
 log(
   "  2. have a Finder window open at the location of the Unity game," + EOL +
     "     e.g. by clicking",
-  chalk.italic("Manage -> Browse local files..."),
+  chalk.italic("Manage -> Browse local files"),
   "in Steam",
 );
 log();
