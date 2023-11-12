@@ -14,6 +14,13 @@ If you run into any unexpected issues while following these instructions or need
 
 ### Prerequisites
 
+1. If you don't own the game on Steam, you'll need to add it to Steam as a non-Steam game, as this is the best way to launch the game with mods. Follow [the guide to add a non-Steam game to Steam](https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam) if you're unsure how.
+   
+1. You'll want a Finder window open at the folder where the game is installed.
+   
+   * If you own the game on Steam (i.e. you _didn't_ add the game to Steam as a non-Steam game), find the game in your library, then right-click it and select `Manage` -> `Browse local files`.
+   * For the Epic Games Launcher, find the game in your library, then right-click it and select `Manage`. In the window that opens, look for the folder icon and click it.
+   
 1. You'll want a copy of BepInEx downloaded and unzipped in your Downloads folder.
    
    If you're unsure where to get BepInEx from, try a Google search for `[game name] bepinex pack`, e.g. for Subnautica, I would search for:
@@ -30,13 +37,6 @@ If you run into any unexpected issues while following these instructions or need
    Go ahead and open a Finder window in the unzipped BepInEx folder, so that you can see the file `run_bepinex.sh`. Leave this Finder window open - you'll want to come back to it later.
    
    <img width="920" alt="A screenshot of Finder window open at the location of BepInEx's run_bepinex.sh " src="https://github.com/toebeann/gib/assets/45315526/8b961265-2fd2-4017-85fb-2c91369a825f">
-   
-1. If you don't own the game on Steam, you'll need to add it to Steam as a non-Steam game, as this is the best way to launch the game with mods. Follow [the guide to add a non-Steam game to Steam](https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam) if you're unsure how.
-   
-1. You'll want a Finder window open at the folder where the game is installed.
-   
-   * If you own the game on Steam (i.e. you _didn't_ add the game to Steam as a non-Steam game), find the game in your library, then right-click it and select `Manage` -> `Browse local files`.
-   * For the Epic Games Launcher, find the game in your library, then right-click it and select `Manage`. In the window that opens, look for the folder icon and click it.
    
 ### Running gib
 
