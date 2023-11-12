@@ -38,7 +38,7 @@ If you run into any unexpected issues while following these instructions or need
    * If you own the game on Steam (i.e. you _didn't_ add the game to Steam as a non-Steam game), find the game in your library, then right-click it and select `Manage` -> `Browse local files`.
    * For the Epic Games Launcher, find the game in your library, then right-click it and select `Manage`. In the window that opens, look for the folder icon and click it.
    
-### Running the Installer
+### Running gib
 
 1. Open Terminal from Launchpad by pressing `⌘ Space`, typing `terminal` and pressing `Enter`.
    
