@@ -14,7 +14,7 @@ If you run into any unexpected issues while following these instructions or need
 
 ### Prerequisites
 
-1. If you don't own the game on Steam, you'll need to add it to Steam as a non-Steam game, as this is the best way to launch the game with mods. Follow [the guide to add a non-Steam game to Steam](https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam) if you're unsure how.
+1. If you don't own the game on Steam, you'll need to add it to Steam as a non-Steam game. Follow [the guide to add a non-Steam game to Steam](https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam) if you're unsure how.
    
 1. You'll want a Finder window open at the folder where the game is installed.
    
