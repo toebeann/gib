@@ -1,6 +1,33 @@
 #!/bin/sh
-# Shell script to make sure matching deno version is installed before running the deno script
-# Copyright 2023 Tobey Blaber. All rights reserved.
+#
+# This file is a shell script to ensure a user has deno installed,
+# and that its version matches the intended.
+#
+# Where possible, it will offer to up/downgrade deno if necessary.
+#
+# The intended use case is for the script to be called directly before
+# running a deno script.
+#
+###############################################################################
+#
+# ISC License
+#
+# Copyright 2023 Tobey Blaber
+#
+# Permission to use, copy, modify and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+###############################################################################
+
 # TODO: Keep this script simple and easy to audit.
 
 deno_target_version="1.37.2"
@@ -14,18 +41,21 @@ version() {
     echo "$@" | awk -F. '{ printf("%d%05d%05d\n", $1,$2,$3); }'
 }
 
-if ! command -v deno >/dev/null; then # if no deno command, add expected deno environment variables and try again
+# if no deno command, add expected deno environment variables and try again
+if ! command -v deno >/dev/null; then
     export DENO_INSTALL="${HOME}/.deno"
     export PATH="${DENO_INSTALL}/bin:${PATH}"
 fi
 
-if ! command -v deno >/dev/null; then # deno couldn't be found at expected path, let's just install the latet version
+# deno couldn't be found at expected path, let's just install the latet version
+if ! command -v deno >/dev/null; then
     echo "Installing deno..."
     curl -fsSL https://deno.land/x/install/install.sh | sh >/dev/null
 fi
 
 # try to get installed deno version
-# this will likely break if deno ever changes the output format of the deno --version command
+# this will likely break if deno ever changes the output format of
+# the deno --version command
 deno_current_version=$(deno --version | sed 1q | cut -d ' ' -f2)
 
 # parse version strings into integers for numeric comparison
@@ -33,9 +63,11 @@ parsed_deno_current_version=$(version $deno_current_version)
 parsed_deno_target_version=$(version $deno_target_version)
 parsed_deno_max_version=$(version $deno_max_version)
 
-# check installed deno version matches requirements and offer to up/downgrade otherwise
-if [ $parsed_deno_current_version -lt $parsed_deno_target_version ] || [ $parsed_deno_current_version -gt $parsed_deno_max_version ]; then
-    echo "Warning: deno version mismatch - v${deno_target_version} required, found v${deno_current_version}"
+# check installed deno version matches requirements
+if [ $parsed_deno_current_version -lt $parsed_deno_target_version ] ||
+    [ $parsed_deno_current_version -gt $parsed_deno_max_version ]; then
+    echo "Warning: deno version mismatch - v${deno_target_version} required"
+    echo "Found v${deno_current_version}"
 
     tput sc # store cursor position
     while true; do
@@ -67,6 +99,3 @@ if [ $parsed_deno_current_version -lt $parsed_deno_target_version ] || [ $parsed
         tput el
     done
 fi
-
-# all set. user should now run the run.ts script with deno
-# e.g. deno run --allow-all https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts

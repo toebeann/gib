@@ -1,4 +1,48 @@
-const version = "0.0.0";
+/**
+ * This file is a deno script which aims to automate installing BepInEx
+ * to a Unity game.
+ * 
+ * Currently, only macOS is supported, as the process of manual BepInEx
+ * installation is exceptionally cumbersome on this operating system.
+ * 
+ * This script aims to automate whatever it can, and hold the user's hand
+ * through whatever cannot be automated.
+ *
+ * USAGE:
+ *
+ * Full usage instructions can be found in the README. The script itself will
+ * try to guide you through usage, though it also attempts to be concise.
+ * Read the README if you get stuck.
+ *
+ * Recommended command to run the script:
+ *
+ *   curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh &&
+ *   PATH="$HOME/.deno/bin:$PATH" && deno run --allow-env
+ *   --allow-run=deno,pbcopy,/bin/sh --allow-read --allow-sys=uid --allow-write
+ *   --reload=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
+ *   https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
+ *
+ ******************************************************************************
+ *
+ * ISC License
+ *
+ * Copyright 2023 Tobey Blaber
+ *
+ * Permission to use, copy, modify and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ *****************************************************************************/
+
+const version = "0.0.1";
 
 // --allow-env
 import chalk, { supportsColor } from "npm:chalk";
@@ -22,6 +66,9 @@ const { stdout } = await (new Deno.Command("deno", { args: ["--version"] }))
 log(chalk.gray(`gib ${version}`));
 log(chalk.gray(new TextDecoder().decode(stdout)));
 
+// TODO: warn the user if they're not on macOS
+// currently only macOS is supported
+
 log("This script will:");
 log();
 log("  •", chalk.green("install BepInEx to the game folder specified"));
@@ -44,9 +91,6 @@ const pressHeartToContinue = (message = "to continue") => {
 };
 
 pressHeartToContinue();
-
-// log(`This script will ${chalk.bold("not")}:`);
-// log();
 
 import { EOL } from "node:os";
 
@@ -332,5 +376,3 @@ if (!detectedGame && !detectedBepInEx) {
   log(pink("- tobey ♥"));
   log();
 }
-
-// curl -fsSL file://$HOME/Documents/GitHub/gib/bootstrap.sh | sh && ~/.deno/bin/deno run --allow-env --allow-run=deno,pbcopy,/bin/sh --allow-read --allow-sys=uid --allow-write --reload=file://$HOME/Documents/GitHub/gib/mod.ts file://$HOME/Documents/GitHub/gib/mod.ts
