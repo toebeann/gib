@@ -1,20 +1,20 @@
 /**
- * This file is a deno script which aims to automate installing BepInEx
+ * This file is gib: a deno script which aims to automate installing BepInEx
  * to a Unity game.
  * 
  * Currently only macOS is supported, as the process of manual BepInEx
  * installation is exceptionally cumbersome on this operating system.
  * 
- * This script aims to automate whatever it can, and hold the user's hand
- * through whatever cannot be automated.
+ * gib aims to automate whatever it can, and hold the user's hand
+ * through whatever it cannot.
  *
  * USAGE:
  *
- * Full usage instructions can be found in the README. The script itself will
- * try to guide you through usage, though it also attempts to be concise.
- * Read the README if you get stuck.
+ * Full usage instructions can be found in the README. gib itself will try to
+ * guide you through usage, though it also attempts to be concise. Read the
+ * README if you get stuck.
  *
- * Recommended command to run the script:
+ * Recommended command to run gib:
  *
  *   curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh &&
  *   PATH="$HOME/.deno/bin:$PATH" && deno run --allow-env
@@ -94,7 +94,7 @@ pressHeartToContinue();
 
 import { EOL } from "node:os";
 
-log("Before using this script, make sure that you have:");
+log("Before using gib, make sure that you have:");
 log();
 log(
   "  1. downloaded and unzipped the relevant BepInEx pack for the game to your",
@@ -144,11 +144,6 @@ import {
   dirname,
   join,
 } from "https://deno.land/std@0.206.0/path/mod.ts";
-
-// 1. Open the Finder window with your copy of BepInEx, find the run_bepinex_sh
-//    script, select it and press ⌥⌘C to copy the path to the script file.
-
-// 2. Press xV here to paste the path, and press enter:
 
 const bepinexPath = dirname(
   await prompt(
@@ -217,7 +212,7 @@ const gameAppPath = await prompt(
 const gamePath = dirname(gameAppPath);
 
 log();
-log("This script will now install the macOS BepInEx pack located at:");
+log("gib will now install the macOS BepInEx pack located at:");
 log(pink(bepinexPath));
 log("to the Unity game located at:");
 log(pink(gamePath));
@@ -335,7 +330,7 @@ if (!detectedGame && !detectedBepInEx) {
   );
   error("Unable to verify whether BepInEx is correctly installed.");
   error(
-    "We recommend running this script again, making sure to run the right game.",
+    "We recommend running gib again, making sure to run the right game.",
   );
   Deno.exit(1);
 } else if (!detectedBepInEx) {
@@ -344,16 +339,16 @@ if (!detectedGame && !detectedBepInEx) {
     "Failed to detect BepInEx. Did you forget to set Steam launch options?",
   );
   error(
-    "We recommend running this script again, making sure to pay attention to the",
+    "We recommend running gib again, making sure to pay attention to the section",
   );
-  error("section for setting the launch options for the game in Steam.");
+  error("for setting the launch options for the game in Steam.");
   Deno.exit(1);
 } else {
   log(chalk.green("Successfully detected BepInEx running!"));
   log();
   log("Congratulations, you're now ready to go wild installing mods!");
   log();
-  log("If you found this script helpful, please consider donating:");
+  log("If you found gib helpful, please consider donating:");
   log();
   log(
     "  •",
