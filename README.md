@@ -46,7 +46,7 @@ If you run into any unexpected issues while following these instructions or need
    
    **ℹ️** _These instructions haven't been tested with iTerm2 or other terminal apps. Use the standard terminal if you have problems._
    
-1. Copy the following command, and paste it in your terminal window with `⌘V`, then press `Enter` to run it.
+1. Copy the following command, and paste it in your terminal window with `⌘ V`, then press `Enter` to run it.
    
    ```sh
    curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh && PATH="$HOME/.deno/bin:$PATH" && deno run --allow-env --allow-run=deno,pbcopy,/bin/sh --allow-read --allow-sys=uid --allow-write --reload=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
