@@ -21,7 +21,7 @@ If you run into any unexpected issues while following these instructions or need
    Subnautica BepInEx pack
    ```
    
-   Where available, it is always advised to use a popular pack of BepInEx which has been tailored to the specific game.
+   Where available, it is always advised to use a popular pack of BepInEx which has been tailored to the specific game you're trying to mod.
    
    If you can't find a BepInEx pack for the game, then the latest stable version of BepInEx from their official GitHub repo will do. [You can find it here](https://github.com/BepInEx/BepInEx/releases/latest) - scroll down to the `Assets` section, then download the file with "unix" in the name, e.g. `BepInEx_unix_5.4.22.zip`.
    
