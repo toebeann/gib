@@ -2,7 +2,7 @@
  * This file is a deno script which aims to automate installing BepInEx
  * to a Unity game.
  * 
- * Currently, only macOS is supported, as the process of manual BepInEx
+ * Currently only macOS is supported, as the process of manual BepInEx
  * installation is exceptionally cumbersome on this operating system.
  * 
  * This script aims to automate whatever it can, and hold the user's hand
