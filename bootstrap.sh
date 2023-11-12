@@ -3,7 +3,7 @@
 # Copyright 2023 Tobey Blaber. All rights reserved.
 # TODO: Keep this script simple and easy to audit.
 
-deno_target_version="1.38.0"
+deno_target_version="1.37.2"
 deno_max_version=$(($(echo $deno_target_version | cut -d '.' -f1) + 1))
 
 set -e # exit on err
@@ -49,7 +49,10 @@ if [ $parsed_deno_current_version -lt $parsed_deno_target_version ] || [ $parsed
         case $yn in
         [Yy]*)
             echo "Yes\n"
-            deno upgrade --version "$deno_target_version"
+            set +e
+            deno upgrade --version "$deno_target_version" 2>/dev/null
+            brew upgrade deno 2>/dev/null
+            set -e
             break
             ;;
         [Nn]*)
