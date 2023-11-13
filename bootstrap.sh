@@ -47,7 +47,7 @@ if ! command -v deno >/dev/null; then
     export PATH="${DENO_INSTALL}/bin:${PATH}"
 fi
 
-# deno couldn't be found at expected path, let's just install the latet version
+# deno couldn't be found at expected path, let's just install the latest version
 if ! command -v deno >/dev/null; then
     echo "Installing deno..."
     curl -fsSL https://deno.land/x/install/install.sh | sh >/dev/null
