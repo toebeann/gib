@@ -1,10 +1,10 @@
 /**
  * This file is gib: a deno script which aims to automate installing BepInEx
  * to a Unity game.
- * 
+ *
  * Currently only macOS is supported, as the process of manual BepInEx
  * installation is exceptionally cumbersome on this operating system.
- * 
+ *
  * gib aims to automate whatever it can, and hold the user's hand
  * through whatever it cannot.
  *
@@ -42,7 +42,7 @@
  *
  *****************************************************************************/
 
-const version = "0.0.1";
+const version = "0.0.2";
 
 // --allow-env
 import chalk, { supportsColor } from "npm:chalk";
@@ -72,6 +72,7 @@ log(chalk.gray(new TextDecoder().decode(stdout)));
 log("gib will:");
 log();
 log("  •", chalk.green("install BepInEx to the game folder specified"));
+log("  •", chalk.green("configure the run_bepinex.sh script if needed"));
 log("  •", chalk.green("take care of macOS permissions issues"));
 log(
   "  •",
@@ -113,7 +114,12 @@ log(
   "Additionally, if you don't own the game with Steam, make sure to add it to",
 );
 log("Steam as a non-Steam game. Instructions can be found here:");
-log("  ", chalk.underline("https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam"));
+log(
+  "  ",
+  chalk.underline(
+    "https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam",
+  ),
+);
 
 pressHeartToContinue();
 
@@ -243,6 +249,27 @@ for await (const item of walk(bepinexPath)) {
   await Deno.copyFile(item.path, destination);
 
   if (item.name === "run_bepinex.sh" && dirname(item.path) === bepinexPath) {
+    const bepinexScriptContents = await Deno.readTextFile(destination);
+    let output = bepinexScriptContents;
+
+    // check if line endings are CRLF and fix them if needed
+    if (output.includes("\r\n")) {
+      output = output.replaceAll("\r\n", "\n");
+    }
+
+    // check if the run_bepinex.sh needs to be configured, and configure it
+    if (bepinexScriptContents.includes('\nexecutable_name=""')) {
+      output = output.replace(
+        '\nexecutable_name=""',
+        `\nexecutable_name="${basename(gameAppPath)}"`,
+      );
+    }
+
+    // write the changes, if any
+    if (output !== bepinexScriptContents) {
+      await Deno.writeTextFile(destination, output);
+    }
+
     await Deno.chmod(destination, 0o764);
   }
 }
