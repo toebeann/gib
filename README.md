@@ -1,7 +1,8 @@
 # gib
 
 gib _(tobey's Guided Installer for BepInEx)_ is a deno script for automating the
-installation of BepInEx, the popular modding framework for Unity games.
+installation of [BepInEx](https://github.com/BepInEx/BepInEx), the popular
+modding framework for Unity games.
 
 <img alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/7ce16628-167c-482a-8dc8-4eabaa4a55b2">
 
