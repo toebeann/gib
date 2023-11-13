@@ -3,6 +3,8 @@
 gib _(tobey's Guided Installer for BepInEx)_ is a deno script for automating the
 installation of BepInEx, the popular modding framework for Unity games.
 
+<img alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/7ce16628-167c-482a-8dc8-4eabaa4a55b2">
+
 Currently only macOS is supported, as the process of manual BepInEx installation
 is _exceptionally_ cumbersome on this operating system.
 
@@ -10,6 +12,18 @@ gib aims to automate whatever it can, and hold your hand through whatever it
 cannot.
 
 ## Usage
+
+### TL;DR
+
+Run the following command in Terminal:
+
+```sh
+curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh && PATH="$HOME/.deno/bin:$PATH" && deno run --allow-env --allow-run=deno,pbcopy,/bin/sh --allow-read --allow-sys=uid --allow-write --reload=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
+```
+
+**ℹ️** _This command will make sure that [deno](https://deno.land/) (a JavaScript runtime similar to Node.js) is installed, then run the latest version of gib with it. If you're curious how it all works or want to verify the source code is safe, check [`bootstrap.sh`](https://github.com/toebeann/gib/blob/main/bootstrap.sh) and [`mod.ts`](https://github.com/toebeann/gib/blob/main/mod.ts) for details._
+
+### Walkthrough
 
 **ℹ️ These usage instructions were written for macOS Sonoma. The instructions
 below should work for other versions of macOS, but there may be some slight
@@ -20,7 +34,7 @@ further assistance, please feel free to send a DM on discord to `toebean`
 (that's me) explaining the issue and I'll reply when I remember to check my
 message requests.
 
-### Prerequisites
+#### Prerequisites
 
 1. If you don't own the game on Steam, you'll need to add it to Steam as a
    non-Steam game. Follow
@@ -65,7 +79,7 @@ message requests.
 
    <img width="920" alt="A screenshot of Finder window open at the location of BepInEx's run_bepinex.sh " src="https://github.com/toebeann/gib/assets/45315526/8b961265-2fd2-4017-85fb-2c91369a825f">
 
-### Running gib
+#### Running gib
 
 1. Open Terminal from Launchpad by pressing `⌘ Space`, typing `terminal` and
    pressing `Enter`.
@@ -75,19 +89,8 @@ message requests.
    **ℹ️** _These instructions haven't been tested with iTerm2 or other terminal
    apps. Use the standard terminal if you have problems._
 
-1. Copy the following command, and paste it in your terminal window with `⌘ V`,
+1. Copy the command from the [TL;DR](#tldr) section above and paste it in your terminal window with `⌘ V`,
    then press `Enter` to run it.
-
-   ```sh
-   curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh && PATH="$HOME/.deno/bin:$PATH" && deno run --allow-env --allow-run=deno,pbcopy,/bin/sh --allow-read --allow-sys=uid --allow-write --reload=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
-   ```
-
-   **ℹ️** _This command will make sure that [deno](https://deno.land/) (a JavaScript
-   runtime similar to Node.js) is installed, then run the latest version of gib
-   with it. If you're curious how it all works or want to verify the source code
-   is safe, check
-   [`bootstrap.sh`](https://github.com/toebeann/gib/blob/main/bootstrap.sh) and
-   [`mod.ts`](https://github.com/toebeann/gib/blob/main/mod.ts) for details._
 
    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/7ce16628-167c-482a-8dc8-4eabaa4a55b2">
 
