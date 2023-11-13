@@ -21,8 +21,6 @@ Just run the following command in Terminal:
 curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh && PATH="$HOME/.deno/bin:$PATH" && deno run --allow-env --allow-run=deno,pbcopy,/bin/sh --allow-read --allow-sys=uid --allow-write --reload=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
 ```
 
-**ℹ️** _This command will make sure that [deno](https://deno.land/) (a JavaScript runtime similar to Node.js) is installed, then run the latest version of gib with it. If you're curious how it all works or want to verify the source code is safe, check [`bootstrap.sh`](https://github.com/toebeann/gib/blob/main/bootstrap.sh) and [`mod.ts`](https://github.com/toebeann/gib/blob/main/mod.ts) for details._
-
 If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 ### Walkthrough
@@ -93,6 +91,8 @@ message requests.
 
 1. Copy the command from the [TL;DR](#tldr) section above and paste it in your terminal window with `⌘ V`,
    then press `Enter` to run it.
+
+   **ℹ️** _This command will make sure that [deno](https://deno.land/) (a JavaScript runtime similar to Node.js) is installed, then run the latest version of gib with it. If you're curious how it all works or want to verify the source code is safe, check [`bootstrap.sh`](https://github.com/toebeann/gib/blob/main/bootstrap.sh) and [`mod.ts`](https://github.com/toebeann/gib/blob/main/mod.ts) for details._
 
    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/7ce16628-167c-482a-8dc8-4eabaa4a55b2">
 
