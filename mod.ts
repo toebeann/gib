@@ -151,11 +151,14 @@ import {
   join,
 } from "https://deno.land/std@0.206.0/path/mod.ts";
 
+const copyPath = code("⌥ ⌘ C");
+const paste = code("⌘ V");
+
 const bepinexPath = dirname(
   await prompt(
     `${EOL}  1. Open the Finder window with your copy of BepInEx, find the ${run_bepinex_sh}${EOL}` +
-      `     script, select it and press ⌥⌘C to copy the path to the script file${EOL}${EOL}` +
-      `  2. Press ⌘V here to paste the path, and ${
+      `     script, select it and press ${copyPath} to copy the path${EOL}${EOL}` +
+      `  2. Press ${paste} here to paste the path, and ${
         chalk.yellow("press enter")
       }:`,
     async (value) => {
@@ -186,8 +189,8 @@ const gameAppPath = await prompt(
   `${EOL}  1. Open the Finder window where your Unity game is located, find the app${EOL}` +
     `     (e.g. ${
       code("Subnautica.app")
-    }), select it and press ⌥⌘C to copy the path to the app${EOL}${EOL}` +
-    `  2. Then, press ⌘V here to paste the path, and ${
+    }), select it and press ${copyPath} to copy the path${EOL}${EOL}` +
+    `  2. Then, press ${paste} here to paste the path, and ${
       chalk.yellow("press enter")
     }:`,
   async (value) => {
@@ -290,7 +293,7 @@ log();
 log(
   "  2. Select the",
   chalk.italic("launch options"),
-  "field, and press ⌘V to paste the following line",
+  `field and press ${paste} to paste the following line`,
 );
 log(
   `${
