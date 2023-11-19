@@ -1,5 +1,7 @@
 # gib
 
+[<img alt="Usage statistics for gib from the jsDelivr CDN" src="https://data.jsdelivr.com/v1/package/gh/toebeann/gib/badge">](https://www.jsdelivr.com/package/gh/toebeann/gib?tab=stats)
+
 gib _(tobey's Guided Installer for BepInEx)_ is a deno script for automating the
 installation of [BepInEx](https://github.com/BepInEx/BepInEx), the popular
 modding framework for Unity games.
