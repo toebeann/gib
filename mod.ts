@@ -105,9 +105,6 @@ log(
   ),
 );
 log("  •", chalk.green("test that BepInEx is working"));
-if (supportsColor && supportsColor.has16m) {
-  log("  •", chalk.strikethrough("make you a cup of tea"));
-}
 
 const pressHeartToContinue = (message = "to continue") => {
   log();
