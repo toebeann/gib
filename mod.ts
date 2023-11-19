@@ -18,8 +18,8 @@
  *
  *   curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh &&
  *   PATH="$HOME/.deno/bin:$PATH" && deno run --allow-env
- *   --allow-run=deno,pbcopy,/bin/sh --allow-read --allow-sys=uid --allow-write
- *   --reload=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
+ *   --allow-run=deno,pbcopy,/bin/sh --allow-read --allow-sys=osRelease,uid
+ *   --allow-write --reload=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
  *   https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
  *
  ******************************************************************************
@@ -66,6 +66,7 @@ const { stdout } = await (new Deno.Command("deno", { args: ["--version"] }))
 log(chalk.gray(`gib ${version}`));
 log(chalk.gray(new TextDecoder().decode(stdout)));
 
+// allow-sys=osRelease
 import { platform } from "node:process";
 
 if (platform !== "darwin") {
