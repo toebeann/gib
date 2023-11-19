@@ -66,8 +66,31 @@ const { stdout } = await (new Deno.Command("deno", { args: ["--version"] }))
 log(chalk.gray(`gib ${version}`));
 log(chalk.gray(new TextDecoder().decode(stdout)));
 
-// TODO: warn the user if they're not on macOS
-// currently only macOS is supported
+import { platform } from "node:process";
+
+if (platform !== "darwin") {
+  error(chalk.red("Error:"), "detected platform", chalk.yellow(platform));
+  error("Currently only", chalk.yellow("darwin"), "(macOS) is supported.");
+  log();
+
+  if (platform === "win32") {
+    log(
+      "For automated BepInEx installation on Windows, I recommended Vortex:",
+    );
+    log("  https://www.nexusmods.com/about/vortex/");
+    log();
+  }
+
+  log(
+    "To install BepInEx for other supported platforms, follow the instructions in",
+  );
+  log("the BepInEx documentation:");
+  log(
+    "  https://docs.bepinex.dev/articles/user_guide/installation/index.html",
+  );
+
+  Deno.exit(1);
+}
 
 log("gib will:");
 log();
