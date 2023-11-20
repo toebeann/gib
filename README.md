@@ -6,7 +6,7 @@ gib _(tobey's Guided Installer for BepInEx)_ is a deno script for automating the
 installation of [BepInEx](https://github.com/BepInEx/BepInEx), the popular
 modding framework for Unity games.
 
-<img alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/7ce16628-167c-482a-8dc8-4eabaa4a55b2">
+<img alt="Running gib in the Terminal" src="https://user-images.githubusercontent.com/45315526/284220551-9910e1f7-a841-435b-8473-7bead8b1b006.png">
 
 Currently only macOS is supported, as the process of manual BepInEx installation
 is _exceptionally_ cumbersome on this operating system.
@@ -102,7 +102,7 @@ message requests.
    [`bootstrap.sh`](https://github.com/toebeann/gib/blob/main/bootstrap.sh) and
    [`mod.ts`](https://github.com/toebeann/gib/blob/main/mod.ts) for details._
 
-   <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/7ce16628-167c-482a-8dc8-4eabaa4a55b2">
+   <img width="585" alt="Running gib in the Terminal" src="https://user-images.githubusercontent.com/45315526/284220551-9910e1f7-a841-435b-8473-7bead8b1b006.png">
 
 1. Now, simply follow the instructions in the terminal to install BepInEx to
    your game!
