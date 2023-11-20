@@ -45,7 +45,7 @@
 const version = "0.0.2";
 
 // --allow-env
-import chalk, { supportsColor } from "npm:chalk";
+import chalk, { supportsColor } from "npm:chalk@5";
 
 const pink = chalk.hex("#AE0956");
 const code = supportsColor && supportsColor.has16m
