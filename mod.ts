@@ -18,8 +18,9 @@
  *
  *   curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh &&
  *   PATH="$HOME/.deno/bin:$PATH" && deno run --allow-env
- *   --allow-run=deno,pbcopy,/bin/sh --allow-read --allow-sys=osRelease,uid
- *   --allow-write --reload=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
+ *   --allow-run=deno,pbcopy,/bin/sh,open --allow-read
+ *   --allow-sys=osRelease,uid --allow-write
+ *   --reload=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
  *   https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
  *
  ******************************************************************************
@@ -42,7 +43,7 @@
  *
  *****************************************************************************/
 
-const version = "0.0.3";
+const version = "0.0.4";
 
 // --allow-env
 import chalk from "npm:chalk@5";
@@ -418,6 +419,8 @@ const interval = setInterval(async () => {
   }
 }, 200);
 
+import open from "npm:open@9";
+
 let detectedBepInEx = false;
 for await (const event of watcher) {
   if (
@@ -426,6 +429,10 @@ for await (const event of watcher) {
     event.paths.includes(join(gamePath, "BepInEx", "LogOutput.log"))
   ) {
     detectedBepInEx = true;
+    // --allow-run=open
+    await open("https://github.com/toebeann/gib/?sponsor=1", {
+      background: true,
+    });
   }
 }
 
