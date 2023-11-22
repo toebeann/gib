@@ -84,10 +84,10 @@ message requests.
 
 #### Running gib
 
-1. Open Terminal from Launchpad by pressing `⌘ Space`, typing `terminal` and
-   pressing `Enter`.
+1. Open Terminal from Launchpad or Spotlight (press `⌘ Space`, type `terminal`
+   and press `Enter`).
 
-   <img width="600" alt="Searching for Terminal in macOS Launchpad" src="https://github.com/toebeann/BepInEx.Subnautica/assets/45315526/f374da75-5c74-4b49-99c2-25daa296c504">
+   <img width="600" alt="Searching for Terminal with macOS Spotlight" src="https://github.com/toebeann/BepInEx.Subnautica/assets/45315526/f374da75-5c74-4b49-99c2-25daa296c504">
 
    **ℹ️** _These instructions haven't been tested with iTerm2 or other terminal
    apps. Use the standard terminal if you have problems._
