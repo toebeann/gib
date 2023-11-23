@@ -216,7 +216,7 @@ const prompt = async (
 
   do {
     value = globalThis.prompt(message, defaultValue)?.trim();
-  } while (!value || !(await validator(value)));
+  } while (!value || !await validator(value));
 
   return value;
 };
