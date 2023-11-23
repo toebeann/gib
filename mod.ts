@@ -221,12 +221,12 @@ const prompt = async (
   return value;
 };
 
-import { exists } from "https://deno.land/std@0.206.0/fs/mod.ts";
+import { exists } from "https://deno.land/std@0.207.0/fs/mod.ts";
 import {
   basename,
   dirname,
   join,
-} from "https://deno.land/std@0.206.0/path/mod.ts";
+} from "https://deno.land/std@0.207.0/path/mod.ts";
 
 const copyPath = code("⌥ ⌘ C");
 const paste = code("⌘ V");
@@ -264,7 +264,7 @@ log(
   ),
 );
 
-import { extname } from "https://deno.land/std@0.206.0/path/mod.ts";
+import { extname } from "https://deno.land/std@0.207.0/path/mod.ts";
 
 const gameAppPath = await prompt(
   `${EOL}${
@@ -326,8 +326,8 @@ if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
   Deno.exit(1);
 }
 
-import { ensureDir, walk } from "https://deno.land/std@0.206.0/fs/mod.ts";
-import { sep } from "https://deno.land/std@0.206.0/path/mod.ts";
+import { ensureDir, walk } from "https://deno.land/std@0.207.0/fs/mod.ts";
+import { sep } from "https://deno.land/std@0.207.0/path/mod.ts";
 
 const i = bepinexPath.split(sep).length;
 for await (const item of walk(bepinexPath)) {
