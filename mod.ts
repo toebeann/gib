@@ -43,25 +43,25 @@
  *
  *****************************************************************************/
 
-import { EOL } from "node:os";
-import { platform } from "node:process";
-import { ensureDir } from "https://deno.land/std@0.207.0/fs/ensure_dir.ts";
-import { exists } from "https://deno.land/std@0.207.0/fs/exists.ts";
-import { walk } from "https://deno.land/std@0.207.0/fs/walk.ts";
-import { basename } from "https://deno.land/std@0.207.0/path/basename.ts";
-import { dirname } from "https://deno.land/std@0.207.0/path/dirname.ts";
-import { extname } from "https://deno.land/std@0.207.0/path/extname.ts";
-import { join } from "https://deno.land/std@0.207.0/path/join.ts";
-import { sep } from "https://deno.land/std@0.207.0/path/mod.ts";
-import Clipboard from "https://deno.land/x/clipboard@v0.0.2/mod.ts";
-import chalk from "npm:chalk@5";
-import cliWidth from "npm:cli-width@4";
-import findProcess from "npm:find-process@1";
-import open from "npm:open@9";
-import terminalLink, {
-  Options as TermninalLinkOptions,
-} from "npm:terminal-link@3";
-import wrapAnsi, { Options as WrapOptions } from "npm:wrap-ansi@9";
+import {
+  basename,
+  chalk,
+  Clipboard,
+  cliWidth,
+  dirname,
+  ensureDir,
+  EOL,
+  exists,
+  extname,
+  findProcess,
+  join,
+  open,
+  platform,
+  sep,
+  terminalLink,
+  walk,
+  wrapAnsi,
+} from "./deps.ts";
 
 const version = "0.0.4";
 
@@ -73,7 +73,7 @@ const link = (
   label: string,
   url: string = label,
   short: string = url,
-  options?: TermninalLinkOptions,
+  options?: Parameters<typeof terminalLink>[2],
 ) =>
   terminalLink(label, url, {
     fallback: () => `${label} (\u200B${short}\u200B)`,
@@ -82,8 +82,11 @@ const link = (
 
 const width = () => cliWidth({ defaultWidth: 80 });
 
-const wrap = (str: string, columns = width(), options?: WrapOptions) =>
-  wrapAnsi(str, columns, options);
+const wrap = (
+  str: string,
+  columns = width(),
+  options?: Parameters<typeof wrapAnsi>[2],
+) => wrapAnsi(str, columns, options);
 
 const list = (items: string[], ordered: boolean) => {
   const padding = ordered ? items.length.toString().length + 2 : 3;
