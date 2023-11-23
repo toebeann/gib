@@ -45,33 +45,56 @@
 
 const version = "0.0.4";
 
-// --allow-env
-import chalk from "npm:chalk@5";
-const pink = chalk.hex("#AE0956");
-const code = chalk.bold.yellowBright;
+const [
+  {
+    default: {
+      bold,
+      gray,
+      green,
+      hex,
+      italic,
+      redBright,
+      yellow,
+      yellowBright,
+    },
+  },
+  { default: terminalLink },
+  { default: cliWidth },
+  { default: wrapAnsi },
+  { EOL },
+  { platform },
+] = await Promise.all([
+  import("npm:chalk@5"),
+  import("npm:terminal-link@3"),
+  import("npm:cli-width@4"),
+  import("npm:wrap-ansi@9"),
+  import("node:os"),
+  import("node:process"),
+]);
 
-import terminalLink, {
-  Options as TermninalLinkOptions,
-} from "npm:terminal-link@3";
+// --allow-env
+const pink = hex("#AE0956");
+const code = bold.yellowBright;
+
 const link = (
   label: string,
   url: string = label,
   short: string = url,
-  options?: TermninalLinkOptions,
+  options?: Parameters<typeof terminalLink>[2],
 ) =>
   terminalLink(label, url, {
     fallback: () => `${label} (\u200B${short}\u200B)`,
     ...options,
   });
 
-import cliWidth from "npm:cli-width@4";
 const width = () => cliWidth({ defaultWidth: 80 });
 
-import wrapAnsi, { Options as WrapOptions } from "npm:wrap-ansi@9";
-const wrap = (str: string, columns = width(), options?: WrapOptions) =>
-  wrapAnsi(str, columns, options);
+const wrap = (
+  str: string,
+  columns = width(),
+  options?: Parameters<typeof wrapAnsi>[2],
+) => wrapAnsi(str, columns, options);
 
-import { EOL } from "node:os";
 const list = (items: string[], ordered: boolean) => {
   const padding = ordered ? items.length.toString().length + 2 : 3;
   const indent = ordered ? padding + 2 : 4;
@@ -107,21 +130,17 @@ log();
 // --allow-run=deno
 const { stdout } = await (new Deno.Command("deno", { args: ["--version"] }))
   .output();
-log(chalk.gray(`gib ${version}`));
-log(chalk.gray(new TextDecoder().decode(stdout)));
+log(gray(`gib ${version}`));
+log(gray(new TextDecoder().decode(stdout)));
 
 // allow-sys=osRelease
-import { platform } from "node:process";
-
 if (platform !== "darwin") {
   error(
     wrap(
-      `${chalk.redBright("Error:")} detected platform ${
-        chalk.yellow(platform)
-      }`,
+      `${redBright("Error:")} detected platform ${yellow(platform)}`,
     ),
   );
-  error(wrap(`Currently only ${chalk.yellow("darwin")} (macOS) is supported.`));
+  error(wrap(`Currently only ${yellow("darwin")} (macOS) is supported.`));
   log();
 
   if (platform === "win32") {
@@ -158,19 +177,19 @@ log(wrap("gib will:"));
 log();
 log(
   list([
-    chalk.green("install BepInEx to the game folder specified"),
-    chalk.green(`configure the ${run_bepinex_sh} script if needed`),
-    chalk.green("take care of macOS permissions issues"),
-    chalk.green(
+    green("install BepInEx to the game folder specified"),
+    green(`configure the ${run_bepinex_sh} script if needed`),
+    green("take care of macOS permissions issues"),
+    green(
       "walk you through configuring Steam to launch the game with BepInEx",
     ),
-    chalk.green("test that BepInEx is working"),
+    green("test that BepInEx is working"),
   ], false),
 );
 
 const pressHeartToContinue = (message = "to continue") => {
   log();
-  alert(wrap(chalk.yellowBright(`Press enter ${message}`)));
+  alert(wrap(yellowBright(`Press enter ${message}`)));
   log();
 };
 
@@ -182,7 +201,7 @@ log(
   list([
     "downloaded and unzipped the relevant BepInEx pack for the game to your Downloads folder, with a Finder window open at its location",
     `have a Finder window open at the location of the Unity game, e.g. by clicking ${
-      chalk.italic("Manage -> Browse local files")
+      italic("Manage -> Browse local files")
     } in Steam`,
   ], true),
 );
@@ -221,12 +240,10 @@ const prompt = async (
   return value;
 };
 
-import { exists } from "https://deno.land/std@0.206.0/fs/mod.ts";
-import {
-  basename,
-  dirname,
-  join,
-} from "https://deno.land/std@0.206.0/path/mod.ts";
+const [{ exists }, { basename, dirname, join }] = await Promise.all([
+  import("https://deno.land/std@0.207.0/fs/mod.ts"),
+  import("https://deno.land/std@0.207.0/path/mod.ts"),
+]);
 
 const copyPath = code("⌥ ⌘ C");
 const paste = code("⌘ V");
@@ -237,7 +254,7 @@ const bepinexPath = dirname(
       list([
         `Open the Finder window with your copy of BepInEx, find the ${run_bepinex_sh} script, select it and press ${copyPath} to copy the path to the script file`,
         `Press ${paste} here to paste the path, and ${
-          chalk.yellowBright("press enter")
+          yellowBright("press enter")
         }:`,
       ], true)
     }`,
@@ -264,8 +281,6 @@ log(
   ),
 );
 
-import { extname } from "https://deno.land/std@0.206.0/path/mod.ts";
-
 const gameAppPath = await prompt(
   `${EOL}${
     list([
@@ -273,11 +288,15 @@ const gameAppPath = await prompt(
         code("Subnautica.app")
       }), select it and press ${copyPath} to copy the path to the app`,
       `Then, press ${paste} here to paste the path and ${
-        chalk.yellowBright("press enter")
+        yellowBright("press enter")
       }:`,
     ], true)
   }`,
   async (value) => {
+    const { extname } = await import(
+      "https://deno.land/std@0.207.0/path/mod.ts"
+    );
+
     try {
       // --allow-read --allow-sys=uid
       return extname(value).toLowerCase() === ".app" &&
@@ -312,7 +331,7 @@ log(wrap(pink(gamePath)));
 log();
 log(
   wrap(
-    chalk.yellowBright.bold(
+    yellowBright.bold(
       "This operation will potentially overwrite files in the process.",
     ),
   ),
@@ -321,13 +340,15 @@ log();
 log(wrap("You may be required to grant permission to the Terminal."));
 log();
 
-if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
-  error(chalk.redBright("Error:"), "User cancelled installation.");
+if (!confirm(wrap(yellowBright("Proceed?")))) {
+  error(redBright("Error:"), "User cancelled installation.");
   Deno.exit(1);
 }
 
-import { ensureDir, walk } from "https://deno.land/std@0.206.0/fs/mod.ts";
-import { sep } from "https://deno.land/std@0.206.0/path/mod.ts";
+const [{ ensureDir, walk }, { sep }] = await Promise.all([
+  import("https://deno.land/std@0.207.0/fs/mod.ts"),
+  import("https://deno.land/std@0.207.0/path/mod.ts"),
+]);
 
 const i = bepinexPath.split(sep).length;
 for await (const item of walk(bepinexPath)) {
@@ -363,9 +384,11 @@ for await (const item of walk(bepinexPath)) {
   }
 }
 
-// --allow-run=pbcopy
-import Clipboard from "https://deno.land/x/clipboard@v0.0.2/mod.ts";
 const launchOptions = `"${gamePath}${sep}run_bepinex.sh" %command%`;
+// --allow-run=pbcopy
+const { default: Clipboard } = await import(
+  "https://deno.land/x/clipboard@v0.0.2/mod.ts"
+);
 await Clipboard.writeText(launchOptions);
 
 log();
@@ -374,12 +397,12 @@ log();
 log(
   list([
     `In Steam, right-click the game and click ${
-      chalk.italic("Manage -> Properties...")
+      italic("Manage -> Properties...")
     }`,
     `Select the ${
-      chalk.italic("launch options")
+      italic("launch options")
     } field and press ${paste} to paste the following line${EOL}${
-      chalk.bold("(no need to copy - it's already in your 📋 clipboard!)")
+      bold("(no need to copy - it's already in your 📋 clipboard!)")
     }${EOL}${EOL}${pink(launchOptions)}`,
     "Press escape to close the Steam properties for the game",
   ], true),
@@ -396,7 +419,7 @@ log(
 );
 
 // --allow-run=/bin/sh
-import find from "npm:find-process@1";
+const { default: find } = await import("npm:find-process@1");
 
 const watcher = Deno.watchFs(join(gamePath));
 
@@ -419,7 +442,7 @@ const interval = setInterval(async () => {
   }
 }, 200);
 
-import open from "npm:open@9";
+const { default: open } = await import("npm:open@9");
 
 let detectedBepInEx = false;
 for await (const event of watcher) {
@@ -445,7 +468,7 @@ if (!detectedGame && !detectedBepInEx) {
   error(
     wrap(
       `${
-        chalk.redBright("Error:")
+        redBright("Error:")
       } Timed out waiting for the game to launch. Test cancelled.`,
     ),
   );
@@ -458,7 +481,7 @@ if (!detectedGame && !detectedBepInEx) {
   error(
     wrap(
       `${
-        chalk.redBright("Error:")
+        redBright("Error:")
       } Failed to detect BepInEx. Did you forget to set Steam launch options?`,
     ),
   );
@@ -469,7 +492,7 @@ if (!detectedGame && !detectedBepInEx) {
   );
   Deno.exit(1);
 } else {
-  log(wrap(chalk.green("Successfully detected BepInEx running!")));
+  log(wrap(green("Successfully detected BepInEx running!")));
   log();
   log(wrap("Congratulations, you're now ready to go wild installing mods!"));
   log();
@@ -477,10 +500,10 @@ if (!detectedGame && !detectedBepInEx) {
   log();
   log(
     list([
-      link(chalk.hex("#00457C")("PayPal"), "https://paypal.me/tobeyblaber"),
-      link(chalk.hex("#FF5E5B")("Ko-fi"), "https://ko-fi.com/toebean_"),
+      link(hex("#00457C")("PayPal"), "https://paypal.me/tobeyblaber"),
+      link(hex("#FF5E5B")("Ko-fi"), "https://ko-fi.com/toebean_"),
       link(
-        chalk.hex("#4078c0")("GitHub"),
+        hex("#4078c0")("GitHub"),
         "https://github.com/sponsors/toebeann",
       ),
     ], false),
