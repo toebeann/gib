@@ -43,16 +43,32 @@
  *
  *****************************************************************************/
 
-const version = "0.0.4";
-
-// --allow-env
+import { EOL } from "node:os";
+import { platform } from "node:process";
+import { ensureDir } from "https://deno.land/std@0.207.0/fs/ensure_dir.ts";
+import { exists } from "https://deno.land/std@0.207.0/fs/exists.ts";
+import { walk } from "https://deno.land/std@0.207.0/fs/walk.ts";
+import { basename } from "https://deno.land/std@0.207.0/path/basename.ts";
+import { dirname } from "https://deno.land/std@0.207.0/path/dirname.ts";
+import { extname } from "https://deno.land/std@0.207.0/path/extname.ts";
+import { join } from "https://deno.land/std@0.207.0/path/join.ts";
+import { sep } from "https://deno.land/std@0.207.0/path/mod.ts";
+import Clipboard from "https://deno.land/x/clipboard@v0.0.2/mod.ts";
 import chalk from "npm:chalk@5";
-const pink = chalk.hex("#AE0956");
-const code = chalk.bold.yellowBright;
-
+import cliWidth from "npm:cli-width@4";
+import findProcess from "npm:find-process@1";
+import open from "npm:open@9";
 import terminalLink, {
   Options as TermninalLinkOptions,
 } from "npm:terminal-link@3";
+import wrapAnsi, { Options as WrapOptions } from "npm:wrap-ansi@9";
+
+const version = "0.0.4";
+
+// --allow-env
+const pink = chalk.hex("#AE0956");
+const code = chalk.bold.yellowBright;
+
 const link = (
   label: string,
   url: string = label,
@@ -64,14 +80,11 @@ const link = (
     ...options,
   });
 
-import cliWidth from "npm:cli-width@4";
 const width = () => cliWidth({ defaultWidth: 80 });
 
-import wrapAnsi, { Options as WrapOptions } from "npm:wrap-ansi@9";
 const wrap = (str: string, columns = width(), options?: WrapOptions) =>
   wrapAnsi(str, columns, options);
 
-import { EOL } from "node:os";
 const list = (items: string[], ordered: boolean) => {
   const padding = ordered ? items.length.toString().length + 2 : 3;
   const indent = ordered ? padding + 2 : 4;
@@ -111,8 +124,6 @@ log(chalk.gray(`gib ${version}`));
 log(chalk.gray(new TextDecoder().decode(stdout)));
 
 // allow-sys=osRelease
-import { platform } from "node:process";
-
 if (platform !== "darwin") {
   error(
     wrap(
@@ -221,13 +232,6 @@ const prompt = async (
   return value;
 };
 
-import { exists } from "https://deno.land/std@0.207.0/fs/mod.ts";
-import {
-  basename,
-  dirname,
-  join,
-} from "https://deno.land/std@0.207.0/path/mod.ts";
-
 const copyPath = code("⌥ ⌘ C");
 const paste = code("⌘ V");
 
@@ -263,8 +267,6 @@ log(
     "Next, we need to know the location of the Unity game which you would like to install BepInEx to:",
   ),
 );
-
-import { extname } from "https://deno.land/std@0.207.0/path/mod.ts";
 
 const gameAppPath = await prompt(
   `${EOL}${
@@ -326,9 +328,6 @@ if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
   Deno.exit(1);
 }
 
-import { ensureDir, walk } from "https://deno.land/std@0.207.0/fs/mod.ts";
-import { sep } from "https://deno.land/std@0.207.0/path/mod.ts";
-
 const i = bepinexPath.split(sep).length;
 for await (const item of walk(bepinexPath)) {
   if (item.isDirectory || item.name === ".DS_Store") continue;
@@ -363,9 +362,8 @@ for await (const item of walk(bepinexPath)) {
   }
 }
 
-// --allow-run=pbcopy
-import Clipboard from "https://deno.land/x/clipboard@v0.0.2/mod.ts";
 const launchOptions = `"${gamePath}${sep}run_bepinex.sh" %command%`;
+// --allow-run=pbcopy
 await Clipboard.writeText(launchOptions);
 
 log();
@@ -395,16 +393,14 @@ log(
   ),
 );
 
-// --allow-run=/bin/sh
-import find from "npm:find-process@1";
-
 const watcher = Deno.watchFs(join(gamePath));
 
 let timeout = setTimeout(() => watcher.close(), 300_000);
 
 let running = false, detectedGame = false;
 const interval = setInterval(async () => {
-  const app = await find("name", basename(gameAppPath));
+  // --allow-run=/bin/sh
+  const app = await findProcess("name", basename(gameAppPath));
 
   if (!running && app.length) {
     clearTimeout(timeout);
@@ -418,8 +414,6 @@ const interval = setInterval(async () => {
     watcher.close();
   }
 }, 200);
-
-import open from "npm:open@9";
 
 let detectedBepInEx = false;
 for await (const event of watcher) {
