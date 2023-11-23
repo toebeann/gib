@@ -45,33 +45,45 @@
 
 const version = "0.0.4";
 
+const [
+  { default: chalk },
+  { default: terminalLink },
+  { default: cliWidth },
+  { default: wrapAnsi },
+  { EOL },
+  { platform },
+] = await Promise.all([
+  import("npm:chalk@5"),
+  import("npm:terminal-link@3"),
+  import("npm:cli-width@4"),
+  import("npm:wrap-ansi@9"),
+  import("node:os"),
+  import("node:process"),
+]);
+
 // --allow-env
-import chalk from "npm:chalk@5";
 const pink = chalk.hex("#AE0956");
 const code = chalk.bold.yellowBright;
 
-import terminalLink, {
-  Options as TermninalLinkOptions,
-} from "npm:terminal-link@3";
 const link = (
   label: string,
   url: string = label,
   short: string = url,
-  options?: TermninalLinkOptions,
+  options?: Parameters<typeof terminalLink>[2],
 ) =>
   terminalLink(label, url, {
     fallback: () => `${label} (\u200B${short}\u200B)`,
     ...options,
   });
 
-import cliWidth from "npm:cli-width@4";
 const width = () => cliWidth({ defaultWidth: 80 });
 
-import wrapAnsi, { Options as WrapOptions } from "npm:wrap-ansi@9";
-const wrap = (str: string, columns = width(), options?: WrapOptions) =>
-  wrapAnsi(str, columns, options);
+const wrap = (
+  str: string,
+  columns = width(),
+  options?: Parameters<typeof wrapAnsi>[2],
+) => wrapAnsi(str, columns, options);
 
-import { EOL } from "node:os";
 const list = (items: string[], ordered: boolean) => {
   const padding = ordered ? items.length.toString().length + 2 : 3;
   const indent = ordered ? padding + 2 : 4;
@@ -111,8 +123,6 @@ log(chalk.gray(`gib ${version}`));
 log(chalk.gray(new TextDecoder().decode(stdout)));
 
 // allow-sys=osRelease
-import { platform } from "node:process";
-
 if (platform !== "darwin") {
   error(
     wrap(
@@ -221,12 +231,10 @@ const prompt = async (
   return value;
 };
 
-import { exists } from "https://deno.land/std@0.206.0/fs/mod.ts";
-import {
-  basename,
-  dirname,
-  join,
-} from "https://deno.land/std@0.206.0/path/mod.ts";
+const [{ exists }, { basename, dirname, join }] = await Promise.all([
+  import("https://deno.land/std@0.207.0/fs/mod.ts"),
+  import("https://deno.land/std@0.207.0/path/mod.ts"),
+]);
 
 const copyPath = code("⌥ ⌘ C");
 const paste = code("⌘ V");
@@ -264,8 +272,6 @@ log(
   ),
 );
 
-import { extname } from "https://deno.land/std@0.206.0/path/mod.ts";
-
 const gameAppPath = await prompt(
   `${EOL}${
     list([
@@ -278,6 +284,10 @@ const gameAppPath = await prompt(
     ], true)
   }`,
   async (value) => {
+    const { extname } = await import(
+      "https://deno.land/std@0.207.0/path/mod.ts"
+    );
+
     try {
       // --allow-read --allow-sys=uid
       return extname(value).toLowerCase() === ".app" &&
@@ -326,8 +336,10 @@ if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
   Deno.exit(1);
 }
 
-import { ensureDir, walk } from "https://deno.land/std@0.206.0/fs/mod.ts";
-import { sep } from "https://deno.land/std@0.206.0/path/mod.ts";
+const [{ ensureDir, walk }, { sep }] = await Promise.all([
+  import("https://deno.land/std@0.207.0/fs/mod.ts"),
+  import("https://deno.land/std@0.207.0/path/mod.ts"),
+]);
 
 const i = bepinexPath.split(sep).length;
 for await (const item of walk(bepinexPath)) {
@@ -363,9 +375,11 @@ for await (const item of walk(bepinexPath)) {
   }
 }
 
-// --allow-run=pbcopy
-import Clipboard from "https://deno.land/x/clipboard@v0.0.2/mod.ts";
 const launchOptions = `"${gamePath}${sep}run_bepinex.sh" %command%`;
+// --allow-run=pbcopy
+const { default: Clipboard } = await import(
+  "https://deno.land/x/clipboard@v0.0.2/mod.ts"
+);
 await Clipboard.writeText(launchOptions);
 
 log();
@@ -396,7 +410,7 @@ log(
 );
 
 // --allow-run=/bin/sh
-import find from "npm:find-process@1";
+const { default: find } = await import("npm:find-process@1");
 
 const watcher = Deno.watchFs(join(gamePath));
 
@@ -419,7 +433,7 @@ const interval = setInterval(async () => {
   }
 }, 200);
 
-import open from "npm:open@9";
+const { default: open } = await import("npm:open@9");
 
 let detectedBepInEx = false;
 for await (const event of watcher) {
