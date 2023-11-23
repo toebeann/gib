@@ -55,13 +55,17 @@ import {
   extname,
   findProcess,
   join,
+  match,
   open,
+  P,
   platform,
   sep,
   terminalLink,
   walk,
   wrapAnsi,
 } from "./deps.ts";
+import { hasUnityAppIndicators } from "./unity.ts";
+import { findPlistPath } from "./util.ts";
 
 const version = "0.0.4";
 
@@ -287,21 +291,10 @@ const gameAppPath = await prompt(
       // --allow-read --allow-sys=uid
       return extname(value).toLowerCase() === ".app" &&
         await exists(value, { isDirectory: true, isReadable: true }) &&
-        (await exists(
-          join(value, "Contents", "Frameworks", "UnityPlayer.dylib"),
-          { isFile: true },
-        ) ||
-          await exists(
-            join(
-              value,
-              "Contents",
-              "Resources",
-              "Data",
-              "Managed",
-              "Assembly-CSharp.dll",
-            ),
-            { isFile: true },
-          ));
+        await match(await findPlistPath(value))
+          .returnType<Promise<boolean>>()
+          .with(P.string, (plist) => hasUnityAppIndicators(plist))
+          .otherwise(() => Promise.resolve(false));
     } catch {
       return false;
     }
