@@ -18,7 +18,7 @@
  *
  *   curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh &&
  *   PATH="$HOME/.deno/bin:$PATH" && deno run --allow-env
- *   --allow-run=deno,pbcopy,/bin/sh,open --allow-read
+ *   --allow-run=deno,plutil,pbcopy,/bin/sh,open --allow-read
  *   --allow-sys=osRelease,uid --allow-write
  *   --reload=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
  *   https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
@@ -55,15 +55,19 @@ import {
   extname,
   findProcess,
   join,
+  match,
   open,
+  P,
   platform,
   sep,
   terminalLink,
   walk,
   wrapAnsi,
 } from "./deps.ts";
+import { hasUnityAppIndicators } from "./unity.ts";
+import { findPlistPath } from "./util.ts";
 
-const version = "0.0.4";
+const version = "0.0.5";
 
 // --allow-env
 const pink = chalk.hex("#AE0956");
@@ -284,24 +288,13 @@ const gameAppPath = await prompt(
   }`,
   async (value) => {
     try {
-      // --allow-read --allow-sys=uid
+      // --allow-read --allow-sys=uid --allow-run=plutil
       return extname(value).toLowerCase() === ".app" &&
         await exists(value, { isDirectory: true, isReadable: true }) &&
-        (await exists(
-          join(value, "Contents", "Frameworks", "UnityPlayer.dylib"),
-          { isFile: true },
-        ) ||
-          await exists(
-            join(
-              value,
-              "Contents",
-              "Resources",
-              "Data",
-              "Managed",
-              "Assembly-CSharp.dll",
-            ),
-            { isFile: true },
-          ));
+        await match(await findPlistPath(value))
+          .returnType<Promise<boolean>>()
+          .with(P.string, (plist) => hasUnityAppIndicators(plist))
+          .otherwise(() => Promise.resolve(false));
     } catch {
       return false;
     }
