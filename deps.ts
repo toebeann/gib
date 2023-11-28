@@ -17,4 +17,9 @@ export { default as findProcess } from "npm:find-process@1";
 export { default as open } from "npm:open@9";
 export { default as terminalLink } from "npm:terminal-link@3";
 export { match, P } from "npm:ts-pattern@5";
+export {
+  parse as parseVdf,
+  stringify as stringifyVdf,
+} from "npm:@node-steam/vdf@2";
 export { default as wrapAnsi } from "npm:wrap-ansi@9";
+export { z } from "npm:zod@3";

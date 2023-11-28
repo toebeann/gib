@@ -3,10 +3,12 @@ import {
   dirname,
   exists,
   extname,
+  homedir,
   join,
   match,
   P,
   resolve,
+  z,
 } from "./deps.ts";
 
 const plistBasename = "Info.plist";
@@ -82,17 +84,66 @@ export const getApps = async function* (path: string) {
  * array.
  * @returns A new Promise.
  */
-export const booleanRace = (values: Promise<boolean>[], n = 1) => {
+export const booleanRace = <T>(values: Promise<T>[], n = 1) => {
   let i = 0;
   return Promise.race([
     ...values.map((p) =>
-      new Promise<boolean>((resolve, reject) =>
+      new Promise<T>((resolve, reject) =>
         p.then(
-          (v) => v && ++i >= Math.min(n, values.length) && resolve(true),
+          (v) => !!v && ++i >= Math.min(n, values.length) && resolve(v),
           reject,
         )
       )
     ),
-    Promise.all(values).then(() => false),
+    Promise.all(values).then(() => false as const),
   ]);
 };
+
+export const launchServicesSecureSchema = z.object({
+  LSHandlerURLScheme: z.string().optional(),
+}).passthrough().array();
+
+/**
+ * Determines whether a handler for a given protocol is registered.
+ *
+ * Checks the launch services registered in
+ * `$HOME/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist`
+ * first, and if not found there falls back checking with `open`, which opens
+ * the handler for the given protocol in the background if one is registered.
+ *
+ * Requires permissions:
+ * - `allow-env=HOME`
+ * - `allow-run=plutil,open`
+ *
+ * @param protocol The protocol to check for.
+ */
+export const isProtocolHandlerRegistered = async (protocol: string) =>
+  match(
+    await new Deno.Command("plutil", {
+      args: [
+        "-convert",
+        "json",
+        "-o",
+        "-",
+        join(
+          homedir(),
+          "Library",
+          "Preferences",
+          "com.apple.LaunchServices",
+          "com.apple.launchservices.secure.plist",
+        ),
+      ],
+    }).output(),
+  )
+    .returnType<boolean | Promise<boolean>>()
+    .when(({ success, stdout }) =>
+      !success ||
+      !launchServicesSecureSchema.parse(
+        JSON.parse(new TextDecoder().decode(stdout)),
+      ).map((entry) => entry.LSHandlerURLScheme).filter(Boolean).includes(
+        protocol,
+      ), async () =>
+      (await new Deno.Command("open", {
+        args: ["--background", `${protocol}://`],
+      }).output()).success)
+    .otherwise(() => true);
