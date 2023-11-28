@@ -1,4 +1,5 @@
-export { EOL } from "node:os";
+import "npm:@total-typescript/ts-reset@0";
+export { EOL, homedir } from "node:os";
 export { platform } from "node:process";
 export { ensureDir } from "https://deno.land/std@0.207.0/fs/ensure_dir.ts";
 export { exists } from "https://deno.land/std@0.207.0/fs/exists.ts";
