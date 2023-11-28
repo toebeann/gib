@@ -256,7 +256,7 @@ const bepinexPath = dirname(
         // --allow-read --allow-sys=uid
         return basename(value).toLowerCase() == "run_bepinex.sh" &&
           await exists(value, { isFile: true, isReadable: true }) &&
-          await exists(join(dirname(value), "doorstop_libs"), {
+          await exists(join(value, "..", "doorstop_libs"), {
             isDirectory: true,
             isReadable: true,
           });
