@@ -64,7 +64,7 @@ export const appManifestSchema = z.object({
     AutoUpdateBehavior: z.number().optional(),
     AllowOtherDownloadsWhileRunning: z.number().optional(),
     ScheduledAutoUpdate: z.number().optional(),
-    SharedDepots: z.record(z.string()).optional(),
+    SharedDepots: z.record(z.union([z.string(), z.number()])).optional(),
     InstalledDepots: z.record(
       z.object({
         manifest: z.number().optional(),
