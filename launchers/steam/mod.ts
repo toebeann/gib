@@ -202,11 +202,14 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
    */
   async *getApps() {
     for (const folder of await this.getLibraryfolders()) {
-      const appManifestPaths = Object.keys(folder.apps).map((id) =>
-        join(folder.path, "steamapps", `appmanifest_${id}.acf`)
-      );
+      const folderPath = join(folder.path, "steamapps");
+      for await (const entry of Deno.readDir(folderPath)) {
+        if (
+          !entry.name.startsWith("appmanifest_") ||
+          extname(entry.name) !== ".acf"
+        ) continue;
 
-      for (const manifestPath of appManifestPaths) {
+        const manifestPath = join(folderPath, entry.name);
         try {
           yield new SteamApp(
             this,
