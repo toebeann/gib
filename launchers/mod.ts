@@ -45,9 +45,7 @@ export interface Launcher<
    * Gets information about apps which are installed on this computer and
    * managed by the launcher.
    */
-  getApps():
-    | Promise<App<Launcher<TManifest>, TManifest>[]>
-    | AsyncGenerator<App<Launcher<TManifest>, TManifest>>;
+  getApps(): AsyncGenerator<App<Launcher<TManifest>, TManifest>, void>;
 
   /**
    * Gets information about a specific app installed on this computer and
