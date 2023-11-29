@@ -1,10 +1,13 @@
+/** An app data manifest. */
+export type AppManifest = Record<string, unknown> | undefined;
+
 /**
  * An abstraction for working with an app/game, managed by a launcher and
  * installed on this computer.
  */
 export interface App<
   TLauncher extends Launcher<TManifest>,
-  TManifest extends Record<string, unknown> | undefined = undefined,
+  TManifest extends AppManifest = undefined,
 > {
   /** An id which identifies the app with its launcher. */
   readonly id: string;
@@ -30,7 +33,7 @@ export interface App<
  * e.g. Steam, Epic Games Launcher, etc.
  */
 export interface Launcher<
-  TManifest extends Record<string, unknown> | undefined = undefined,
+  TManifest extends AppManifest = undefined,
 > {
   /** The name of the launcher. */
   readonly name: string;
