@@ -99,9 +99,24 @@ export const booleanRace = <T>(values: Promise<T>[], n = 1) => {
   ]);
 };
 
-export const launchServicesSecureSchema = z.object({
+const launchServicesHandlersSchema = z.object({
   LSHandlerURLScheme: z.string().optional(),
 }).passthrough().array();
+
+export const launchServicesSecureSchema = z.union([
+  launchServicesHandlersSchema,
+  z.object({
+    LSHandlers: launchServicesHandlersSchema,
+  }).passthrough(),
+]);
+
+const parseLaunchServices = (
+  launchServices: z.infer<typeof launchServicesSecureSchema>,
+) =>
+  match(launchServices)
+    .returnType<z.infer<typeof launchServicesHandlersSchema>>()
+    .with(P.array(), (launchServices) => launchServices)
+    .otherwise((obj) => obj.LSHandlers);
 
 /**
  * Determines whether a handler for a given protocol is registered.
@@ -136,13 +151,19 @@ export const isProtocolHandlerRegistered = async (protocol: string) =>
     }).output(),
   )
     .returnType<boolean | Promise<boolean>>()
-    .when(({ success, stdout }) =>
-      !success ||
-      !launchServicesSecureSchema.parse(
-        JSON.parse(new TextDecoder().decode(stdout)),
-      ).map((entry) => entry.LSHandlerURLScheme).filter(Boolean).includes(
-        protocol,
-      ), async () =>
+    .when(({ success, stdout }) => {
+      try {
+        return !success ||
+          !(parseLaunchServices(launchServicesSecureSchema.parse(
+            JSON.parse(new TextDecoder().decode(stdout)),
+          ))
+            .map((entry) => entry.LSHandlerURLScheme)
+            .filter(Boolean)
+            .includes(protocol));
+      } catch {
+        return true;
+      }
+    }, async () =>
       (await new Deno.Command("open", {
         args: ["--background", `${protocol}://`],
       }).output()).success)
