@@ -82,9 +82,12 @@ export class EpicGamesApp
   /**
    * @param launcher The launcher which manages the app.
    * @param manifest The data manifest the launcher holds about the app.
-   * @param id The ArtifactId or AppName of the app.
-   * @param name The DisplayName of the app.
-   * @param path The InstallLocation of the app.
+   * @param [id=manifest.ArtifactId ?? manifest.AppName] The ArtifactId or
+   * AppName of the app.
+   * @param [name=manifest.DisplayName] The DisplayName of the app.
+   * @param [path=manifest.InstallLocation] The InstallLocation of the app.
+   * @param [fullyInstalled=manifest.bIsIncompleteInstall !== true] Whether the
+   * app is fully installed.
    */
   constructor(
     public launcher: EpicGamesLauncher,
@@ -92,6 +95,7 @@ export class EpicGamesApp
     public id = manifest.ArtifactId ?? manifest.AppName,
     public name = manifest.DisplayName,
     public path = manifest.InstallLocation,
+    public fullyInstalled = manifest.bIsIncompleteInstall !== true,
   ) {}
 
   /**

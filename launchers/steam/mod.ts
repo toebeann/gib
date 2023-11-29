@@ -98,9 +98,9 @@ export class SteamApp implements App<SteamLauncher, SteamAppManifest> {
    * @param launcher The launcher which manages the app.
    * @param manifest The data manifest the launcher holds about the app.
    * @param manifestPath The path to the manifest on disk.
-   * @param id The Steam app id of the app.
-   * @param name The display name of the app.
-   * @param path The path to the folder where the app is installed on disk.
+   * @param [id=manifest.AppState.appid.toString()] The Steam app id of the app.
+   * @param [name=manifest.AppState.name] The display name of the app.
+   * @param [path] The path to the folder where the app is installed on disk.
    */
   constructor(
     public readonly launcher: SteamLauncher,
@@ -124,6 +124,10 @@ export class SteamApp implements App<SteamLauncher, SteamAppManifest> {
    */
   hasState = (state: SteamAppState) =>
     (this.manifest.AppState.StateFlags & state) === state;
+
+  get fullyInstalled() {
+    return this.hasState(SteamAppState.FullyInstalled);
+  }
 
   /**
    * Launches the app with Steam.

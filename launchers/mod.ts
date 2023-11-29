@@ -24,6 +24,9 @@ export interface App<
   /** The data manifest the launcher holds about the app. */
   readonly manifest: TManifest;
 
+  /** Whether the app is fully installed. */
+  readonly fullyInstalled?: boolean;
+
   /** Launches the app with its launcher. */
   launch?(): Promise<void>;
 }
