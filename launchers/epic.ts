@@ -1,6 +1,6 @@
-import { basename, extname, homedir, join, match, P, z } from "../../deps.ts";
-import { isProtocolHandlerRegistered } from "../../util.ts";
-import { App, Launcher } from "../mod.ts";
+import { basename, extname, homedir, join, match, P, z } from "../deps.ts";
+import { isProtocolHandlerRegistered } from "../util.ts";
+import { App, Launcher } from "./mod.ts";
 
 /**
  * Zod schema for working with the Epic Games Launcher's

@@ -7,9 +7,9 @@ import {
   P,
   parseVdf,
   z,
-} from "../../deps.ts";
-import { App, Launcher } from "../mod.ts";
-import { booleanRace, isProtocolHandlerRegistered } from "../../util.ts";
+} from "../deps.ts";
+import { booleanRace, isProtocolHandlerRegistered } from "../util.ts";
+import { App, Launcher } from "./mod.ts";
 
 /** State flags used in Steam's app manifest files. */
 export enum SteamAppState {
