@@ -79,7 +79,7 @@ const link = (
   options?: Parameters<typeof terminalLink>[2],
 ) =>
   terminalLink(label, url, {
-    fallback: () => `${label} (\u200B${short}\u200B)`,
+    fallback: () => `${label} [ ${short} ]`,
     ...options,
   });
 
