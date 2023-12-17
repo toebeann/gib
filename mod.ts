@@ -44,7 +44,12 @@
 
 import {
   basename,
-  chalk,
+  blue,
+  bold,
+  brightBlue,
+  brightMagenta,
+  brightRed,
+  brightYellow,
   Clipboard,
   cliWidth,
   dirname,
@@ -53,24 +58,42 @@ import {
   exists,
   extname,
   findProcess,
+  green,
+  italic,
   join,
+  magenta,
   match,
   open,
   P,
   platform,
+  reset,
+  rgb24,
+  rgb8,
   sep,
+  supportsColor,
   terminalLink,
   walk,
   wrapAnsi,
-} from "./deps.ts";
-import { hasUnityAppIndicators } from "./unity.ts";
-import { findPlistPath } from "./util.ts";
-
-const version = "0.0.5";
+  yellow,
+} from "./src/deps.ts";
+import { renderLogo } from "./src/cli/renderLogo.ts";
+import { findPlistPath } from "./src/utils/findPlistPath.ts";
+import { hasUnityAppIndicators } from "./src/unity/hasUnityAppIndicators.ts";
 
 // --allow-env
-const pink = chalk.hex("#AE0956");
-const code = chalk.bold.yellowBright;
+const pink = match(supportsColor.stdout)
+  .returnType<(str: string) => string>()
+  .with(
+    { has16m: true },
+    () => (str: string) => `${rgb24(str, 0xae0956)}${reset("")}`,
+  )
+  .with(
+    { has256: true },
+    () => (str: string) => `${rgb8(str, 125)}${reset("")}`,
+  )
+  .otherwise(() => brightMagenta);
+
+const code = brightYellow;
 
 const link = (
   label: string,
@@ -113,32 +136,16 @@ const list = (items: string[], ordered: boolean) => {
 
 const { error, log } = console;
 
-log();
-if (width() > 40) {
-  log(pink("/======================================\\"));
-  log(pink("| tobey's Guided Installer for BepInEx |"));
-  log(pink("\\======================================/"));
-} else {
-  log(wrap(pink("tobey's Guided Installer for BepInEx")));
-}
-log();
-
-// --allow-run=deno
-const { stdout } = await (new Deno.Command("deno", { args: ["--version"] }))
-  .output();
-log(chalk.gray(`gib ${version}`));
-log(chalk.gray(new TextDecoder().decode(stdout)));
+await renderLogo();
 
 // allow-sys=osRelease
 if (platform !== "darwin") {
   error(
     wrap(
-      `${chalk.redBright("Error:")} detected platform ${
-        chalk.yellow(platform)
-      }`,
+      `${brightRed("Error:")} detected platform ${yellow(platform)}`,
     ),
   );
-  error(wrap(`Currently only ${chalk.yellow("darwin")} (macOS) is supported.`));
+  error(wrap(`Currently only ${yellow("darwin")} (macOS) is supported.`));
   log();
 
   if (platform === "win32") {
@@ -172,22 +179,20 @@ if (platform !== "darwin") {
 
 const run_bepinex_sh = code("run_bepinex.sh");
 log(wrap("gib will:"));
-log();
+if (width() < 40) log();
 log(
   list([
-    chalk.green("install BepInEx to the game folder specified"),
-    chalk.green(`configure the ${run_bepinex_sh} script if needed`),
-    chalk.green("take care of macOS permissions issues"),
-    chalk.green(
+    green("install and configure BepInEx for a compatible game"),
+    green(
       "walk you through configuring Steam to launch the game with BepInEx",
     ),
-    chalk.green("test that BepInEx is working"),
+    green("test that BepInEx is working"),
   ], false),
 );
 
 const pressHeartToContinue = (message = "to continue") => {
   log();
-  alert(wrap(chalk.yellowBright(`Press enter ${message}`)));
+  alert(wrap(brightYellow(`Press enter ${message}`)));
   log();
 };
 
@@ -199,7 +204,7 @@ log(
   list([
     "downloaded and unzipped the relevant BepInEx pack for the game to your Downloads folder, with a Finder window open at its location",
     `have a Finder window open at the location of the Unity game, e.g. by clicking ${
-      chalk.italic("Manage -> Browse local files")
+      italic("Manage -> Browse local files")
     } in Steam`,
   ], true),
 );
@@ -247,7 +252,7 @@ const bepinexPath = dirname(
       list([
         `Open the Finder window with your copy of BepInEx, find the ${run_bepinex_sh} script, select it and press ${copyPath} to copy the path to the script file`,
         `Press ${paste} here to paste the path, and ${
-          chalk.yellowBright("press enter")
+          brightYellow("press enter")
         }:`,
       ], true)
     }`,
@@ -281,7 +286,7 @@ const gameAppPath = await prompt(
         code("Subnautica.app")
       }), select it and press ${copyPath} to copy the path to the app`,
       `Then, press ${paste} here to paste the path and ${
-        chalk.yellowBright("press enter")
+        brightYellow("press enter")
       }:`,
     ], true)
   }`,
@@ -309,8 +314,10 @@ log(wrap(pink(gamePath)));
 log();
 log(
   wrap(
-    chalk.yellowBright.bold(
-      "This operation will potentially overwrite files in the process.",
+    bold(
+      brightYellow(
+        "This operation will potentially overwrite files in the process.",
+      ),
     ),
   ),
 );
@@ -318,8 +325,8 @@ log();
 log(wrap("You may be required to grant permission to the Terminal."));
 log();
 
-if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
-  error(chalk.redBright("Error:"), "User cancelled installation.");
+if (!confirm(wrap(brightYellow("Proceed?")))) {
+  error(brightRed("Error:"), "User cancelled installation.");
   Deno.exit(1);
 }
 
@@ -367,12 +374,12 @@ log();
 log(
   list([
     `In Steam, right-click the game and click ${
-      chalk.italic("Manage -> Properties...")
+      italic("Manage -> Properties...")
     }`,
     `Select the ${
-      chalk.italic("launch options")
+      italic("launch options")
     } field and press ${paste} to paste the following line${EOL}${
-      chalk.bold("(no need to copy - it's already in your 📋 clipboard!)")
+      bold("(no need to copy - it's already in your 📋 clipboard!)")
     }${EOL}${EOL}${pink(launchOptions)}`,
     "Press escape to close the Steam properties for the game",
   ], true),
@@ -434,7 +441,7 @@ if (!detectedGame && !detectedBepInEx) {
   error(
     wrap(
       `${
-        chalk.redBright("Error:")
+        brightRed("Error:")
       } Timed out waiting for the game to launch. Test cancelled.`,
     ),
   );
@@ -447,7 +454,7 @@ if (!detectedGame && !detectedBepInEx) {
   error(
     wrap(
       `${
-        chalk.redBright("Error:")
+        brightRed("Error:")
       } Failed to detect BepInEx. Did you forget to set Steam launch options?`,
     ),
   );
@@ -458,7 +465,7 @@ if (!detectedGame && !detectedBepInEx) {
   );
   Deno.exit(1);
 } else {
-  log(wrap(chalk.green("Successfully detected BepInEx running!")));
+  log(wrap(green("Successfully detected BepInEx running!")));
   log();
   log(wrap("Congratulations, you're now ready to go wild installing mods!"));
   log();
@@ -466,10 +473,34 @@ if (!detectedGame && !detectedBepInEx) {
   log();
   log(
     list([
-      link(chalk.hex("#00457C")("PayPal"), "https://paypal.me/tobeyblaber"),
-      link(chalk.hex("#FF5E5B")("Ko-fi"), "https://ko-fi.com/toebean_"),
       link(
-        chalk.hex("#4078c0")("GitHub"),
+        match(supportsColor.stdout).returnType<string>()
+          .with(
+            { has16m: true },
+            () => `${rgb24("PayPal", 0x00457C)}${reset("")}`,
+          )
+          .with({ has256: true }, () => `${rgb8("PayPal", 18)}${reset("")}`)
+          .otherwise(() => blue("PayPal")),
+        "https://paypal.me/tobeyblaber",
+      ),
+      link(
+        match(supportsColor.stdout).returnType<string>()
+          .with(
+            { has16m: true },
+            () => `${rgb24("Ko-fi", 0xff5e5b)}${reset("")}`,
+          )
+          .with({ has256: true }, () => `${rgb8("Ko-fi", 167)}${reset("")}`)
+          .otherwise(() => magenta("Ko-fi")),
+        "https://ko-fi.com/toebean_",
+      ),
+      link(
+        match(supportsColor.stdout).returnType<string>()
+          .with(
+            { has16m: true },
+            () => `${rgb24("GitHub", 0x4078c0)}${reset("")}`,
+          )
+          .with({ has256: true }, () => `${rgb8("GitHub", 75)}${reset("")}`)
+          .otherwise(() => brightBlue("GitHub")),
         "https://github.com/sponsors/toebeann",
       ),
     ], false),
