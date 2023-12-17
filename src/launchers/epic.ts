@@ -1,5 +1,5 @@
 import { basename, extname, homedir, join, match, P, z } from "../deps.ts";
-import { isProtocolHandlerRegistered } from "../util.ts";
+import { isProtocolHandlerRegistered } from "../utils/isProtocolHandlerRegistered.ts";
 import { App, Launcher } from "./mod.ts";
 
 /**
