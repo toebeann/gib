@@ -17,10 +17,9 @@
  * Recommended command to run gib:
  *
  *   curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh &&
- *   PATH="$HOME/.deno/bin:$PATH" && deno run --allow-env
- *   --allow-run=deno,plutil,pbcopy,/bin/sh,open --allow-read
- *   --allow-sys=osRelease,uid --allow-write
- *   --reload https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
+ *   PATH="$HOME/.deno/bin:$PATH" && deno run
+ *   -Ar=https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
+ *   https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
  *
  ******************************************************************************
  *
