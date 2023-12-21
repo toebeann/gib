@@ -45,11 +45,12 @@ message requests.
    if you're unsure how.
 
 - You'll want a Finder window open at the folder where the game is installed.
-
-   - If you own the game on Steam (i.e. you _didn't_ add the game to Steam as a
+  
+  - If you own the game on Steam (i.e. you _didn't_ add the game to Steam as a
      non-Steam game), find the game in your library, then right-click it and
      select `Manage` -> `Browse local files`.
-   - For the Epic Games Launcher, find the game in your library, then
+  
+  - For the Epic Games Launcher, find the game in your library, then
      right-click it and select `Manage`. In the window that opens, look for the
      folder icon and click it.
 
