@@ -39,12 +39,12 @@ message requests.
 
 #### Prerequisites
 
-1. If you don't own the game on Steam, you'll need to add it to Steam as a
+- If you don't own the game on Steam, you'll need to add it to Steam as a
    non-Steam game. Follow
    [the guide to add a non-Steam game to Steam](https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam)
    if you're unsure how.
 
-1. You'll want a Finder window open at the folder where the game is installed.
+- You'll want a Finder window open at the folder where the game is installed.
 
    - If you own the game on Steam (i.e. you _didn't_ add the game to Steam as a
      non-Steam game), find the game in your library, then right-click it and
@@ -53,7 +53,7 @@ message requests.
      right-click it and select `Manage`. In the window that opens, look for the
      folder icon and click it.
 
-1. You'll want a copy of BepInEx downloaded and unzipped in your Downloads
+- You'll want a copy of BepInEx downloaded and unzipped in your Downloads
    folder.
 
    If you're unsure where to get BepInEx from, try a Google search for
