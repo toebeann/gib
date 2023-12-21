@@ -130,7 +130,7 @@ message requests.
 
 ## Known issues
 
-- If the shell script to launch BepInEx is not named `run_bepinex.sh`, gib will not recognise it. I plan to fix this in an update. In the meantime, you can workaround this by renaming the shell script to `run_bepinex.sh` as needed.
+- If the shell script to launch BepInEx is named something other than `run_bepinex.sh` (e.g. `start_game_bepinex.sh`), gib will not recognise it. I plan to fix this in an update. In the meantime, you can workaround this by renaming the shell script to `run_bepinex.sh` as needed.
 
 ## License
 
