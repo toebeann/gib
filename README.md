@@ -116,6 +116,22 @@ further assistance, please feel free to send a DM on discord to `toebean`
 (that's me) explaining the issue and I'll reply when I remember to check my
 message requests.
 
+## Caveats
+
+- Only native macOS applications are currently supported.
+  
+  - Support for Windows apps on macOS (e.g. via CrossOver or Wine) is being considered.
+  
+  - Support for other operating systems is being considered.
+
+- Only BepInEx 5 is currently supported. Support for BepInEx 6 is being considered.
+
+- I have not personally tested gib on Apple silicon, i.e. M1, M2, M3 etc., but it should work as long as the BepInEx pack you're downloading is compatible with Apple silicon.
+
+## Known issues
+
+- If the shell script to launch BepInEx is not named `run_bepinex.sh`, gib will not recognise it. I plan to fix this in an update. In the meantime, you can workaround this by renaming the shell script to `run_bepinex.sh` as needed.
+
 ## License
 
 gib is licensed under the
