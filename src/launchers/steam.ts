@@ -204,7 +204,6 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
             ),
             manifestPath,
           );
-          // deno-lint-ignore no-empty
         } catch {}
       }
     }
