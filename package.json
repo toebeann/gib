@@ -3,11 +3,14 @@
   "name": "gib",
   "version": "0.1.0",
   "description": "",
-  "main": "./src/index.js",
   "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "update": "pnpm -s dlx degit --force toebeann/gib#node ~/.gib",
+    "launch": "pnpm -s dlx tsx src/index.ts"
+  },
   "devDependencies": {
     "@deno/shim-prompts": "^0.1.1",
     "@node-steam/vdf": "^2.2.0",

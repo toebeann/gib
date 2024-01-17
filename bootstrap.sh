@@ -46,5 +46,10 @@ if ! command -v pnpm >/dev/null; then
 fi
 
 # ensure node v20 is in use
-echo "Initiating node v20..."
+echo "Preparing node..."
 pnpm env use --global 20 >/dev/null
+
+# ensuring gib is up-to-date
+echo "Loading gib..."
+pnpm -C ~/.gib update >/dev/null
+pnpm -C ~/.gib install >/dev/null
