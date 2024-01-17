@@ -1,13 +1,6 @@
-import {
-  basename,
-  dirname,
-  exists,
-  extname,
-  join,
-  match,
-  P,
-  resolve,
-} from "../deps.ts";
+import { access, constants, realpath, stat } from "node:fs/promises";
+import { basename, dirname, extname, join, resolve } from "node:path";
+import { booleanRace } from "./booleanRace.js";
 
 export const plistBasename = "Info.plist";
 export const plistDirname = "Contents";
@@ -15,31 +8,31 @@ export const plistDirname = "Contents";
 /**
  * Attempts to find the path to the `Info.plist` file of a macOS Application.
  *
- * Requires `allow-read` permission.
- *
  * @param path The path to search in.
  * @returns The absolute path to the `Info.plist` file if found, otherwise
  * `undefined`
  */
 
-export const findPlistPath = (
+export const findPlistPath = async (
   path: string,
-): Promise<string | void> =>
-  match([resolve(path), basename(dirname(path)), basename(path)])
-    .returnType<Promise<string | void>>()
-    .with(
-      [P._, plistDirname, plistBasename],
-      ([p]) => exists(p, { isFile: true, isReadable: true }),
-      ([p]) => Deno.realPath(p),
-    )
-    .with(
-      [P._, P._, plistDirname],
-      async ([p]) =>
-        (await findPlistPath(join(p, plistBasename))) ??
-          findPlistPath(join(p, "..")),
-    )
-    .with(
-      [P._, P._, P.when((base) => extname(base.toLowerCase()) === ".app")],
-      ([p]) => findPlistPath(join(p, plistDirname)),
-    )
-    .otherwise(() => Promise.resolve());
+): Promise<string | void> => {
+  const resolved = resolve(path);
+  const dir = basename(dirname(resolved));
+  const base = basename(resolved);
+
+  if (
+    dir === plistDirname &&
+    base === plistBasename &&
+    await booleanRace([
+      access(resolved, constants.R_OK).then(() => true).catch(() => false),
+      stat(resolved).then((stats) => stats.isFile()).catch(() => false),
+    ])
+  ) {
+    return realpath(resolved);
+  } else if (base === plistDirname) {
+    return await findPlistPath(join(resolved, plistBasename)) ??
+      findPlistPath(join(resolved, ".."));
+  } else if (extname(base.toLowerCase()) === ".app") {
+    return findPlistPath(join(resolved, plistDirname, plistBasename));
+  }
+};

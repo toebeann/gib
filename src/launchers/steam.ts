@@ -1,16 +1,15 @@
-import {
-  basename,
-  extname,
-  homedir,
-  join,
-  match,
-  P,
-  parseVdf,
-  z,
-} from "../deps.ts";
-import { booleanRace } from "../utils/booleanRace.ts";
-import { isProtocolHandlerRegistered } from "../utils/isProtocolHandlerRegistered.ts";
-import { App, Launcher } from "./mod.ts";
+import { realpath } from "node:fs/promises";
+import { basename, join } from "node:path";
+import { homedir } from "node:os";
+import { Glob } from "glob";
+import { match, P } from "ts-pattern";
+import { parse } from "@node-steam/vdf";
+import { z } from "zod";
+import { booleanRace } from "../utils/booleanRace.js";
+import { exec } from "../fs/exec.js";
+import { isProtocolHandlerRegistered } from "../utils/isProtocolHandlerRegistered.js";
+import type { App, Launcher } from "./index.js";
+import { readFile } from "node:fs/promises";
 
 /** State flags used in Steam's app manifest files. */
 export enum SteamAppState {
@@ -132,8 +131,6 @@ export class SteamApp implements App<SteamLauncher, SteamAppManifest> {
 
   /**
    * Launches the app with Steam.
-   *
-   * Requires `allow-run=open` permission.
    */
   launch = () => this.launcher.launch(this);
 }
@@ -163,14 +160,9 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
   /**
    * Gets information about Steam Library folders on this computer, parsed from
    * Steam's `libraryfolders.vdf` file.
-   *
-   * Requires permmissions:
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Steam/config/libraryfolders.vdf"`
    */
   private getLibraryfolders = () =>
-    Deno.readTextFile(
+    readFile(
       join(
         homedir(),
         "Library",
@@ -179,43 +171,36 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
         "config",
         "libraryfolders.vdf",
       ),
+      { encoding: "utf8" },
     ).then((text) =>
-      Object.values(libraryfoldersSchema.parse(parseVdf(text)).libraryfolders)
+      Object.values(libraryfoldersSchema.parse(parse(text)).libraryfolders)
     );
 
   /**
    * Determines whether Steam appears to be installed by checking for a
    * `steam://` protocol handler. May open Steam in the background if it is
    * installed.
-   *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-run=plutil,open`
    */
   isInstalled = () => isProtocolHandlerRegistered("steam");
 
   /**
    * Gets information about installed Steam apps.
-   *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-read`
    */
   async *getApps() {
     for (const folder of await this.getLibraryfolders()) {
       const folderPath = join(folder.path, "steamapps");
-      for await (const entry of Deno.readDir(folderPath)) {
-        if (
-          !entry.name.startsWith("appmanifest_") ||
-          extname(entry.name) !== ".acf"
-        ) continue;
-
-        const manifestPath = join(folderPath, entry.name);
+      for await (
+        const manifestPath of new Glob("/appmanifest_*.acf", {
+          absolute: true,
+          nodir: true,
+          root: folderPath,
+        })
+      ) {
         try {
           yield new SteamApp(
             this,
             appManifestSchema.parse(
-              parseVdf(await Deno.readTextFile(manifestPath)),
+              parse(await readFile(manifestPath, { encoding: "utf8" })),
             ),
             manifestPath,
           );
@@ -229,10 +214,6 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
    * Gets information about an installed Steam app.
    *
    * Resolves `undefined` if an app with a matching id cannot be found.
-   *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-read`
    *
    * @param id The Steam app id of the app.
    */
@@ -251,7 +232,7 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
     return new SteamApp(
       this,
       appManifestSchema.parse(
-        parseVdf(await Deno.readTextFile(manifestPath)),
+        parse(await readFile(manifestPath, { encoding: "utf8" })),
       ),
       manifestPath,
     );
@@ -263,17 +244,13 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
    *
    * Resolves `undefined` if the path does not seem to refer to a Steam app.
    *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-read`
-   *
    * @param path The path to the folder where the Steam app is installed.
    */
   async getAppByPath(path: string) {
     let folderPath = join(path, "..", "..", "..");
 
     try {
-      folderPath = await Deno.realPath(folderPath);
+      folderPath = await realpath(folderPath);
     } catch {
       return;
     }
@@ -282,7 +259,7 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
       !(await booleanRace(
         (await this.getLibraryfolders())
           .map((folder) =>
-            Deno.realPath(folder.path)
+            realpath(folder.path)
               .then((path) => path === folderPath)
               .catch(() => false)
           ),
@@ -290,15 +267,15 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
     ) return;
 
     const steamapps = join(folderPath, "steamapps");
-    for await (const entry of Deno.readDir(steamapps)) {
-      if (
-        extname(entry.name) !== ".acf" ||
-        !entry.name.startsWith("appmanifest_")
-      ) continue;
-
-      const manifestPath = join(steamapps, entry.name);
+    for await (
+      const manifestPath of new Glob("/appmanifest_*.acf", {
+        absolute: true,
+        nodir: true,
+        root: steamapps,
+      })
+    ) {
       const manifest = appManifestSchema.parse(
-        parseVdf(await Deno.readTextFile(manifestPath)),
+        parse(await readFile(manifestPath, { encoding: "utf8" })),
       );
 
       if (basename(path) === manifest.AppState.installdir) {
@@ -312,10 +289,6 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
    *
    * Resolves `undefined` if a matching app cannot be found.
    *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-read`
-   *
    * @param idOrPath The Steam app id of the app, or the path to a folder where
    * the app is installed.
    * ```
@@ -328,8 +301,6 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
   /**
    * Launches a Steam app.
    *
-   * Requires `allow-run=open` permission.
-   *
    * @param app The app to launch.
    */
   async launch(app: SteamApp): Promise<void>;
@@ -337,22 +308,12 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
   /**
    * Launches a Steam app by id or path.
    *
-   * Requires permissions:
-   * - `allow-run=open`
-   * - `allow-env=HOME`
-   * - `allow-read`
-   *
    * @param app The app id or path of the app to launch.
    */
   async launch(app: string): Promise<void>;
 
   /**
    * Launches a Steam app.
-   *
-   * Requires permissions:
-   * - `allow-run=open`
-   * - `allow-env=HOME`
-   * - `allow-read`
    *
    * @param app The app, app id or path of the app to launch.
    */
@@ -365,7 +326,8 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
 
     if (!id) return;
 
-    await new Deno.Command("open", { args: [`steam://rungameid/${id}`] })
-      .output();
+    try {
+      await exec(`open steam://rungameid/${id}`);
+    } catch {}
   }
 }

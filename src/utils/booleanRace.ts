@@ -20,6 +20,6 @@ export const booleanRace = <T>(values: Promise<T>[], n = 1) => {
           .catch(reject)
       )
     ) as (Promise<T> | Promise<false>)[])
-      .concat(Promise.all(values).then(() => false as const))
+      .concat(Promise.all(values).then(() => false as const)),
   );
 };

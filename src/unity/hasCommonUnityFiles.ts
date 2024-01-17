@@ -1,5 +1,6 @@
-import { exists, join } from "../deps.ts";
-import { booleanRace } from "../utils/booleanRace.ts";
+import { stat } from "node:fs/promises";
+import { join } from "node:path";
+import { booleanRace } from "../utils/booleanRace.js";
 
 /**
  * Determines whether the macOS Application corresponding with the provided
@@ -11,16 +12,14 @@ import { booleanRace } from "../utils/booleanRace.ts";
 
 export const hasCommonUnityFiles = (plist: string) =>
   booleanRace([
-    exists(join(plist, "..", "Data", "boot.config"), { isFile: true }),
-    exists(join(plist, "..", "Resources", "Data", "boot.config"), {
-      isFile: true,
-    }),
-    exists(join(plist, "..", "Data", "globalgamemanagers"), { isFile: true }),
-    exists(join(plist, "..", "Resources", "Data", "globalgamemanagers"), {
-      isFile: true,
-    }),
-    exists(join(plist, "..", "Data", "resources.assets"), { isFile: true }),
-    exists(join(plist, "..", "Resources", "Data", "resources.assets"), {
-      isFile: true,
-    }),
-  ]);
+    stat(join(plist, "..", "Data", "boot.config")),
+    stat(join(plist, "..", "Resources", "Data", "boot.config")),
+    stat(join(plist, "..", "Data", "globalgamemanagers")),
+    stat(join(plist, "..", "Resources", "Data", "globalgamemanagers")),
+    stat(join(plist, "..", "Data", "resources.assets")),
+    stat(join(plist, "..", "Resources", "Data", "resources.assets")),
+  ].map((promise) =>
+    promise
+      .then((stats) => stats.isFile())
+      .catch(() => false)
+  ));

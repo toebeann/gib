@@ -1,6 +1,12 @@
-import { basename, extname, homedir, join, match, P, z } from "../deps.ts";
-import { isProtocolHandlerRegistered } from "../utils/isProtocolHandlerRegistered.ts";
-import { App, Launcher } from "./mod.ts";
+import { readFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { basename, join } from "node:path";
+import { Glob } from "glob";
+import { match, P } from "ts-pattern";
+import { z } from "zod";
+import { exec } from "../fs/exec.js";
+import { isProtocolHandlerRegistered } from "../utils/isProtocolHandlerRegistered.js";
+import type { App, Launcher } from "./index.js";
 
 /**
  * Zod schema for working with the Epic Games Launcher's
@@ -122,32 +128,25 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
   /**
    * Gets information about Epic Games Launcher apps installed on this
    * computer, parsed from its `LauncherInstalled.dat` file.
-   *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/UnrealEngineLauncher/LauncherInstalled.dat"`
    */
   private getLauncherInstalled = async () =>
     launcherInstalledSchema.parse(JSON.parse(
-      await Deno.readTextFile(join(
-        homedir(),
-        "Library",
-        "Application Support",
-        "Epic",
-        "UnrealEngineLauncher",
-        "LauncherInstalled.dat",
-      )),
+      await readFile(
+        join(
+          homedir(),
+          "Library",
+          "Application Support",
+          "Epic",
+          "UnrealEngineLauncher",
+          "LauncherInstalled.dat",
+        ),
+        { encoding: "utf8" },
+      ),
     )).InstallationList;
 
   /**
    * Gets information about Epic Games Launcher apps installed on this
    * computer, parsed from its `${InstallationGuid}.item` manifest files.
-   *
-   * Requires permissins:
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/EpicGamesLauncher/Data/Manifests"`
    */
   private async *getManifests() {
     const manifestPath = join(
@@ -160,10 +159,17 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
       "Manifests",
     );
 
-    for await (const entry of Deno.readDir(manifestPath)) {
-      if (extname(entry.name) !== ".item") continue;
+    for await (
+      const path of new Glob("/*.item", {
+        absolute: true,
+        nodir: true,
+        root: manifestPath,
+      })
+    ) {
       yield appManifestSchema.parse(
-        JSON.parse(await Deno.readTextFile(join(manifestPath, entry.name))),
+        JSON.parse(
+          await readFile(path, { encoding: "utf8" }),
+        ),
       );
     }
   }
@@ -173,11 +179,6 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    * its `${InstallationGuid}.item` manifest file.
    *
    * Resolves `undefined` if a manifest with a matching id cannot be found.
-   *
-   * Requires permissins:
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/EpicGamesLauncher/Data/Manifests"`
    *
    * @param id The ArtifactId or AppName of the app.
    */
@@ -193,11 +194,6 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    *
    * Resolves `undefined` if a manifest with a matching path cannot be found.
    *
-   * Requires permissins:
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/EpicGamesLauncher/Data/Manifests"`
-   *
    * @param path The InstallLocation of the app.
    */
   private async getManifestByPath(path: string) {
@@ -212,11 +208,6 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    *
    * Resolves `undefined` if a matching manifest cannot be found.
    *
-   * Requires permissins:
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/EpicGamesLauncher/Data/Manifests"`
-   *
    * @param idOrPath The ArtifactId, AppName or InstallLocation of the app.
    */
   private getManifest = (idOrPath: string) =>
@@ -228,21 +219,11 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    * Determines whether the Epic Games Launcher appears to be installed by
    * checking for a `com.epicgames.launcher://` protocol handler. May open the
    * Epic Games Launcher in the background if it is installed.
-   *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-run=plutil,open`
    */
   isInstalled = () => isProtocolHandlerRegistered("com.epicgames.launcher");
 
   /**
    * Gets information about installed Epic Games Launcher apps.
-   *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/EpicGamesLauncher/Data/Manifests","$HOME/Library/Application
-   *    Support/Epic/UnrealEngineLauncher/LauncherInstalled.dat"`
    */
   async *getApps() {
     const launcherInstalled = this.getLauncherInstalled();
@@ -259,12 +240,6 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    * Gets information about an installed Epic Games Launcher app.
    *
    * Resolves `undefined` if an app with a matching id cannot be found.
-   *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/EpicGamesLauncher/Data/Manifests","$HOME/Library/Application
-   *    Support/Epic/UnrealEngineLauncher/LauncherInstalled.dat"`
    *
    * @param id The ArtifactId or AppName of the app.
    */
@@ -290,12 +265,6 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    *
    * Resolves `undefined` if an app with a matching path cannot be found.
    *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/EpicGamesLauncher/Data/Manifests","$HOME/Library/Application
-   *    Support/Epic/UnrealEngineLauncher/LauncherInstalled.dat"`
-   *
    * @param path The InstallLocation of the app.
    */
   getAppByPath = async (path: string) =>
@@ -318,12 +287,6 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    *
    * Resolves `undefined` if a matching app cannot be found.
    *
-   * Requires permissions:
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/EpicGamesLauncher/Data/Manifests","$HOME/Library/Application
-   *    Support/Epic/UnrealEngineLauncher/LauncherInstalled.dat"`
-   *
    * @param idOrPath The ArtifactId, AppName or InstallLocation of the app.
    */
   getApp = (idOrPath: string) =>
@@ -334,8 +297,6 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
   /**
    * Launches an Epic Games Launcher app.
    *
-   * Requires `allow-run=open` permission.
-   *
    * @param app The app to launch.
    */
   launch(app: EpicGamesApp): Promise<void>;
@@ -343,26 +304,12 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
   /**
    * Launches an Epic Games Launcher app.
    *
-   * Requires permissions:
-   * - `allow-run=open`
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/EpicGamesLauncher/Data/Manifests","$HOME/Library/Application
-   *    Support/Epic/UnrealEngineLauncher/LauncherInstalled.dat"`
-   *
    * @param app The ArtifactId, AppName or InstallLocation of the app.
    */
   launch(app: string): Promise<void>;
 
   /**
    * Launches an Epic Games Launcher app.
-   *
-   * Requires permissions:
-   * - `allow-run=open`
-   * - `allow-env=HOME`
-   * - `allow-read="$HOME/Library/Application
-   *    Support/Epic/EpicGamesLauncher/Data/Manifests","$HOME/Library/Application
-   *    Support/Epic/UnrealEngineLauncher/LauncherInstalled.dat"`
    *
    * @param app The app, ArtifactId, AppName or InstallLocation of the app.
    */
@@ -379,10 +326,10 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
 
     if (!launchId) return;
 
-    await new Deno.Command("open", {
-      args: [
-        `com.epicgames.launcher://apps/${launchId}?action=launch&silent=true`,
-      ],
-    }).output();
+    try {
+      await exec(
+        `open com.epicgames.launcher://apps/${launchId}?action=launch&silent=true`,
+      );
+    } catch {}
   }
 }
