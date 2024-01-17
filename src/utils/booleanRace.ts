@@ -12,15 +12,14 @@
 
 export const booleanRace = <T>(values: Promise<T>[], n = 1) => {
   let i = 0;
-  return Promise.race([
-    ...values.map((p) =>
+  return Promise.race(
+    (values.map((promise) =>
       new Promise<T>((resolve, reject) =>
-        p.then(
-          (v) => !!v && ++i >= Math.min(n, values.length) && resolve(v),
-          reject,
-        )
+        promise
+          .then((v) => !!v && ++i >= Math.min(n, values.length) && resolve(v))
+          .catch(reject)
       )
-    ),
-    Promise.all(values).then(() => false as const),
-  ]);
+    ) as (Promise<T> | Promise<false>)[])
+      .concat(Promise.all(values).then(() => false as const))
+  );
 };
