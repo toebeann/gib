@@ -1,15 +1,12 @@
-import {
-  boxen,
-  center,
-  cliWidth,
-  figlet,
-  getColorEnabled,
-  gradientString,
-  gray,
-  reset,
-  wrapAnsi,
-} from "../deps.ts";
-import { version } from "../version.ts";
+import { env } from "node:process";
+import boxen from "boxen";
+import center from "center-align";
+import chalk from "chalk";
+import cliWidth from "cli-width";
+import figlet from "figlet";
+import gradientString from "gradient-string";
+import wrapAnsi from "wrap-ansi";
+import { version } from "../version.js";
 
 const width = () => cliWidth({ defaultWidth: 80 });
 const wrap = (
@@ -21,12 +18,7 @@ const wrap = (
 export const createLogo = async () => {
   const outputLines: string[] = [];
 
-  const { stdout } = await (new Deno.Command("deno", { args: ["--version"] }))
-    .output();
-  outputLines.push(
-    gray(`gib ${version}`),
-    ...gray(wrap(new TextDecoder().decode(stdout))).split("\n"),
-  );
+  outputLines.push(chalk.gray(`gib ${version}`));
 
   const logo = new Promise<string>((resolve, reject) =>
     figlet(
@@ -36,7 +28,7 @@ export const createLogo = async () => {
     )
   );
 
-  const gradient = getColorEnabled()
+  const gradient = env.NO_COLOR === undefined
     ? gradientString.retro
     : gradientString("white", "white");
 
@@ -64,9 +56,9 @@ export const createLogo = async () => {
 
     outputLines.push(
       ...wrap(
-        gradient.multiline(boxedLines.join("\n")).split("\n").map((line) =>
-          `${" ".repeat(padding)}${line}`
-        ).join("\n"),
+        gradient.multiline(boxedLines.join("\n")).split("\n").map((
+          line: string,
+        ) => `${" ".repeat(padding)}${line}`).join("\n"),
         width(),
         { trim: false },
       ).split("\n"),
@@ -77,7 +69,7 @@ export const createLogo = async () => {
     );
   }
 
-  return `${outputLines.join("\n")}${reset("")}`;
+  return `${outputLines.join("\n")}${chalk.reset("")}`;
 };
 
 export const renderLogo = () => createLogo().then(console.log);

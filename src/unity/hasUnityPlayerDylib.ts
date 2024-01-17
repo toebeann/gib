@@ -1,4 +1,5 @@
-import { exists, join } from "../deps.ts";
+import { stat } from "node:fs/promises";
+import { join } from "node:path";
 
 /**
  * Determines whether the macOS Application corresponding with the provided
@@ -9,6 +10,6 @@ import { exists, join } from "../deps.ts";
  */
 
 export const hasUnityPlayerDylib = (plist: string) =>
-  exists(join(plist, "..", "Frameworks", "UnityPlayer.dylib"), {
-    isFile: true,
-  });
+  stat(join(plist, "..", "Frameworks", "UnityPlayer.dylib"))
+    .then((stats) => stats.isFile())
+    .catch(() => false);
