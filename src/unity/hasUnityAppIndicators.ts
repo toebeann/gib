@@ -15,9 +15,12 @@ import { hasUnityPlayerDylib } from "./hasUnityPlayerDylib.ts";
  */
 
 export const hasUnityAppIndicators = (plist: string, n = 2) =>
-  booleanRace([
-    hasUnityBuildNumber(plist),
-    hasCommonUnityString(plist),
-    hasUnityPlayerDylib(plist),
-    hasCommonUnityFiles(plist),
-  ], n);
+  booleanRace(
+    [
+      hasUnityBuildNumber(plist),
+      hasCommonUnityString(plist),
+      hasUnityPlayerDylib(plist),
+      hasCommonUnityFiles(plist),
+    ].map((promise) => promise.catch(() => false)),
+    n,
+  );
