@@ -46,8 +46,10 @@
     pnpm env use --global 20 >/dev/null
 
     # ensure gib is up-to-date, then launch it
-    echo "Loading gib..."
+    echo "Updating gib..."
     pnpm -s dlx tiged -f toebeann/gib#node ~/.gib >/dev/null
+    echo "Updating gib's dependencies..."
     pnpm -C ~/.gib install >/dev/null
+    echo "Launching gib..."
     pnpm -C ~/.gib launch
 } # this ensures the entire script is downloaded #
