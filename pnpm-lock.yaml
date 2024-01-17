@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
-  '@deno/shim-prompts':
-    specifier: ^0.1.1
-    version: 0.1.1
   '@node-steam/vdf':
     specifier: ^2.2.0
     version: 2.2.0
@@ -91,10 +88,6 @@ devDependencies:
     version: 3.22.4
 
 packages:
-
-  /@deno/shim-prompts@0.1.1:
-    resolution: {integrity: sha512-E3tqmVdIhrFvyxUTDUA0lta2VHsDBH6JX48XMpveBoTtO+Js2cwfrYId7QhCkA7+9DEc96Eof7nWLiKwxxYmFA==}
-    dev: true
 
   /@isaacs/cliui@8.0.2:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
