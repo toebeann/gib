@@ -20,18 +20,6 @@ export const createLogo = async () => {
 
   outputLines.push(chalk.gray(`gib ${version}`));
 
-  // let denoVersion: string | undefined;
-  // try {
-  //   const { stdout } = await exec("deno --version");
-  //   denoVersion = stdout.trim();
-  // } catch {}
-
-  // if (denoVersion) {
-  //   outputLines.push(
-  //     ...chalk.gray(wrap(denoVersion)).split("\n"),
-  //   );
-  // }
-
   const logo = new Promise<string>((resolve, reject) =>
     figlet(
       "gib",
