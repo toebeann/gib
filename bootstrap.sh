@@ -52,7 +52,7 @@
 
     # ensure gib is up-to-date, then launch it
     echo "Loading gib..."
-    pnpm -s dlx tiged -fD toebeann/gib#node ~/.gib >/dev/null
+    pnpm -s dlx tiged -f toebeann/gib#node ~/.gib >/dev/null
     pnpm -C ~/.gib install >/dev/null
     pnpm -C ~/.gib launch
 }
