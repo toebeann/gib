@@ -49,7 +49,8 @@ fi
 echo "Preparing node..."
 pnpm env use --global 20 >/dev/null
 
-# ensuring gib is up-to-date
+# ensure gib is up-to-date, then launch it
 echo "Loading gib..."
-pnpm -C ~/.gib update >/dev/null
+pnpm -s dlx degit --force toebeann/gib#node ~/.gib >/dev/null
 pnpm -C ~/.gib install >/dev/null
+pnpm -C ~/.gib launch
