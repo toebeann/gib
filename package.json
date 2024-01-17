@@ -2,11 +2,33 @@
   "private": true,
   "name": "gib",
   "version": "0.1.0",
-  "description": "",
-  "type": "module",
-  "keywords": [],
-  "author": "",
+  "description": "A CLI tool for automating the installation of BepInEx",
   "license": "ISC",
+  "author": "Tobey Blaber",
+  "homepage": "https://github.com/toebeann/gib",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toebeann/gib.git"
+  },
+  "bugs": {
+    "url": "https://github.com/toebeann/gib/issues"
+  },
+  "funding": [
+    "https://github.com/toebeann/gib?sponsor=1",
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/toebeann"
+    },
+    {
+      "type": "kofi",
+      "url": "https://ko-fi.com/toebean_"
+    },
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/tobeyblaber"
+    }
+  ],
+  "type": "module",
   "scripts": {
     "launch": "pnpm -s dlx tsx src/index.ts"
   },
@@ -39,5 +61,8 @@
     "typescript": "^5.3.3",
     "wrap-ansi": "^9.0.0",
     "zod": "^3.22.4"
+  },
+  "engines": {
+    "node": "^20"
   }
 }
