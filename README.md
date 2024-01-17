@@ -2,7 +2,7 @@
 
 [<img alt="Usage statistics for gib from the jsDelivr CDN" src="https://data.jsdelivr.com/v1/package/gh/toebeann/gib/badge">](https://www.jsdelivr.com/package/gh/toebeann/gib?tab=stats)
 
-gib _(tobey's Guided Installer for BepInEx)_ is a deno script for automating the
+gib _(tobey's Guided Installer for BepInEx)_ is a CLI utility for automating the
 installation of [BepInEx](https://github.com/BepInEx/BepInEx), the popular
 modding framework for Unity games.
 
@@ -21,7 +21,7 @@ cannot.
 Just run the following command in Terminal:
 
 ```sh
-curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/bootstrap.sh | sh && PATH="$HOME/.deno/bin:$PATH" && deno run -Ar https://cdn.jsdelivr.net/gh/toebeann/gib/mod.ts
+curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | sh
 ```
 
 If you get stuck, refer to the below [walkthrough](#walkthrough).
@@ -100,12 +100,12 @@ message requests.
 1. Copy the command from the [TL;DR](#tldr) section above and paste it in your
    terminal window with `⌘ V`, then press `Enter` to run it.
 
-   **ℹ️** _This command will make sure that [deno](https://deno.land/) (a
-   JavaScript runtime similar to Node.js) is installed, then run the latest
+   **ℹ️** _This command will make sure that [pnpm](https://pnpm.io/) (a
+   package manager for node modules) is installed, then install and run the latest
    version of gib with it. If you're curious how it all works or want to verify
    the source code is safe, check
-   [`bootstrap.sh`](https://github.com/toebeann/gib/blob/main/bootstrap.sh) and
-   [`mod.ts`](https://github.com/toebeann/gib/blob/main/mod.ts) for details._
+   [`gib.sh`](https://github.com/toebeann/gib/blob/main/gib.sh) and
+   [`index.ts`](https://github.com/toebeann/gib/blob/main/src/index.ts) for details._
 
    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/8ad7f224-e3a6-44b5-968b-c46d039d5d5d">
 
