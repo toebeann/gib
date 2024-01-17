@@ -30,27 +30,29 @@
 
 # TODO: Keep this script simple and easy to audit.
 
-set -e # exit on err
+{
+    set -e # exit on err
 
-# ensure pnpm is installed
-if ! command -v pnpm >/dev/null; then
-    echo "Installing pnpm..."
-    curl -fsSL https://get.pnpm.io/install.sh | sh - >/dev/null
-    source ~/.zshrc
-fi
+    # ensure pnpm is installed
+    if ! command -v pnpm >/dev/null; then
+        echo "Installing pnpm..."
+        curl -fsSL https://get.pnpm.io/install.sh | sh - >/dev/null
+        source ~/.zshrc
+    fi
 
-if ! command -v pnpm >/dev/null; then
-    echo "Couldn't automatically set pnpm in your path"
-    echo "Please run the command below to add it to your path, then run this script again"
-    echo "source ~/.zshrc"
-fi
+    if ! command -v pnpm >/dev/null; then
+        echo "Couldn't automatically set pnpm in your path"
+        echo "Please run the command below to add it to your path, then run this script again"
+        echo "source ~/.zshrc"
+    fi
 
-# ensure node v20 is in use
-echo "Preparing node..."
-pnpm env use --global 20 >/dev/null
+    # ensure node v20 is in use
+    echo "Preparing node..."
+    pnpm env use --global 20 >/dev/null
 
-# ensure gib is up-to-date, then launch it
-echo "Loading gib..."
-pnpm -s dlx degit --force toebeann/gib#node ~/.gib >/dev/null
-pnpm -C ~/.gib install >/dev/null
-pnpm -C ~/.gib launch
+    # ensure gib is up-to-date, then launch it
+    echo "Loading gib..."
+    pnpm -s dlx tiged -fD toebeann/gib#node ~/.gib >/dev/null
+    pnpm -C ~/.gib install >/dev/null
+    pnpm -C ~/.gib launch
+}
