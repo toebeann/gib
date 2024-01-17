@@ -1,12 +1,7 @@
 #!/bin/sh
 #
-# This file is a shell script to ensure a user has deno installed,
-# and that its version matches the intended.
-#
-# Where possible, it will offer to up/downgrade deno if necessary.
-#
-# The intended use case is for the script to be called directly before
-# running a deno script.
+# This file is a shell script to ensure a user has pnpm & node installed,
+# before using them to install and launching the gib CLI.
 #
 ###############################################################################
 #
@@ -30,7 +25,7 @@
 
 # TODO: Keep this script simple and easy to audit.
 
-{
+{ # this ensures the entire script is downloaded #
     set -e # exit on err
 
     # ensure pnpm is installed
@@ -55,4 +50,4 @@
     pnpm -s dlx tiged -f toebeann/gib#node ~/.gib >/dev/null
     pnpm -C ~/.gib install >/dev/null
     pnpm -C ~/.gib launch
-}
+} # this ensures the entire script is downloaded #
