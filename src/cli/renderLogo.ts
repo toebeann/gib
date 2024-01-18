@@ -6,7 +6,7 @@ import cliWidth from "cli-width";
 import figlet from "figlet";
 import gradientString from "gradient-string";
 import wrapAnsi from "wrap-ansi";
-import { version } from "../version.js";
+import { version } from "../../package.json";
 
 const width = () => cliWidth({ defaultWidth: 80 });
 const wrap = (
