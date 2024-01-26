@@ -28,12 +28,10 @@
 { # this ensures the entire script is downloaded #
     set -e # exit on err
 
-    # ensure pnpm is installed
-    if ! command -v pnpm >/dev/null; then
-        echo "Installing pnpm..."
-        curl -fsSL https://get.pnpm.io/install.sh | sh - >/dev/null
-        source ~/.zshrc
-    fi
+    # ensure pnpm is installed and up-to-date
+    echo "Preparing pnpm..."
+    curl -fsSL https://get.pnpm.io/install.sh | sh - >/dev/null
+    source ~/.zshrc
 
     if ! command -v pnpm >/dev/null; then
         echo "Couldn't automatically set pnpm in your path"
