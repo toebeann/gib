@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # This file is a shell script to ensure a user has pnpm & node installed,
-# before using them to install and launching the gib CLI.
+# before using them to install and launch the gib CLI.
 #
 ###############################################################################
 #
