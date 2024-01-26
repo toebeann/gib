@@ -39,6 +39,7 @@
         echo "Couldn't automatically set pnpm in your path"
         echo "Please run the command below to add it to your path, then run this script again"
         echo "source ~/.zshrc"
+        exit 1
     fi
 
     # ensure node v20 is in use
