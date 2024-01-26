@@ -62,7 +62,7 @@
     # get latest release version from github
     pnpm -s dlx tiged -fm=tar toebeann/gib${version} ~/.gib
     echo "Fetching dependencies..."
-    pnpm -C ~/.gib install >/dev/null
+    pnpm -C ~/.gib install
     echo "Launching gib..."
     pnpm -C ~/.gib launch
 } # this ensures the entire script is downloaded #
