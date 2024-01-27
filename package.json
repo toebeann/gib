@@ -32,6 +32,10 @@
   "scripts": {
     "launch": "pnpm -s dlx tsx src/index.ts"
   },
+  "engines": {
+    "node": "^20"
+  },
+  "os": ["darwin"],
   "devDependencies": {
     "@node-steam/vdf": "^2.2.0",
     "@total-typescript/ts-reset": "^0.5.1",
@@ -60,8 +64,5 @@
     "typescript": "^5.3.3",
     "wrap-ansi": "^9.0.0",
     "zod": "^3.22.4"
-  },
-  "engines": {
-    "node": "^20"
   }
 }
