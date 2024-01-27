@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+optionalDependencies:
+  registry-js:
+    specifier: ^1.15.1
+    version: 1.15.1
+
 devDependencies:
   '@node-steam/vdf':
     specifier: ^2.2.0
@@ -68,6 +73,9 @@ devDependencies:
   open:
     specifier: ^10.0.3
     version: 10.0.3
+  protocol-registry:
+    specifier: ^1.4.1
+    version: 1.4.1
   readline-sync:
     specifier: ^1.4.10
     version: 1.4.10
@@ -678,6 +686,18 @@ packages:
     engines: {node: '>=8.6'}
     dev: true
 
+  /protocol-registry@1.4.1:
+    resolution: {integrity: sha512-i4T/jTey9R/YSWFwAWmRN6cKdgOg9ItrUUdkmMlioMiG12KNpV+WwKsOchHVIH2HeSy9Lv+Lkj8VkSFNJjyz8w==}
+    engines: {node: '>=10.0.0'}
+    requiresBuild: true
+    dependencies:
+      ejs: 3.1.9
+      is-wsl: 2.2.0
+      joi: 17.12.0
+      plist: 3.1.0
+      winreg: 1.2.5
+    dev: true
+
   /readdirp@3.6.0:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
     engines: {node: '>=8.10.0'}
@@ -689,6 +709,15 @@ packages:
     resolution: {integrity: sha512-gNva8/6UAe8QYepIQH/jQ2qn91Qj0B9sYjMBBs3QOB8F2CXcKgLxQaJRP76sWVRQt+QU+8fAkCbCvjjMFu7Ycw==}
     engines: {node: '>= 0.8.0'}
     dev: true
+
+  /registry-js@1.15.1:
+    resolution: {integrity: sha512-aHEHtbzqusxkhprn7+rf2Cu7z0oPHaXVuOVKTpZigBSRpXUTw7+yWBJyuAREpG1bt2doe+qJzSR+kyZ9uWsj7A==}
+    requiresBuild: true
+    dependencies:
+      node-addon-api: 3.2.1
+      prebuild-install: 5.3.6
+    dev: false
+    optional: true
 
   /repeat-string@1.6.1:
     resolution: {integrity: sha512-PV0dzCYDNfRi1jCDbJzpW7jNNDRuCOG/jI5ctQcGKt/clZD+YcPS3yIlWuTJMmESC8aevCFmWJy5wjAFgNqN6w==}
