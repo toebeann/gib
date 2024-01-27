@@ -1,16 +1,26 @@
 import { readFile } from "node:fs/promises";
-import { homedir } from "node:os";
 import { basename, join } from "node:path";
+import type { platform } from "node:process";
 import { Glob } from "glob";
+import open from "open";
 import { match, P } from "ts-pattern";
-import { exec } from "../../fs/exec.js";
 import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.js";
 import type { Launcher } from "../index.js";
-import { appManifestSchema, launcherInstalledSchema, EpicGamesApp, type EpicGamesAppManifest } from "./app.js";
+import {
+  appManifestSchema,
+  EpicGamesApp,
+  type EpicGamesAppManifest,
+  launcherInstalledSchema,
+} from "./app.js";
+import { getAppDataPath } from "./getAppDataPath.js";
 
 /** An abstraction for working with the Epic Games Launcher and its apps. */
 export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
   readonly name = "Epic Games Launcher";
+  readonly supportedPlatforms = [
+    "darwin",
+    "win32",
+  ] satisfies typeof platform[];
 
   /**
    * Gets information about Epic Games Launcher apps installed on this
@@ -20,37 +30,26 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
     launcherInstalledSchema.parse(JSON.parse(
       await readFile(
         join(
-          homedir(),
-          "Library",
-          "Application Support",
-          "Epic",
+          getAppDataPath(),
+          "..",
+          "..",
           "UnrealEngineLauncher",
           "LauncherInstalled.dat",
         ),
         { encoding: "utf8" },
       ),
-    )).InstallationList;
+    )).installationList;
 
   /**
    * Gets information about Epic Games Launcher apps installed on this
    * computer, parsed from its `${InstallationGuid}.item` manifest files.
    */
   private async *getManifests() {
-    const manifestPath = join(
-      homedir(),
-      "Library",
-      "Application Support",
-      "Epic",
-      "EpicGamesLauncher",
-      "Data",
-      "Manifests",
-    );
-
     for await (
       const path of new Glob("/*.item", {
         absolute: true,
         nodir: true,
-        root: manifestPath,
+        root: join(getAppDataPath(), "Manifests"),
       })
     ) {
       yield appManifestSchema.parse(
@@ -71,7 +70,7 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    */
   private async getManifestById(id: string) {
     for await (const manifest of this.getManifests()) {
-      if (manifest.AppName == id) return manifest;
+      if (manifest.appName == id) return manifest;
     }
   }
 
@@ -85,7 +84,7 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    */
   private async getManifestByPath(path: string) {
     for await (const manifest of this.getManifests()) {
-      if (manifest.InstallLocation === path) return manifest;
+      if (manifest.installLocation === path) return manifest;
     }
   }
 
@@ -117,7 +116,7 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
 
     for await (const manifest of this.getManifests()) {
       const info = (await launcherInstalled)
-        .find((x) => [x.ArtifactId, x.AppName].includes(manifest.AppName));
+        .find((x) => [x.artifactId, x.appName].includes(manifest.appName));
 
       if (info) yield new EpicGamesApp(this, { ...info, ...manifest });
     }
@@ -213,10 +212,8 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
 
     if (!launchId) return;
 
-    try {
-      await exec(
-        `open com.epicgames.launcher://apps/${launchId}?action=launch&silent=true`,
-      );
-    } catch {}
+    await open(
+      `com.epicgames.launcher://apps/${launchId}?action=launch&silent=true`,
+    );
   }
 }

@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { z } from "zod";
+import { toCamelCaseKeys } from "../../zod/toCamelCaseKeys.js";
 import type { App } from "../app.js";
 import type { SteamLauncher } from "./launcher.js";
 
@@ -29,57 +30,68 @@ export enum SteamAppState {
   UpdateStopping = 1 << 20,
 }
 
-const manifestConfigSchema = z.object({
-  language: z.string().optional(),
-  BetaKey: z.string().optional(),
-});
+const manifestConfigSchema = toCamelCaseKeys(
+  z.object({
+    language: z.string().optional(),
+    betaKey: z.string().optional(),
+  }).passthrough(),
+);
 
 /** Zod schema for working with Steam app manifest files. */
-export const appManifestSchema = z.object({
-  AppState: z.object({
-    appid: z.number(),
-    name: z.string(),
-    installdir: z.string(),
-    StateFlags: z.number(),
-    universe: z.number(),
-    LastUpdated: z.number().optional(),
-    SizeOnDisk: z.number().optional(),
-    StagingSize: z.number().optional(),
-    buildid: z.number().optional(),
-    LastOwner: z.number().optional(),
-    UpdateResult: z.number().optional(),
-    BytesToDownload: z.number().optional(),
-    BytesDownloaded: z.number().optional(),
-    BytesToStage: z.number().optional(),
-    BytesStaged: z.number().optional(),
-    TargetBuildID: z.number().optional(),
-    AutoUpdateBehavior: z.number().optional(),
-    AllowOtherDownloadsWhileRunning: z.number().optional(),
-    ScheduledAutoUpdate: z.number().optional(),
-    SharedDepots: z.record(z.union([z.string(), z.number()])).optional(),
-    InstalledDepots: z.record(
-      z.object({
-        manifest: z.number().optional(),
-        size: z.number().optional(),
-      }).passthrough(),
-    ).optional(),
-    StagedDepots: z.record(
-      z.object({
-        manifest: z.number().optional(),
-        size: z.number().optional(),
-        dlcappid: z.number().optional(),
-      }).passthrough(),
-    ).optional(),
-    DlcDownloads: z.record(
-      z.object({
-        BytesDownloaded: z.number().optional(),
-        BytesToDownload: z.number().optional(),
-      }).passthrough(),
-    ).optional(),
-    UserConfig: manifestConfigSchema.passthrough().optional(),
-    MountedConfig: manifestConfigSchema.passthrough().optional(),
-  }),
-}).passthrough();
+export const appManifestSchema = toCamelCaseKeys(
+  z.object({
+    appState: toCamelCaseKeys(z.object({
+      appid: z.number(),
+      name: z.string(),
+      installdir: z.string(),
+      stateFlags: z.number(),
+      universe: z.number(),
+      lastUpdated: z.number().optional(),
+      sizeOnDisk: z.number().optional(),
+      stagingSize: z.number().optional(),
+      buildid: z.number().optional(),
+      lastOwner: z.number().optional(),
+      updateResult: z.number().optional(),
+      bytesToDownload: z.number().optional(),
+      bytesDownloaded: z.number().optional(),
+      bytesToStage: z.number().optional(),
+      bytesStaged: z.number().optional(),
+      targetBuildId: z.number().optional(),
+      autoUpdateBehavior: z.number().optional(),
+      allowOtherDownloadsWhileRunning: z.number().optional(),
+      scheduledAutoUpdate: z.number().optional(),
+      sharedDepots: z.record(z.union([z.string(), z.number()])).optional(),
+      installedDepots: z.record(
+        toCamelCaseKeys(
+          z.object({
+            manifest: z.number().optional(),
+            size: z.number().optional(),
+          }).passthrough(),
+        ),
+      ).optional(),
+      stagedDepots: z.record(
+        toCamelCaseKeys(
+          z.object({
+            manifest: z.number().optional(),
+            size: z.number().optional(),
+            dlcappid: z.number().optional(),
+          }).passthrough(),
+        ),
+      ).optional(),
+      dlcDownloads: z.record(
+        toCamelCaseKeys(
+          z.object({
+            bytesDownloaded: z.number().optional(),
+            bytesToDownload: z.number().optional(),
+          }).passthrough(),
+        ),
+      ).optional(),
+      userConfig: manifestConfigSchema.optional(),
+      mountedConfig: manifestConfigSchema.optional(),
+    })),
+  })
+    .passthrough(),
+);
 
 /** A parsed Steam app manifest. */
 export type SteamAppManifest = z.infer<typeof appManifestSchema>;
@@ -90,21 +102,21 @@ export class SteamApp implements App<SteamLauncher, SteamAppManifest> {
    * @param launcher The launcher which manages the app.
    * @param manifest The data manifest the launcher holds about the app.
    * @param manifestPath The path to the manifest on disk.
-   * @param [id=manifest.AppState.appid.toString()] The Steam app id of the app.
-   * @param [name=manifest.AppState.name] The display name of the app.
+   * @param [id=manifest.appState.appid.toString()] The Steam app id of the app.
+   * @param [name=manifest.appState.name] The display name of the app.
    * @param [path] The path to the folder where the app is installed on disk.
    */
   constructor(
     public readonly launcher: SteamLauncher,
     public readonly manifest: SteamAppManifest,
     manifestPath: string,
-    public readonly id = manifest.AppState.appid.toString(),
-    public readonly name = manifest.AppState.name,
+    public readonly id = manifest.appState.appid.toString(),
+    public readonly name = manifest.appState.name,
     public readonly path = join(
       manifestPath,
       "..",
       "common",
-      manifest.AppState.installdir,
+      manifest.appState.installdir,
     ),
   ) {}
 
@@ -115,7 +127,7 @@ export class SteamApp implements App<SteamLauncher, SteamAppManifest> {
    * @param state The state flag to check for.
    */
   hasState = (state: SteamAppState) =>
-    (this.manifest.AppState.StateFlags & state) === state;
+    (this.manifest.appState.stateFlags & state) === state;
 
   get fullyInstalled() {
     return this.hasState(SteamAppState.FullyInstalled);

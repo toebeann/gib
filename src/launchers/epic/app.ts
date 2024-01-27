@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { toCamelCaseKeys } from "../../zod/toCamelCaseKeys.js";
 import type { App } from "../app.js";
 import type { EpicGamesLauncher } from "./launcher.js";
 
@@ -6,74 +7,80 @@ import type { EpicGamesLauncher } from "./launcher.js";
  * Zod schema for working with the Epic Games Launcher's
  * `LauncherInstalled.dat` file.
  */
-export const launcherInstalledSchema = z.object({
-  InstallationList: z.object({
-    InstallLocation: z.string(),
-    NamespaceId: z.string().optional(),
-    ItemId: z.string().optional(),
-    ArtifactId: z.string().optional(),
-    AppVersion: z.string().optional(),
-    AppName: z.string(),
-  }).passthrough().array(),
-}).passthrough();
+export const launcherInstalledSchema = toCamelCaseKeys(
+  z.object({
+    installationList: toCamelCaseKeys(
+      z.object({
+        installLocation: z.string(),
+        namespaceId: z.string().optional(),
+        itemId: z.string().optional(),
+        artifactId: z.string().optional(),
+        appVersion: z.string().optional(),
+        appName: z.string(),
+      }).passthrough(),
+    ).array(),
+  }).passthrough(),
+);
 
 /** Zod schema for working with Epic Games Launcher app manifest files. */
-export const appManifestSchema = z.object({
-  FormatVersion: z.number(),
-  bIsIncompleteInstall: z.boolean().optional(),
-  LaunchCommand: z.string().optional(),
-  LaunchExecutable: z.string().optional(),
-  ManifestLocation: z.string().optional(),
-  ManifestHash: z.string().optional(),
-  bIsApplication: z.boolean().optional(),
-  bIsExecutable: z.boolean().optional(),
-  bIsManaged: z.boolean().optional(),
-  bNeedsValidation: z.boolean().optional(),
-  bRequiresAuth: z.boolean().optional(),
-  bAllowMultipleInstances: z.boolean().optional(),
-  bCanRunOffline: z.boolean().optional(),
-  bAllowUriCmdArgs: z.boolean().optional(),
-  bLaunchElevated: z.boolean().optional(),
-  BaseURLs: z.string().array().optional(),
-  BuildLabel: z.string().optional(),
-  AppCategories: z.string().array().optional(),
-  ChunkDbs: z.unknown().array().optional(),
-  CompatibleApps: z.unknown().array().optional(),
-  DisplayName: z.string(),
-  InstallationGuid: z.string().optional(),
-  InstallLocation: z.string(),
-  InstallSessionId: z.string().optional(),
-  InstallTags: z.unknown().array().optional(),
-  InstallComponents: z.unknown().array().optional(),
-  HostInstallationGuid: z.string().optional(),
-  PrereqIds: z.unknown().array().optional(),
-  PrereqSHA1Hash: z.string().optional(),
-  LastPrereqSucceededSHA1Hash: z.string().optional(),
-  StagingLocation: z.string().optional(),
-  TechnicalType: z.string().optional(),
-  VaultThumbnailUrl: z.string().optional(),
-  VaultTitleText: z.string().optional(),
-  InstallSize: z.number().optional(),
-  MainWindowProcessName: z.string().optional(),
-  ProcessNames: z.unknown().array().optional(),
-  BackgroundProcessNames: z.unknown().array().optional(),
-  IgnoredProcessNames: z.unknown().array().optional(),
-  DlcProcessNames: z.unknown().array().optional(),
-  MandatoryAppFolderName: z.string().optional(),
-  OwnershipToken: z.string().optional(),
-  CatalogNamespace: z.string(),
-  CatalogItemId: z.string(),
-  AppName: z.string(),
-  AppVersionString: z.string().optional(),
-  MainGameCatalogNamespace: z.string().optional(),
-  MainGameCatalogItemId: z.string().optional(),
-  MainGameAppName: z.string().optional(),
-  AllowedUriEnvVars: z.unknown().array().optional(),
-}).passthrough();
+export const appManifestSchema = toCamelCaseKeys(
+  z.object({
+    formatVersion: z.number(),
+    bIsIncompleteInstall: z.boolean().optional(),
+    launchCommand: z.string().optional(),
+    launchExecutable: z.string().optional(),
+    manifestLocation: z.string().optional(),
+    manifestHash: z.string().optional(),
+    bIsApplication: z.boolean().optional(),
+    bIsExecutable: z.boolean().optional(),
+    bIsManaged: z.boolean().optional(),
+    bNeedsValidation: z.boolean().optional(),
+    bRequiresAuth: z.boolean().optional(),
+    bAllowMultipleInstances: z.boolean().optional(),
+    bCanRunOffline: z.boolean().optional(),
+    bAllowUriCmdArgs: z.boolean().optional(),
+    bLaunchElevated: z.boolean().optional(),
+    baseUrLs: z.string().array().optional(),
+    buildLabel: z.string().optional(),
+    appCategories: z.string().array().optional(),
+    chunkDbs: z.unknown().array().optional(),
+    compatibleApps: z.unknown().array().optional(),
+    displayName: z.string(),
+    installationGuid: z.string().optional(),
+    installLocation: z.string(),
+    installSessionId: z.string().optional(),
+    installTags: z.unknown().array().optional(),
+    installComponents: z.unknown().array().optional(),
+    hostInstallationGuid: z.string().optional(),
+    prereqIds: z.unknown().array().optional(),
+    prereqSha1Hash: z.string().optional(),
+    lastPrereqSucceededSha1Hash: z.string().optional(),
+    stagingLocation: z.string().optional(),
+    technicalType: z.string().optional(),
+    vaultThumbnailUrl: z.string().optional(),
+    vaultTitleText: z.string().optional(),
+    installSize: z.number().optional(),
+    mainWindowProcessName: z.string().optional(),
+    processNames: z.unknown().array().optional(),
+    backgroundProcessNames: z.unknown().array().optional(),
+    ignoredProcessNames: z.unknown().array().optional(),
+    dlcProcessNames: z.unknown().array().optional(),
+    mandatoryAppFolderName: z.string().optional(),
+    ownershipToken: z.string().optional(),
+    catalogNamespace: z.string(),
+    catalogItemId: z.string(),
+    appName: z.string(),
+    appVersionString: z.string().optional(),
+    mainGameCatalogNamespace: z.string().optional(),
+    mainGameCatalogItemId: z.string().optional(),
+    mainGameAppName: z.string().optional(),
+    allowedUriEnvVars: z.unknown().array().optional(),
+  }).passthrough(),
+);
 
 /** A parsed Epic Games Launcher app manifest. */
 export type EpicGamesAppManifest =
-  & z.infer<typeof launcherInstalledSchema>["InstallationList"][number]
+  & z.infer<typeof launcherInstalledSchema>["installationList"][number]
   & z.infer<typeof appManifestSchema>;
 
 /** An abstraction for working with an installed Epic Games Launcher app. */
@@ -82,19 +89,19 @@ export class EpicGamesApp
   /**
    * @param launcher The launcher which manages the app.
    * @param manifest The data manifest the launcher holds about the app.
-   * @param [id=manifest.ArtifactId ?? manifest.AppName] The ArtifactId or
+   * @param [id=manifest.artifactId ?? manifest.appName] The ArtifactId or
    * AppName of the app.
-   * @param [name=manifest.DisplayName] The DisplayName of the app.
-   * @param [path=manifest.InstallLocation] The InstallLocation of the app.
+   * @param [name=manifest.displayName] The DisplayName of the app.
+   * @param [path=manifest.installLocation] The InstallLocation of the app.
    * @param [fullyInstalled=manifest.bIsIncompleteInstall !== true] Whether the
    * app is fully installed.
    */
   constructor(
     public launcher: EpicGamesLauncher,
     public manifest: EpicGamesAppManifest,
-    public id = manifest.ArtifactId ?? manifest.AppName,
-    public name = manifest.DisplayName,
-    public path = manifest.InstallLocation,
+    public id = manifest.artifactId ?? manifest.appName,
+    public name = manifest.displayName,
+    public path = manifest.installLocation,
     public fullyInstalled = manifest.bIsIncompleteInstall !== true,
   ) {}
 

@@ -1,3 +1,4 @@
+import type { platform } from "node:process";
 import type { App, AppManifest } from "./app.js";
 
 /**
@@ -9,6 +10,9 @@ export interface Launcher<
 > {
   /** The name of the launcher. */
   readonly name: string;
+
+  /** The platforms on which interfacing with this launcher is supported. */
+  readonly supportedPlatforms: typeof platform[];
 
   /** Determines whether the launcher appears to be installed. */
   isInstalled?(): Promise<boolean>;

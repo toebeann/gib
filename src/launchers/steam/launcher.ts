@@ -1,15 +1,16 @@
 import { readFile, realpath } from "node:fs/promises";
 import { basename, join } from "node:path";
-import { homedir } from "node:os";
+import type { platform } from "node:process";
 import { Glob } from "glob";
+import open from "open";
 import { match, P } from "ts-pattern";
 import { parse } from "@node-steam/vdf";
 import { z } from "zod";
 import { booleanRace } from "../../utils/booleanRace.js";
-import { exec } from "../../fs/exec.js";
 import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.js";
 import type { Launcher } from "../launcher.js";
 import { appManifestSchema, SteamApp, type SteamAppManifest } from "./app.js";
+import { getLibraryfoldersPath } from "./getLibraryfoldersPath.js";
 
 /** Zod schema for working with Steam's `libraryfolders.vdf` file. */
 export const libraryfoldersSchema = z.object({
@@ -32,6 +33,11 @@ export type SteamLibraryFolders = z.infer<typeof libraryfoldersSchema>;
 /** An abstraction for working with Steam and its apps. */
 export class SteamLauncher implements Launcher<SteamAppManifest> {
   readonly name = "Steam";
+  readonly supportedPlatforms = [
+    "darwin",
+    "linux",
+    "win32",
+  ] satisfies typeof platform[];
 
   /**
    * Gets information about Steam Library folders on this computer, parsed from
@@ -39,14 +45,7 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
    */
   private getLibraryfolders = () =>
     readFile(
-      join(
-        homedir(),
-        "Library",
-        "Application Support",
-        "Steam",
-        "config",
-        "libraryfolders.vdf",
-      ),
+      getLibraryfoldersPath(),
       { encoding: "utf8" },
     ).then((text) =>
       Object.values(libraryfoldersSchema.parse(parse(text)).libraryfolders)
@@ -153,7 +152,7 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
         parse(await readFile(manifestPath, { encoding: "utf8" })),
       );
 
-      if (basename(path) === manifest.AppState.installdir) {
+      if (basename(path) === manifest.appState.installdir) {
         return new SteamApp(this, manifest, manifestPath);
       }
     }
@@ -201,8 +200,6 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
 
     if (!id) return;
 
-    try {
-      await exec(`open steam://rungameid/${id}`);
-    } catch {}
+    await open(`steam://rungameid/${id}`);
   }
 }
