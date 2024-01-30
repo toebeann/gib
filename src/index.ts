@@ -142,7 +142,6 @@ async function main() {
 
   await renderLogo();
 
-  // allow-sys=osRelease
   if (platform !== "darwin") {
     error(
       wrap(
