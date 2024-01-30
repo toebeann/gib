@@ -164,7 +164,13 @@ async function main() {
               "https://www.nexusmods.com/about/vortex/",
               "https://tinyurl.com/3wjededw",
             )
-          } is recommended for automated installation on Windows.`,
+          } or ${
+            link(
+              "Thunderstore Mod Manager",
+              "https://www.overwolf.com/oneapp/Thunderstore-Thunderstore_Mod_Manager",
+              "http://tinyurl.com/2kbt393c",
+            )
+          } are recommended for automated installation on Windows.`,
         ),
       );
       log();
@@ -177,7 +183,7 @@ async function main() {
             "https://docs.bepinex.dev/articles/user_guide/installation/index.html",
             "https://tinyurl.com/yzp3evma",
           )
-        } for installation instructions.`,
+        } for manual installation instructions.`,
       ),
     );
 
