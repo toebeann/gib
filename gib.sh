@@ -45,24 +45,6 @@
     pnpm env use --global 20 >/dev/null
 
     # ensure gib is up-to-date, then launch it
-    echo "Fetching gib..."
-
-    if [ -n "${GIB_VERSION}" ]; then
-        version="${GIB_VERSION}"
-    else
-        version="$(curl -s https://api.github.com/repos/toebeann/gib/releases/latest | pnpm -s dlx node-jq .tag_name | tr -d \" )"
-    fi
-
-    if [ -z "${version}" ]; then
-        version="#${version}"
-    else
-        version=""
-    fi
-
-    # get latest release version from github
-    pnpm -s dlx tiged -fm=tar toebeann/gib${version} ~/.gib
-    echo "Fetching dependencies..."
-    pnpm -C ~/.gib install
-    echo "Launching gib..."
-    pnpm -C ~/.gib start
+    echo "Preparing and launching gib..."
+    pnpm -s --package=tsx --package=toebeann/gib\#semver:^0.1.4 dlx gib
 } # this ensures the entire script is downloaded #
