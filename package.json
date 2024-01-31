@@ -53,6 +53,7 @@
     "core-js": "^3.35.1",
     "lodash": "^4.17.21",
     "protocol-registry": "^1.4.1",
+    "tsx": "^4.7.0",
     "typescript": "^5.3.3",
     "zod": "^3.22.4"
   },
@@ -75,7 +76,6 @@
     "readline-sync": "^1.4.10",
     "terminal-link": "^3.0.0",
     "ts-pattern": "^5.0.6",
-    "tsx": "^4.7.0",
     "wrap-ansi": "^9.0.0"
   }
 }
