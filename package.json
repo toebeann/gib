@@ -34,7 +34,8 @@
     "start": "tsx src/index.ts"
   },
   "engines": {
-    "node": "^20"
+    "node": "^20",
+    "pnpm": ">=8"
   },
   "os": [
     "darwin"
