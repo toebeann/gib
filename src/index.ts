@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * This file is gib: a node script which aims to automate installing BepInEx
  * to a Unity game.
