@@ -29,6 +29,7 @@
     }
   ],
   "type": "module",
+  "bin": "src/index.ts",
   "scripts": {
     "start": "tsx src/index.ts"
   },
