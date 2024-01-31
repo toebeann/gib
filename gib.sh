@@ -44,7 +44,13 @@
     echo "Preparing node..."
     pnpm env use --global 20 >/dev/null
 
+    if [ -n "${GIB_VERSION}" ]; then
+        version="${GIB_VERSION}"
+    else
+        version="^0.1.4"
+    fi
+
     # ensure gib is up-to-date, then launch it
     echo "Preparing and launching gib..."
-    pnpm -s --package=tsx --package=toebeann/gib\#semver:^0.1.4 dlx gib
+    pnpm -s --package=tsx --package=toebeann/gib\#semver:${version} dlx gib
 } # this ensures the entire script is downloaded #
