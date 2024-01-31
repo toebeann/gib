@@ -30,7 +30,7 @@
   ],
   "type": "module",
   "scripts": {
-    "launch": "tsx src/index.ts"
+    "start": "tsx src/index.ts"
   },
   "engines": {
     "node": "^20"

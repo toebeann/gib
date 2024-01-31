@@ -64,5 +64,5 @@
     echo "Fetching dependencies..."
     pnpm -C ~/.gib install
     echo "Launching gib..."
-    pnpm -C ~/.gib launch
+    pnpm -C ~/.gib start
 } # this ensures the entire script is downloaded #
