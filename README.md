@@ -101,7 +101,7 @@ message requests.
    terminal window with `⌘ V`, then press `Enter` to run it.
 
    **ℹ️** _This command will make sure that [pnpm](https://pnpm.io/) (a
-   package manager for node modules) is installed, then install and run the latest
+   package manager for [node](https://nodejs.org) modules) is installed, then install and run the latest
    version of gib with it. If you're curious how it all works or want to verify
    the source code is safe, check
    [`gib.sh`](https://github.com/toebeann/gib/blob/main/gib.sh) and
