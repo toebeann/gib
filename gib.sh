@@ -31,7 +31,10 @@
     # ensure pnpm is installed and up-to-date
     echo "Preparing pnpm..."
     curl -fsSL https://get.pnpm.io/install.sh | sh - >/dev/null
-    source ~/.zshrc
+
+    if ! command -v pnpm >/dev/null; then
+        source ~/.zshrc # only automatically reload .zshrc if pnpm isn't already in the path
+    fi
 
     if ! command -v pnpm >/dev/null; then
         echo "pnpm command not found in PATH"
