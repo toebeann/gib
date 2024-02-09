@@ -406,7 +406,7 @@ log(
     } field and press ${paste} to paste the following line${EOL}${
       chalk.bold("(no need to copy - it's already in your 📋 clipboard!)")
     }${EOL}${EOL}${pink(launchOptions)}`,
-    "Press escape to close the Steam properties for the game",
+    "Close the Steam properties for the game",
   ], true),
 );
 
