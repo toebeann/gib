@@ -34,7 +34,9 @@
 
     # automatically reload .zshrc if pnpm isn't already in the path
     if ! command -v pnpm >/dev/null; then
+        set +e # ignore errors in the .zshrc, we just need the path to be updated
         source ~/.zshrc
+        set -e # re-enable exit on err
     fi
 
     if ! command -v pnpm >/dev/null; then
