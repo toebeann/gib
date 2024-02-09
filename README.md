@@ -40,52 +40,53 @@ message requests.
 #### Prerequisites
 
 - If you don't own the game on Steam, you'll need to add it to Steam as a
-   non-Steam game. Follow
-   [the guide to add a non-Steam game to Steam](https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam)
-   if you're unsure how.
+  non-Steam game. Follow
+  [the guide to add a non-Steam game to Steam](https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam)
+  if you're unsure how.
 
 - You'll want a Finder window open at the folder where the game is installed.
-  
+
   - If you own the game on Steam (i.e. you _didn't_ add the game to Steam as a
-     non-Steam game), find the game in your library, then right-click it and
-     select `Manage` -> `Browse local files`.
-  
-  - For the Epic Games Launcher, find the game in your library, then
-     right-click it and select `Manage`. In the window that opens, look for the
-     folder icon and click it.
+    non-Steam game), find the game in your library, then right-click it and
+    select `Manage` -> `Browse local files`.
+
+  - For the Epic Games Launcher, find the game in your library, then right-click
+    it and select `Manage`. In the window that opens, look for the folder icon
+    and click it.
 
 - You'll want a copy of BepInEx downloaded and unzipped in your Downloads
-   folder.
+  folder.
 
-   If you're unsure where to get BepInEx from, try a Google search for
-   `[game name] bepinex pack`, e.g. for Subnautica, I would search for:
-   ```
-   Subnautica BepInEx pack
-   ```
+  If you're unsure where to get BepInEx from, try a Google search for
+  `[game name] bepinex pack`, e.g. for Subnautica, I would search for:
+  ```
+  Subnautica BepInEx pack
+  ```
 
-   Where available, it is always advised to use a popular pack of BepInEx which
-   has been tailored to the specific game you're trying to mod.
+  Where available, it is always advised to use a popular pack of BepInEx which
+  has been tailored to the specific game you're trying to mod.
 
-   If you can't find a BepInEx pack for the game, then the latest stable version
-   of BepInEx from their official GitHub repo will do.
-   [You can find it here](https://github.com/BepInEx/BepInEx/releases/latest) -
-   scroll down to the `Assets` section, then download the file with "unix" in
-   the name, e.g. `BepInEx_unix_5.4.22.0.zip`.
+  If you can't find a BepInEx pack for the game, then the latest stable version
+  of BepInEx from their official GitHub repo will do.
+  [You can find it here](https://github.com/BepInEx/BepInEx/releases/latest) -
+  scroll down to the `Assets` section, then download the file with "unix" in the
+  name, e.g. `BepInEx_unix_5.4.22.0.zip`.
 
-   Make sure it is unzipped in your Downloads folder after downloading it, as
-   presently gib requires this. By default, Safari will have unzipped it for
-   you. If you use other browsers, simply open the .zip and macOS should unzip
-   it for you.
+  Make sure it is unzipped in your Downloads folder after downloading it, as
+  presently gib requires this. By default, Safari will have unzipped it for you.
+  If you use other browsers, simply open the .zip and macOS should unzip it for
+  you.
 
-   Go ahead and open a Finder window in the unzipped BepInEx folder, so that you
-   can see the file `run_bepinex.sh`.
+  Go ahead and open a Finder window in the unzipped BepInEx folder, so that you
+  can see the file `run_bepinex.sh`.
 
-   **ℹ️** _In some cases the shell script to load BepInEx may be named something else, e.g. `start_game_bepinex.sh` - in this case you will need to rename it to `run_bepinex.sh` for gib to recognise it._
+  **ℹ️** _In some cases the shell script to load BepInEx may be named something
+  else, e.g. `start_game_bepinex.sh` - in this case you will need to rename it
+  to `run_bepinex.sh` for gib to recognise it._
 
-   Leave this Finder window open - you'll
-   want to come back to it later.
+  Leave this Finder window open - you'll want to come back to it later.
 
-   <img width="920" alt="A screenshot of Finder window open at the location of BepInEx's run_bepinex.sh " src="https://github.com/toebeann/gib/assets/45315526/8b961265-2fd2-4017-85fb-2c91369a825f">
+  <img width="920" alt="A screenshot of Finder window open at the location of BepInEx's run_bepinex.sh " src="https://github.com/toebeann/gib/assets/45315526/8b961265-2fd2-4017-85fb-2c91369a825f">
 
 #### Running gib
 
@@ -100,12 +101,13 @@ message requests.
 1. Copy the command from the [TL;DR](#tldr) section above and paste it in your
    terminal window with `⌘ V`, then press `Enter` to run it.
 
-   **ℹ️** _This command will make sure that [pnpm](https://pnpm.io/) (a
-   package manager for [node](https://nodejs.org) modules) is installed, then install and run the latest
-   version of gib with it. If you're curious how it all works or want to verify
-   the source code is safe, check
+   **ℹ️** _This command will make sure that [pnpm](https://pnpm.io/) (a package
+   manager for [node](https://nodejs.org) modules) is installed, then install
+   and run the latest version of gib with it. If you're curious how it all works
+   or want to verify the source code is safe, check
    [`gib.sh`](https://github.com/toebeann/gib/blob/main/gib.sh) and
-   [`index.ts`](https://github.com/toebeann/gib/blob/main/src/index.ts) for details._
+   [`index.ts`](https://github.com/toebeann/gib/blob/main/src/index.ts) for
+   details._
 
    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/8ad7f224-e3a6-44b5-968b-c46d039d5d5d">
 
@@ -120,18 +122,25 @@ message requests.
 ## Caveats
 
 - Only native macOS applications are currently supported.
-  
-  - Support for Windows apps on macOS (e.g. via CrossOver or Wine) is being considered.
-  
+
+  - Support for Windows apps on macOS (e.g. via CrossOver or Wine) is being
+    considered.
+
   - Support for other operating systems is being considered.
 
-- Only BepInEx 5 is currently supported. Support for BepInEx 6 is being considered.
+- Only BepInEx 5 is currently supported. Support for BepInEx 6 is being
+  considered.
 
-- I have not personally tested gib on Apple silicon, i.e. M1, M2, M3 etc., but it should work as long as the BepInEx pack you're downloading is compatible with Apple silicon.
+- I have not personally tested gib on Apple silicon, i.e. M1, M2, M3 etc., but
+  it should work as long as the BepInEx pack you're downloading is compatible
+  with Apple silicon.
 
 ## Known issues
 
-- If the shell script to launch BepInEx is named something other than `run_bepinex.sh` (e.g. `start_game_bepinex.sh`), gib will not recognise it. I plan to fix this in an update. In the meantime, you can workaround this by renaming the shell script to `run_bepinex.sh` as needed.
+- If the shell script to launch BepInEx is named something other than
+  `run_bepinex.sh` (e.g. `start_game_bepinex.sh`), gib will not recognise it. I
+  plan to fix this in an update. In the meantime, you can workaround this by
+  renaming the shell script to `run_bepinex.sh` as needed.
 
 ## License
 
