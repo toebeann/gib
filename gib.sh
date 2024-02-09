@@ -41,8 +41,7 @@
 
     if ! command -v pnpm >/dev/null; then
         echo "pnpm command not found in PATH"
-        echo "Please run the command below or reload your terminal, then run this script again"
-        echo "source ~/.zshrc"
+        echo "Please reload your terminal, then run this script again"
         exit 1
     fi
 
