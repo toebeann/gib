@@ -36,15 +36,16 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 ### Walkthrough
 
+> [!TIP]\
+> If you run into any unexpected issues while following these instructions or
+> need further assistance, please feel free to send a DM on discord to `toebean`
+> (that's me) explaining the issue and I'll reply when I remember to check my
+> message requests.
+
 > [!NOTE]\
 > These usage instructions were written for macOS Sonoma. The instructions below
 > should work for other versions of macOS, but there may be some slight
 > differences.
-
-If you run into any unexpected issues while following these instructions or need
-further assistance, please feel free to send a DM on discord to `toebean`
-(that's me) explaining the issue and I'll reply when I remember to check my
-message requests.
 
 #### Prerequisites
 
