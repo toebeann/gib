@@ -32,8 +32,9 @@
     echo "Preparing pnpm..."
     curl -fsSL https://get.pnpm.io/install.sh | sh - >/dev/null
 
+    # automatically reload .zshrc if pnpm isn't already in the path
     if ! command -v pnpm >/dev/null; then
-        source ~/.zshrc # only automatically reload .zshrc if pnpm isn't already in the path
+        source ~/.zshrc
     fi
 
     if ! command -v pnpm >/dev/null; then
