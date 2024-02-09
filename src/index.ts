@@ -420,9 +420,6 @@ log(
   ),
 );
 
-// const ac = new AbortController();
-// const { signal } = ac;
-
 var { detectedGame, detectedBepInEx } = await new Promise<
   { detectedGame: boolean; detectedBepInEx: boolean }
 >(
