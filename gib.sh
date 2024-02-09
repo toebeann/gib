@@ -37,12 +37,13 @@
         set +e # ignore errors in the .zshrc, we just need the path to be updated
         source ~/.zshrc
         set -e # re-enable exit on err
-    fi
 
-    if ! command -v pnpm >/dev/null; then
-        echo "pnpm command not found in PATH"
-        echo "Please reload your terminal, then run this script again"
-        exit 1
+        # if pnpm still not in path after reloading .zshrc, exit with error
+        if ! command -v pnpm >/dev/null; then
+            echo "pnpm command not found in PATH"
+            echo "Please reload your terminal, then run this script again"
+            exit 1
+        fi
     fi
 
     # ensure node v20 is in use

@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "gib",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "A CLI utility for automating the installation of BepInEx",
   "license": "ISC",
   "author": "Tobey Blaber",
