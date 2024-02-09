@@ -115,10 +115,11 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 1. Now, simply follow the instructions in the terminal to install BepInEx to
    your game!
 
-If you ran into any unexpected issues while following these instructions or need
-further assistance, please feel free to send a DM on discord to `toebean`
-(that's me) explaining the issue and I'll reply when I remember to check my
-message requests.
+> [!TIP]\
+> If you ran into any unexpected issues while following these instructions or
+> need further assistance, please feel free to send a DM on discord to `toebean`
+> (that's me) explaining the issue and I'll reply when I remember to check my
+> message requests.
 
 ## Caveats
 
