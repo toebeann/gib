@@ -24,13 +24,22 @@ Just run the following command in Terminal:
 curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | sh
 ```
 
+This command will make sure that [pnpm](https://pnpm.io/) (a package manager for
+[node](https://nodejs.org) modules) is installed, then install and run the
+latest version of gib with it. If you're curious how it all works or want to
+verify the source code is safe, check
+[`gib.sh`](https://github.com/toebeann/gib/blob/main/gib.sh) and
+[`index.ts`](https://github.com/toebeann/gib/blob/main/src/index.ts) for
+details.
+
 If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 ### Walkthrough
 
-**ℹ️ These usage instructions were written for macOS Sonoma. The instructions
-below should work for other versions of macOS, but there may be some slight
-differences.**
+> [!NOTE]\
+> These usage instructions were written for macOS Sonoma. The instructions below
+> should work for other versions of macOS, but there may be some slight
+> differences.
 
 If you run into any unexpected issues while following these instructions or need
 further assistance, please feel free to send a DM on discord to `toebean`
@@ -59,6 +68,7 @@ message requests.
 
   If you're unsure where to get BepInEx from, try a Google search for
   `[game name] bepinex pack`, e.g. for Subnautica, I would search for:
+
   ```
   Subnautica BepInEx pack
   ```
@@ -80,13 +90,14 @@ message requests.
   Go ahead and open a Finder window in the unzipped BepInEx folder, so that you
   can see the file `run_bepinex.sh`.
 
-  **ℹ️** _In some cases the shell script to load BepInEx may be named something
-  else, e.g. `start_game_bepinex.sh` - in this case you will need to rename it
-  to `run_bepinex.sh` for gib to recognise it._
-
   Leave this Finder window open - you'll want to come back to it later.
 
   <img width="920" alt="A screenshot of Finder window open at the location of BepInEx's run_bepinex.sh " src="https://github.com/toebeann/gib/assets/45315526/8b961265-2fd2-4017-85fb-2c91369a825f">
+
+> [!TIP]\
+> In some cases the shell script to load BepInEx may be named something else,
+> e.g. `start_game_bepinex.sh` - in this case you will need to rename it to
+> `run_bepinex.sh` for gib to recognise it.
 
 #### Running gib
 
@@ -95,19 +106,8 @@ message requests.
 
    <img width="600" alt="Searching for Terminal with macOS Spotlight" src="https://github.com/toebeann/BepInEx.Subnautica/assets/45315526/f374da75-5c74-4b49-99c2-25daa296c504">
 
-   **ℹ️** _These instructions haven't been tested with iTerm2 or other terminal
-   apps. Use the standard terminal if you have problems._
-
 1. Copy the command from the [TL;DR](#tldr) section above and paste it in your
    terminal window with `⌘ V`, then press `Enter` to run it.
-
-   **ℹ️** _This command will make sure that [pnpm](https://pnpm.io/) (a package
-   manager for [node](https://nodejs.org) modules) is installed, then install
-   and run the latest version of gib with it. If you're curious how it all works
-   or want to verify the source code is safe, check
-   [`gib.sh`](https://github.com/toebeann/gib/blob/main/gib.sh) and
-   [`index.ts`](https://github.com/toebeann/gib/blob/main/src/index.ts) for
-   details._
 
    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd">
 
