@@ -32,18 +32,22 @@
     echo "Preparing pnpm..."
     curl -fsSL https://get.pnpm.io/install.sh | sh - >/dev/null
 
-    # automatically reload .zshrc if pnpm isn't already in the path
-    if ! command -v pnpm >/dev/null; then
-        set +e # ignore errors in the .zshrc, we just need the path to be updated
-        source ~/.zshrc
-        set -e # re-enable exit on err
+    # ensure pnpm env vars are set
+    if [ -z "$PNPM_HOME" ]; then
+        export PNPM_HOME="$HOME/Library/pnpm"
+    fi
 
-        # if pnpm still not in path after reloading .zshrc, exit with error
-        if ! command -v pnpm >/dev/null; then
-            echo "pnpm command not found in PATH"
-            echo "Please reload your terminal, then run this script again"
-            exit 1
-        fi
+    # ensure PATH contains pnpm home
+    case ":$PATH:" in
+        *":$PNPM_HOME:"*) ;;
+        *) export PATH="$PNPM_HOME:$PATH" ;;
+    esac
+
+    # check for pnpm command and ask user to reload terminal if not found
+    if ! command -v pnpm >/dev/null; then
+        echo "pnpm not found in PATH"
+        echo "Please reload your terminal, then run this script again"
+        exit 1
     fi
 
     # ensure node v20 is in use
