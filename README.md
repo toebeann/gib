@@ -147,4 +147,4 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 ## License
 
 gib is licensed under the
-[ISC License](https://github.com/toebeann/gib#ISC-1-ov-file).
+[ISC License](https://github.com/toebeann/gib?tab=ISC-1-ov-file#readme).
