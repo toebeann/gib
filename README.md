@@ -21,7 +21,7 @@ cannot.
 Just run the following command in Terminal:
 
 ```sh
-curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | sh
+curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash
 ```
 
 This command will make sure that [bun](https://bun.sh/) (a speedy JavaScript
