@@ -1,5 +1,5 @@
 import type { platform } from "node:process";
-import type { App, AppManifest } from "./app.js";
+import type { App, AppManifest } from "./app.ts";
 
 /**
  * An abstraction for working with an app launcher,

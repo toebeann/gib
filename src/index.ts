@@ -64,9 +64,9 @@ import readlineSync from "readline-sync";
 import terminalLink from "terminal-link";
 import { match, P } from "ts-pattern";
 import wrapAnsi from "wrap-ansi";
-import { renderLogo } from "./cli/renderLogo.js";
-import { findPlistPath } from "./utils/findPlistPath.js";
-import { hasUnityAppIndicators } from "./unity/hasUnityAppIndicators.js";
+import { renderLogo } from "./cli/renderLogo.ts";
+import { findPlistPath } from "./utils/findPlistPath.ts";
+import { hasUnityAppIndicators } from "./unity/hasUnityAppIndicators.ts";
 
 const ensureDir = fs.ensureDir;
 

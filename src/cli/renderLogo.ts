@@ -6,7 +6,7 @@ import cliWidth from "cli-width";
 import figlet from "figlet";
 import gradientString from "gradient-string";
 import wrapAnsi from "wrap-ansi";
-import { version } from "../../package.json";
+import packageMetadata from "../../package.json" with { type: "json" };
 
 const width = () => cliWidth({ defaultWidth: 80 });
 const wrap = (
@@ -16,6 +16,7 @@ const wrap = (
 ) => wrapAnsi(str, columns, options);
 
 export const createLogo = async () => {
+  const { version } = packageMetadata;
   const outputLines: string[] = [];
 
   outputLines.push(chalk.gray(`gib ${version}`));

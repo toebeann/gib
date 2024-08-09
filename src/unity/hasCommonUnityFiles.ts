@@ -1,6 +1,6 @@
 import { stat } from "node:fs/promises";
 import { join } from "node:path";
-import { booleanRace } from "../utils/booleanRace.js";
+import { booleanRace } from "../utils/booleanRace.ts";
 
 /**
  * Determines whether the macOS Application corresponding with the provided

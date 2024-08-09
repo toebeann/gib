@@ -1,8 +1,8 @@
 import { join } from "node:path";
 import { z } from "zod";
-import { toCamelCaseKeys } from "../../zod/toCamelCaseKeys.js";
-import type { App } from "../app.js";
-import type { SteamLauncher } from "./launcher.js";
+import { toCamelCaseKeys } from "../../zod/toCamelCaseKeys.ts";
+import type { App } from "../app.ts";
+import type { SteamLauncher } from "./launcher.ts";
 
 /** State flags used in Steam's app manifest files. */
 export enum SteamAppState {

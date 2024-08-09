@@ -1,8 +1,8 @@
-import { booleanRace } from "../utils/booleanRace.js";
-import { hasCommonUnityFiles } from "./hasCommonUnityFiles.js";
-import { hasCommonUnityString } from "./hasCommonUnityString.js";
-import { hasUnityBuildNumber } from "./hasUnityBuildNumber.js";
-import { hasUnityPlayerDylib } from "./hasUnityPlayerDylib.js";
+import { booleanRace } from "../utils/booleanRace.ts";
+import { hasCommonUnityFiles } from "./hasCommonUnityFiles.ts";
+import { hasCommonUnityString } from "./hasCommonUnityString.ts";
+import { hasUnityBuildNumber } from "./hasUnityBuildNumber.ts";
+import { hasUnityPlayerDylib } from "./hasUnityPlayerDylib.ts";
 
 /**
  * Determines whether the macOS Application corresponding with the provided

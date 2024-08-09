@@ -1,4 +1,4 @@
-import { exec } from "../fs/exec.js";
+import { exec } from "../fs/exec.ts";
 
 /**
  * Determines whether the provided `Info.plist` file contains at least one of

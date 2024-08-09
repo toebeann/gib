@@ -1,6 +1,6 @@
 import { access, constants, realpath, stat } from "node:fs/promises";
 import { basename, dirname, extname, join, resolve } from "node:path";
-import { booleanRace } from "./booleanRace.js";
+import { booleanRace } from "./booleanRace.ts";
 
 export const plistBasename = "Info.plist";
 export const plistDirname = "Contents";

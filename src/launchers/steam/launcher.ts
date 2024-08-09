@@ -6,11 +6,11 @@ import open from "open";
 import { match, P } from "ts-pattern";
 import { parse } from "@node-steam/vdf";
 import { z } from "zod";
-import { booleanRace } from "../../utils/booleanRace.js";
-import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.js";
-import type { Launcher } from "../launcher.js";
-import { appManifestSchema, SteamApp, type SteamAppManifest } from "./app.js";
-import { getLibraryfoldersPath } from "./getLibraryfoldersPath.js";
+import { booleanRace } from "../../utils/booleanRace.ts";
+import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.ts";
+import type { Launcher } from "../launcher.ts";
+import { appManifestSchema, SteamApp, type SteamAppManifest } from "./app.ts";
+import { getLibraryfoldersPath } from "./getLibraryfoldersPath.ts";
 
 /** Zod schema for working with Steam's `libraryfolders.vdf` file. */
 export const libraryfoldersSchema = z.object({

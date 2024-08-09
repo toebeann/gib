@@ -1,4 +1,4 @@
-import type { Launcher } from "./launcher.js";
+import type { Launcher } from "./launcher.ts";
 
 /** An app data manifest. */
 export type AppManifest = Record<string, unknown> | undefined;
