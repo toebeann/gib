@@ -1,4 +1,4 @@
-#!/usr/bin/env node --no-warnings --experimental-strip-types
+#!/usr/bin/env node --experimental-strip-types --no-warnings=ExperimentalWarning
 /**
  * This file is gib: a node script which aims to automate installing BepInEx
  * to a Unity game.
