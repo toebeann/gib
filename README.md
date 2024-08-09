@@ -24,11 +24,10 @@ Just run the following command in Terminal:
 curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | sh
 ```
 
-This command will make sure that [pnpm](https://pnpm.io/) (a package manager for
-[node](https://nodejs.org) modules) is installed, then install and run the
-latest version of gib with it. If you're curious how it all works or want to
-verify the source code is safe, check
-[`gib.sh`](https://github.com/toebeann/gib/blob/main/gib.sh) and
+This command will make sure that [bun](https://bun.sh/) (a speedy JavaScript
+runtime) is installed, then install and run the latest version of gib with it.
+If you're curious how it all works or want to verify the source code is safe,
+check [`gib.sh`](https://github.com/toebeann/gib/blob/main/gib.sh) and
 [`index.ts`](https://github.com/toebeann/gib/blob/main/src/index.ts) for
 details.
 
