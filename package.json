@@ -31,7 +31,7 @@
   "type": "module",
   "bin": "src/index.ts",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "start": "node --no-warnings --experimental-strip-types src/index.mts"
   },
   "engines": {
     "node": "22.6.0",
