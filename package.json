@@ -2,7 +2,7 @@
   "private": true,
   "name": "gib",
   "version": "0.1.11",
-  "description": "A CLI utility for automating the installation of BepInEx",
+  "description": "A TUI application for automating the installation of BepInEx",
   "license": "ISC",
   "author": "Tobey Blaber",
   "homepage": "https://github.com/toebeann/gib",
@@ -31,11 +31,12 @@
   "type": "module",
   "bin": "src/index.ts",
   "scripts": {
-    "start": "node --experimental-strip-types --no-warnings=ExperimentalWarning src/index.ts"
+    "start": "bun src/index.ts"
   },
   "engines": {
     "node": "22.6.0",
-    "pnpm": ">=8"
+    "pnpm": ">=8",
+    "bun": "^1.1"
   },
   "os": [
     "darwin"
@@ -43,6 +44,7 @@
   "devDependencies": {
     "@node-steam/vdf": "^2.2.0",
     "@total-typescript/ts-reset": "^0.5.1",
+    "@types/bun": "^1.1.6",
     "@types/center-align": "^1.0.2",
     "@types/figlet": "^1.5.8",
     "@types/fs-extra": "^11.0.4",

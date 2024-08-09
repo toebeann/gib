@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 #
-# This file is a shell script to ensure a user has pnpm & node installed,
-# before using them to install and launch the gib CLI.
+# This file is a shell script to ensure a user has all of the prerequisite
+# dependencies of gib installed before launching it.
 #
 ###############################################################################
 #
@@ -28,39 +28,34 @@
 { # this ensures the entire script is downloaded #
     set -e # exit on err
 
-    # ensure pnpm is installed and up-to-date
-    echo "Preparing pnpm..."
-    curl -fsSL https://get.pnpm.io/install.sh | sh - >/dev/null
+    echo -ne "\r\033[K  ⏳ Preparing to launch gib..."
 
-    # ensure pnpm env vars are set
-    if [ -z "$PNPM_HOME" ]; then
-        export PNPM_HOME="$HOME/Library/pnpm"
+    # ensure bun is installed
+    if ! command -v bun >/dev/null; then
+        curl -fsSL https://bun.sh/install | bash &>/dev/null
+
+        # check for bun command and let user know if not found
+        if ! command -v bun >/dev/null; then
+            echo -e "\r\033[K  ❌ Installing bun failed"
+            echo "Bun not found in PATH!"
+            echo "Please reload your terminal and run this script again."
+            exit 1
+        fi
     fi
 
-    # ensure PATH contains pnpm home
-    case ":$PATH:" in
-        *":$PNPM_HOME:"*) ;;
-        *) export PATH="$PNPM_HOME:$PATH" ;;
-    esac
+    echo -ne "\r\033[2K"
 
-    # check for pnpm command and ask user to reload terminal if not found
-    if ! command -v pnpm >/dev/null; then
-        echo "pnpm not found in PATH"
-        echo "Please reload your terminal, then run this script again"
-        exit 1
+    if [ -n "${GIB_CLEAR_CACHE}" ] && [ ${GIB_CLEAR_CACHE} -eq 1 &>/dev/null ]; then
+        if ! bun pm cache rm -g &>/dev/null; then
+            bun i noop -g &>/dev/null
+            bun rm noop -g &>/dev/null
+            bun pm cache rm -g &>/dev/null
+        fi
     fi
-
-    # ensure node v20 is in use
-    echo "Preparing node..."
-    pnpm env use --global 22.6.0 >/dev/null
 
     if [ -n "${GIB_VERSION}" ]; then
-        version="${GIB_VERSION}"
+        bun x --bun toebeann/gib\#${GIB_VERSION}
     else
-        version="^0.1.4"
+        bun x --bun toebeann/gib
     fi
-
-    # ensure gib is up-to-date, then launch it
-    echo "Preparing and launching gib..."
-    pnpm -s --package=tsx --package=toebeann/gib\#semver:${version} dlx gib
 } # this ensures the entire script is downloaded #
