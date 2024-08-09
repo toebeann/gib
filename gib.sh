@@ -52,7 +52,7 @@
 
     # ensure node v20 is in use
     echo "Preparing node..."
-    pnpm env use --global 20 >/dev/null
+    pnpm env use --global 22.6.0 >/dev/null
 
     if [ -n "${GIB_VERSION}" ]; then
         version="${GIB_VERSION}"
