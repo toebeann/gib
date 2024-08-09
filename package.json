@@ -34,7 +34,7 @@
     "start": "tsx src/index.ts"
   },
   "engines": {
-    "node": "^20",
+    "node": "22.6.0",
     "pnpm": ">=8"
   },
   "os": [
