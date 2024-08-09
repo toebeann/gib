@@ -1,2 +1,2 @@
-export type { App, AppManifest } from "./app.js";
-export type { Launcher } from "./launcher.js";
+export type { App, AppManifest } from "./app.ts";
+export type { Launcher } from "./launcher.ts";

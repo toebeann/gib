@@ -1,6 +1,6 @@
 import ProtocolRegistry from "protocol-registry";
 import { match } from "ts-pattern";
-import { isProtocolHandlerRegistered as win } from "./windows/isProtocolHandlerRegistered.js";
+import { isProtocolHandlerRegistered as win } from "./windows/isProtocolHandlerRegistered.ts";
 
 /**
  * Determines whether a handler for a given protocol is registered.

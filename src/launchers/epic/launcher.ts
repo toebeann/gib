@@ -4,15 +4,15 @@ import type { platform } from "node:process";
 import { Glob } from "glob";
 import open from "open";
 import { match, P } from "ts-pattern";
-import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.js";
-import type { Launcher } from "../index.js";
+import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.ts";
+import type { Launcher } from "../index.ts";
 import {
   appManifestSchema,
   EpicGamesApp,
   type EpicGamesAppManifest,
   launcherInstalledSchema,
-} from "./app.js";
-import { getAppDataPath } from "./getAppDataPath.js";
+} from "./app.ts";
+import { getAppDataPath } from "./getAppDataPath.ts";
 
 /** An abstraction for working with the Epic Games Launcher and its apps. */
 export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {

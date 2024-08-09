@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { toCamelCaseKeys } from "../../zod/toCamelCaseKeys.js";
-import type { App } from "../app.js";
-import type { EpicGamesLauncher } from "./launcher.js";
+import { toCamelCaseKeys } from "../../zod/toCamelCaseKeys.ts";
+import type { App } from "../app.ts";
+import type { EpicGamesLauncher } from "./launcher.ts";
 
 /**
  * Zod schema for working with the Epic Games Launcher's
