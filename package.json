@@ -53,11 +53,9 @@
     "core-js": "^3.38.0",
     "lodash": "^4.17.21",
     "protocol-registry": "^1.4.1",
+    "registry-js": "^1.16.0",
     "typescript": "^5.5.4",
     "zod": "^3.23.8"
-  },
-  "optionalDependencies": {
-    "registry-js": "^1.16.0"
   },
   "dependencies": {
     "boxen": "^8.0.1",
