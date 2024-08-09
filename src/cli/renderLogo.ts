@@ -19,7 +19,7 @@ export const createLogo = async () => {
   const { version } = packageMetadata;
   const outputLines: string[] = [];
 
-  outputLines.push(chalk.gray(`gib ${version}`));
+  outputLines.push(chalk.gray(`gib ${version}${typeof Bun !== "undefined" ? ` bun ${Bun.version}` : ""}`));
 
   const logo = new Promise<string>((resolve, reject) =>
     figlet(
