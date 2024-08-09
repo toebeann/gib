@@ -26,6 +26,15 @@
 # TODO: Keep this script simple and easy to audit.
 
 { # this ensures the entire script is downloaded #
+    
+    #ensure XCode Command Line Developer Tools are installed
+    echo -ne "\033[K  ⏳ Setting up XCode, please confirm the pop-ups and get comfortable..."
+
+    xcode-select --install &>/dev/null
+    until xcode-select --print-path &>/dev/null; do
+        sleep 5
+    done
+
     set -e # exit on err
 
     echo -ne "\r\033[K  ⏳ Preparing to launch gib..."
