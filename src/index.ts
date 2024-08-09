@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node --no-warnings --experimental-strip-types
 /**
  * This file is gib: a node script which aims to automate installing BepInEx
  * to a Unity game.
