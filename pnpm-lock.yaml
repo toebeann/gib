@@ -56,10 +56,6 @@ importers:
       wrap-ansi:
         specifier: ^9.0.0
         version: 9.0.0
-    optionalDependencies:
-      registry-js:
-        specifier: ^1.16.0
-        version: 1.16.0
     devDependencies:
       '@node-steam/vdf':
         specifier: ^2.2.0
@@ -97,6 +93,9 @@ importers:
       protocol-registry:
         specifier: ^1.4.1
         version: 1.4.1
+      registry-js:
+        specifier: ^1.16.0
+        version: 1.16.0
       typescript:
         specifier: ^5.5.4
         version: 5.5.4
@@ -951,8 +950,7 @@ snapshots:
     dependencies:
       type-fest: 1.4.0
 
-  ansi-regex@2.1.1:
-    optional: true
+  ansi-regex@2.1.1: {}
 
   ansi-regex@5.0.1: {}
 
@@ -969,14 +967,12 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  aproba@1.2.0:
-    optional: true
+  aproba@1.2.0: {}
 
   are-we-there-yet@1.1.7:
     dependencies:
       delegates: 1.0.0
       readable-stream: 2.3.8
-    optional: true
 
   async@3.2.5: {}
 
@@ -991,7 +987,6 @@ snapshots:
       buffer: 5.7.1
       inherits: 2.0.4
       readable-stream: 3.6.2
-    optional: true
 
   boxen@8.0.1:
     dependencies:
@@ -1021,7 +1016,6 @@ snapshots:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
-    optional: true
 
   bundle-name@4.1.0:
     dependencies:
@@ -1053,8 +1047,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  chownr@1.1.4:
-    optional: true
+  chownr@1.1.4: {}
 
   cli-boxes@3.0.0: {}
 
@@ -1066,8 +1059,7 @@ snapshots:
       is-wsl: 3.1.0
       is64bit: 2.0.0
 
-  code-point-at@1.1.0:
-    optional: true
+  code-point-at@1.1.0: {}
 
   color-convert@2.0.1:
     dependencies:
@@ -1079,13 +1071,11 @@ snapshots:
 
   concat-map@0.0.1: {}
 
-  console-control-strings@1.1.0:
-    optional: true
+  console-control-strings@1.1.0: {}
 
   core-js@3.38.0: {}
 
-  core-util-is@1.0.3:
-    optional: true
+  core-util-is@1.0.3: {}
 
   cross-spawn@7.0.3:
     dependencies:
@@ -1100,10 +1090,8 @@ snapshots:
   decompress-response@4.2.1:
     dependencies:
       mimic-response: 2.1.0
-    optional: true
 
-  deep-extend@0.6.0:
-    optional: true
+  deep-extend@0.6.0: {}
 
   default-browser-id@5.0.0: {}
 
@@ -1114,11 +1102,9 @@ snapshots:
 
   define-lazy-prop@3.0.0: {}
 
-  delegates@1.0.0:
-    optional: true
+  delegates@1.0.0: {}
 
-  detect-libc@1.0.3:
-    optional: true
+  detect-libc@1.0.3: {}
 
   eastasianwidth@0.2.0: {}
 
@@ -1135,7 +1121,6 @@ snapshots:
   end-of-stream@1.4.4:
     dependencies:
       once: 1.4.0
-    optional: true
 
   execa@8.0.1:
     dependencies:
@@ -1149,8 +1134,7 @@ snapshots:
       signal-exit: 4.1.0
       strip-final-newline: 3.0.0
 
-  expand-template@2.0.3:
-    optional: true
+  expand-template@2.0.3: {}
 
   figlet@1.7.0: {}
 
@@ -1175,8 +1159,7 @@ snapshots:
       cross-spawn: 7.0.3
       signal-exit: 4.1.0
 
-  fs-constants@1.0.0:
-    optional: true
+  fs-constants@1.0.0: {}
 
   fs-extra@11.2.0:
     dependencies:
@@ -1197,14 +1180,12 @@ snapshots:
       string-width: 1.0.2
       strip-ansi: 3.0.1
       wide-align: 1.1.5
-    optional: true
 
   get-east-asian-width@1.2.0: {}
 
   get-stream@8.0.1: {}
 
-  github-from-package@0.0.0:
-    optional: true
+  github-from-package@0.0.0: {}
 
   glob-parent@5.1.2:
     dependencies:
@@ -1228,19 +1209,15 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  has-unicode@2.0.1:
-    optional: true
+  has-unicode@2.0.1: {}
 
   human-signals@5.0.0: {}
 
-  ieee754@1.2.1:
-    optional: true
+  ieee754@1.2.1: {}
 
-  inherits@2.0.4:
-    optional: true
+  inherits@2.0.4: {}
 
-  ini@1.3.8:
-    optional: true
+  ini@1.3.8: {}
 
   is-binary-path@2.1.0:
     dependencies:
@@ -1255,7 +1232,6 @@ snapshots:
   is-fullwidth-code-point@1.0.0:
     dependencies:
       number-is-nan: 1.0.1
-    optional: true
 
   is-fullwidth-code-point@3.0.0: {}
 
@@ -1283,8 +1259,7 @@ snapshots:
     dependencies:
       system-architecture: 0.1.0
 
-  isarray@1.0.0:
-    optional: true
+  isarray@1.0.0: {}
 
   isexe@2.0.0: {}
 
@@ -1327,8 +1302,7 @@ snapshots:
 
   mimic-fn@4.0.0: {}
 
-  mimic-response@2.1.0:
-    optional: true
+  mimic-response@2.1.0: {}
 
   minimatch@10.0.1:
     dependencies:
@@ -1342,29 +1316,23 @@ snapshots:
     dependencies:
       brace-expansion: 2.0.1
 
-  minimist@1.2.8:
-    optional: true
+  minimist@1.2.8: {}
 
   minipass@7.1.2: {}
 
-  mkdirp-classic@0.5.3:
-    optional: true
+  mkdirp-classic@0.5.3: {}
 
   ms@2.1.2: {}
 
-  napi-build-utils@1.0.2:
-    optional: true
+  napi-build-utils@1.0.2: {}
 
   node-abi@2.30.1:
     dependencies:
       semver: 5.7.2
-    optional: true
 
-  node-addon-api@3.2.1:
-    optional: true
+  node-addon-api@3.2.1: {}
 
-  noop-logger@0.1.1:
-    optional: true
+  noop-logger@0.1.1: {}
 
   normalize-path@3.0.0: {}
 
@@ -1378,18 +1346,14 @@ snapshots:
       console-control-strings: 1.1.0
       gauge: 2.7.4
       set-blocking: 2.0.0
-    optional: true
 
-  number-is-nan@1.0.1:
-    optional: true
+  number-is-nan@1.0.1: {}
 
-  object-assign@4.1.1:
-    optional: true
+  object-assign@4.1.1: {}
 
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
-    optional: true
 
   onetime@6.0.0:
     dependencies:
@@ -1438,10 +1402,8 @@ snapshots:
       tar-fs: 2.1.1
       tunnel-agent: 0.6.0
       which-pm-runs: 1.1.0
-    optional: true
 
-  process-nextick-args@2.0.1:
-    optional: true
+  process-nextick-args@2.0.1: {}
 
   protocol-registry@1.4.1:
     dependencies:
@@ -1455,7 +1417,6 @@ snapshots:
     dependencies:
       end-of-stream: 1.4.4
       once: 1.4.0
-    optional: true
 
   rc@1.2.8:
     dependencies:
@@ -1463,7 +1424,6 @@ snapshots:
       ini: 1.3.8
       minimist: 1.2.8
       strip-json-comments: 2.0.1
-    optional: true
 
   readable-stream@2.3.8:
     dependencies:
@@ -1474,14 +1434,12 @@ snapshots:
       safe-buffer: 5.1.2
       string_decoder: 1.1.1
       util-deprecate: 1.0.2
-    optional: true
 
   readable-stream@3.6.2:
     dependencies:
       inherits: 2.0.4
       string_decoder: 1.3.0
       util-deprecate: 1.0.2
-    optional: true
 
   readdirp@3.6.0:
     dependencies:
@@ -1493,23 +1451,18 @@ snapshots:
     dependencies:
       node-addon-api: 3.2.1
       prebuild-install: 5.3.6
-    optional: true
 
   repeat-string@1.6.1: {}
 
   run-applescript@7.0.0: {}
 
-  safe-buffer@5.1.2:
-    optional: true
+  safe-buffer@5.1.2: {}
 
-  safe-buffer@5.2.1:
-    optional: true
+  safe-buffer@5.2.1: {}
 
-  semver@5.7.2:
-    optional: true
+  semver@5.7.2: {}
 
-  set-blocking@2.0.0:
-    optional: true
+  set-blocking@2.0.0: {}
 
   shebang-command@2.0.0:
     dependencies:
@@ -1517,27 +1470,23 @@ snapshots:
 
   shebang-regex@3.0.0: {}
 
-  signal-exit@3.0.7:
-    optional: true
+  signal-exit@3.0.7: {}
 
   signal-exit@4.1.0: {}
 
-  simple-concat@1.0.1:
-    optional: true
+  simple-concat@1.0.1: {}
 
   simple-get@3.1.1:
     dependencies:
       decompress-response: 4.2.1
       once: 1.4.0
       simple-concat: 1.0.1
-    optional: true
 
   string-width@1.0.2:
     dependencies:
       code-point-at: 1.1.0
       is-fullwidth-code-point: 1.0.0
       strip-ansi: 3.0.1
-    optional: true
 
   string-width@4.2.3:
     dependencies:
@@ -1560,17 +1509,14 @@ snapshots:
   string_decoder@1.1.1:
     dependencies:
       safe-buffer: 5.1.2
-    optional: true
 
   string_decoder@1.3.0:
     dependencies:
       safe-buffer: 5.2.1
-    optional: true
 
   strip-ansi@3.0.1:
     dependencies:
       ansi-regex: 2.1.1
-    optional: true
 
   strip-ansi@6.0.1:
     dependencies:
@@ -1582,8 +1528,7 @@ snapshots:
 
   strip-final-newline@3.0.0: {}
 
-  strip-json-comments@2.0.1:
-    optional: true
+  strip-json-comments@2.0.1: {}
 
   supports-color@7.2.0:
     dependencies:
@@ -1602,7 +1547,6 @@ snapshots:
       mkdirp-classic: 0.5.3
       pump: 3.0.0
       tar-stream: 2.2.0
-    optional: true
 
   tar-stream@2.2.0:
     dependencies:
@@ -1611,7 +1555,6 @@ snapshots:
       fs-constants: 1.0.0
       inherits: 2.0.4
       readable-stream: 3.6.2
-    optional: true
 
   terminal-link@3.0.0:
     dependencies:
@@ -1634,7 +1577,6 @@ snapshots:
   tunnel-agent@0.6.0:
     dependencies:
       safe-buffer: 5.2.1
-    optional: true
 
   type-fest@1.4.0: {}
 
@@ -1646,11 +1588,9 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  util-deprecate@1.0.2:
-    optional: true
+  util-deprecate@1.0.2: {}
 
-  which-pm-runs@1.1.0:
-    optional: true
+  which-pm-runs@1.1.0: {}
 
   which@2.0.2:
     dependencies:
@@ -1659,7 +1599,6 @@ snapshots:
   wide-align@1.1.5:
     dependencies:
       string-width: 1.0.2
-    optional: true
 
   widest-line@5.0.0:
     dependencies:
@@ -1685,8 +1624,7 @@ snapshots:
       string-width: 7.2.0
       strip-ansi: 7.1.0
 
-  wrappy@1.0.2:
-    optional: true
+  wrappy@1.0.2: {}
 
   xmlbuilder@15.1.1: {}
 
