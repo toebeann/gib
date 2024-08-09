@@ -17,7 +17,7 @@
  *
  * Recommended command to run gib:
  *
- *   curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | sh
+ *   curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash
  *
  ******************************************************************************
  *
