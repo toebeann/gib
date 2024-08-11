@@ -263,16 +263,14 @@ const prompt = async (
   return value;
 };
 
-const copyPath = code("⌥ ⌘ C");
-const paste = code("⌘ V");
-const copyPathVerbose = code("Option Command C");
-const pasteVerbose = code("Command V");
+const copyPath = code("Option Command C");
+const paste = code("Command V");
 
 const getInvalidPathError = (path: string) =>
   wrap(
     `${EOL}${err} Could not find path:${EOL}${
       pink(path)
-    }${EOL}${EOL}Please try using ${copyPathVerbose} to copy the path from Finder, then ${pasteVerbose} to paste it here.`,
+    }${EOL}${EOL}Please try using ${copyPath} to copy the path from Finder, then ${paste} to paste it here.`,
   );
 
 const getUnknownErrorCheckingPath = (path: string) =>
@@ -516,7 +514,7 @@ log(
     }`,
     `Select the ${
       chalk.italic("launch options")
-    } field and press ${paste} to paste the following line${EOL}${
+    } field and press ${paste} to paste the following:${EOL}${
       chalk.bold("(no need to copy - it's already in your 📋 clipboard!)")
     }${EOL}${EOL}${pink(launchOptions)}`,
     "Close the Steam properties for the game",
