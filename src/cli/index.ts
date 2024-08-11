@@ -212,7 +212,7 @@ pressHeartToContinue();
 
 log(
   wrap(
-    "First, we need to know the location of your unzipped copy of the BepInEx pack inside your Downloads folder:",
+    "First, we need to know the location of your unzipped copy of the BepInEx pack inside your Downloads folder.",
   ),
 );
 
@@ -344,7 +344,7 @@ const bepinexPath = dirname(
 log();
 log(
   wrap(
-    "Next, we need to know the location of the Unity game:",
+    "Next, we need to know the location of the Unity game.",
   ),
 );
 
