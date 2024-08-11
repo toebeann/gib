@@ -40,9 +40,7 @@
  *****************************************************************************/
 
 import {
-  access,
   chmod,
-  constants,
   copyFile,
   readFile,
   stat,
