@@ -66,6 +66,8 @@ import { renderLogo } from "./renderLogo.ts";
 import "./polyfills/index.ts";
 import { findPlistPath } from "../utils/findPlistPath.ts";
 import { hasUnityAppIndicators } from "../unity/hasUnityAppIndicators.ts";
+import unquote from "unquote";
+import { getFixedPath } from "../utils/getFixedPath.ts";
 
 const ensureDir = fs.ensureDir;
 
@@ -245,16 +247,21 @@ const bepinexPath = dirname(
       ], true)
     }`,
     async (value) => {
-      if (basename(value).toLowerCase() !== "run_bepinex.sh") {
+      const input = unquote(value);
+      const path = await getFixedPath(input);
+
+      if (!path) {
+        return false;
+      }
+
+      if (basename(path).toLowerCase() !== "run_bepinex.sh") {
         return false;
       }
 
       try {
         const [shellStats, doorstopStats] = await Promise.all([
-          stat(value),
-          stat(join(value, "..", "doorstop_libs")),
-          access(value, constants.R_OK),
-          access(join(value, "..", "doorstop_libs"), constants.R_OK),
+          stat(path),
+          stat(join(path, "..", "doorstop_libs")),
         ]);
         return shellStats.isFile() && doorstopStats.isDirectory();
       } catch {
@@ -283,14 +290,21 @@ const gameAppPath = await getInput(
     ], true)
   }`,
   async (value) => {
-    if (extname(value).toLowerCase() !== ".app") {
+    const input = unquote(value);
+    const path = await getFixedPath(input);
+
+    if (!path) {
+      return false;
+    }
+
+    if (extname(path).toLowerCase() !== ".app") {
       return false;
     }
 
     try {
-      return extname(value).toLowerCase() === ".app" &&
-        (await stat(value)).isDirectory() &&
-        await match(await findPlistPath(value))
+      return extname(path).toLowerCase() === ".app" &&
+        (await stat(path)).isDirectory() &&
+        await match(await findPlistPath(path))
           .returnType<Promise<boolean>>()
           .with(P.string, (plist: string) => hasUnityAppIndicators(plist))
           .otherwise(() => Promise.resolve(false));

@@ -52,6 +52,7 @@
     "@types/lodash": "^4.17.7",
     "@types/node": "^22.1.0",
     "@types/readline-sync": "^1.4.8",
+    "@types/unquote": "^1.1.0",
     "core-js": "^3.38.0",
     "lodash": "^4.17.21",
     "protocol-registry": "^1.4.1",
@@ -75,6 +76,7 @@
     "readline-sync": "^1.4.10",
     "terminal-link": "^3.0.0",
     "ts-pattern": "^5.2.0",
+    "unquote": "^1.1.1",
     "wrap-ansi": "^9.0.0"
   }
 }
