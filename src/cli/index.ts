@@ -335,7 +335,7 @@ const bepinexPath = dirname(
 log();
 log(
   wrap(
-    "Next, we need to know the location of the Unity game for which you would like to install BepInEx to:",
+    "Next, we need to know the location of the Unity game:",
   ),
 );
 
