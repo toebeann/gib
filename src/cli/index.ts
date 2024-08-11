@@ -1,4 +1,4 @@
-#!/usr/bin/env node --experimental-strip-types --no-warnings=ExperimentalWarning
+#!/usr/bin/env bun
 /**
  * This file is gib: a TUI application which aims to automate installing BepInEx
  * to a Unity game.
