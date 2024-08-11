@@ -40,7 +40,9 @@
  *****************************************************************************/
 
 import {
+  access,
   chmod,
+  constants,
   copyFile,
   readFile,
   stat,
@@ -60,6 +62,7 @@ import open from "open";
 import terminalLink from "terminal-link";
 import wrapAnsi from "wrap-ansi";
 import { renderLogo } from "./renderLogo.ts";
+import "./polyfills/index.ts";
 import { findPlistPath } from "../utils/findPlistPath.ts";
 import { hasUnityAppIndicators } from "../unity/hasUnityAppIndicators.ts";
 import unquote from "unquote";
