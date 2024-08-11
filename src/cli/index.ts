@@ -60,7 +60,6 @@ import fs from "fs-extra";
 import { Glob } from "glob";
 import open from "open";
 import terminalLink from "terminal-link";
-import { match, P } from "ts-pattern";
 import wrapAnsi from "wrap-ansi";
 import { renderLogo } from "./renderLogo.ts";
 import "./polyfills/index.ts";
@@ -117,12 +116,12 @@ const { error, log } = console;
 
 await renderLogo();
 
+const err = chalk.redBright("Error:");
+
 if (platform !== "darwin") {
   error(
     wrap(
-      `${chalk.redBright("Error:")} detected platform ${
-        chalk.yellow(platform)
-      }`,
+      `${err} detected platform ${chalk.yellow(platform)}`,
     ),
   );
   error(
@@ -228,6 +227,16 @@ const getInput = async (
     value = defaultValue !== undefined
       ? prompt(message, defaultValue)?.trim()
       : prompt(message)?.trim();
+
+    if (!value) {
+      error(
+        wrap(
+          `${EOL}${err} No input detected. If you would like to exit gib, press ${
+            code(`Control C`)
+          }. Otherwise, please try again.`,
+        ),
+      );
+    }
   } while (!value || !await validator(value));
 
   return value;
@@ -235,6 +244,30 @@ const getInput = async (
 
 const copyPath = code("⌥ ⌘ C");
 const paste = code("⌘ V");
+const copyPathVerbose = code("Option Command C");
+const pasteVerbose = code("Command V");
+
+const getInvalidPathError = (path: string) =>
+  wrap(
+    `${EOL}${err} Could not find path:${EOL}${
+      pink(path)
+    }${EOL}${EOL}Please try using ${copyPathVerbose} to copy the path from Finder, then ${pasteVerbose} to paste it here.`,
+  );
+
+const getUnknownErrorCheckingPath = (path: string) =>
+  wrap(
+    `${EOL}${err} Unknown error checking path:${EOL}${pink(path)}`,
+  );
+
+const getInvalidBepInExPackError = () =>
+  wrap(
+    `${EOL}${err} ${run_bepinex_sh} script does not appear to be located within a valid BepInEx pack.`,
+  );
+
+const getNotAFolderError = (path: string) =>
+  wrap(
+    `${EOL}${err} Path is not a folder:${EOL}${pink(path)}`,
+  );
 
 const bepinexPath = dirname(
   await getInput(
@@ -251,22 +284,50 @@ const bepinexPath = dirname(
       const path = await getFixedPath(input);
 
       if (!path) {
+        error(getInvalidPathError(input));
         return false;
       }
 
-      if (basename(path).toLowerCase() !== "run_bepinex.sh") {
+      const filename = basename(path);
+      if (filename.toLowerCase() !== "run_bepinex.sh") {
+        error(
+          wrap(
+            `${EOL}${err} Unexpected filename:${EOL}${
+              pink(filename)
+            }${EOL}${EOL}If you are absolutely sure this is a valid ${run_bepinex_sh} script, rename it to ${run_bepinex_sh} and try again.`,
+          ),
+        );
         return false;
       }
 
       try {
-        const [shellStats, doorstopStats] = await Promise.all([
-          stat(path),
-          stat(join(path, "..", "doorstop_libs")),
-        ]);
-        return shellStats.isFile() && doorstopStats.isDirectory();
+        if (!(await stat(path)).isFile()) {
+          error(
+            wrap(
+              `${EOL}${err} Path is not a file:${EOL}${
+                pink(path)
+              }${EOL}${EOL}Please make sure you are selecting the ${run_bepinex_sh} script and try again.`,
+            ),
+          );
+          return false;
+        }
       } catch {
+        error(getUnknownErrorCheckingPath(path));
         return false;
       }
+
+      try {
+        if (!(await stat(join(path, "..", "doorstop_libs"))).isDirectory()) {
+          error(getInvalidBepInExPackError());
+          return false;
+        }
+      } catch {
+        error(getInvalidBepInExPackError());
+        error(getUnknownErrorCheckingPath(join(path, "..", "doorstop_libs")));
+        return false;
+      }
+
+      return true;
     },
   ),
 );
@@ -274,9 +335,12 @@ const bepinexPath = dirname(
 log();
 log(
   wrap(
-    "Next, we need to know the location of the Unity game which you would like to install BepInEx to:",
+    "Next, we need to know the location of the Unity game for which you would like to install BepInEx to:",
   ),
 );
+
+const pleaseSelectAUnityGameAndTryAgain =
+  "Please make sure you are selecting a Unity game app and try again.";
 
 const gameAppPath = await getInput(
   `${EOL}${
@@ -294,23 +358,59 @@ const gameAppPath = await getInput(
     const path = await getFixedPath(input);
 
     if (!path) {
+      error(getInvalidPathError(input));
       return false;
     }
 
     if (extname(path).toLowerCase() !== ".app") {
+      error(
+        wrap(
+          `${EOL}${err} Invalid app extension:${EOL}${
+            pink(basename(path))
+          }${EOL}${EOL}${pleaseSelectAUnityGameAndTryAgain}`,
+        ),
+      );
       return false;
     }
 
     try {
-      return extname(path).toLowerCase() === ".app" &&
-        (await stat(path)).isDirectory() &&
-        await match(await findPlistPath(path))
-          .returnType<Promise<boolean>>()
-          .with(P.string, (plist: string) => hasUnityAppIndicators(plist))
-          .otherwise(() => Promise.resolve(false));
+      if (!(await stat(path)).isDirectory()) {
+        error(
+          `${getNotAFolderError(path)}${EOL}${EOL}${
+            wrap(pleaseSelectAUnityGameAndTryAgain)
+          }`,
+        );
+        return false;
+      }
     } catch {
+      error(getUnknownErrorCheckingPath(path));
       return false;
     }
+
+    const plist = await findPlistPath(path);
+    if (!plist) {
+      error(
+        wrap(
+          `${EOL}${err} Could not find app plist for app:${EOL}${
+            pink(path)
+          }${EOL}${EOL}${pleaseSelectAUnityGameAndTryAgain}`,
+        ),
+      );
+      return false;
+    }
+
+    if (!await hasUnityAppIndicators(plist)) {
+      error(
+        wrap(
+          `${EOL}${err} App does not appear to be a Unity game:${EOL}${
+            pink(path)
+          }${EOL}${EOL}BepInEx only works for Unity games. ${pleaseSelectAUnityGameAndTryAgain}`,
+        ),
+      );
+      return false;
+    }
+
+    return true;
   },
 );
 const gamePath = dirname(gameAppPath);
@@ -333,7 +433,7 @@ log(wrap("You may be required to grant permission to the Terminal."));
 log();
 
 if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
-  error(chalk.redBright("Error:"), "User cancelled installation.");
+  error(wrap(`${err} User cancelled installation.`));
   exit(1);
 }
 
@@ -457,9 +557,7 @@ log();
 if (!detectedGame && !detectedBepInEx) {
   error(
     wrap(
-      `${
-        chalk.redBright("Error:")
-      } Timed out waiting for the game to launch. Test cancelled.`,
+      `${err} Timed out waiting for the game to launch. Test cancelled.`,
     ),
   );
   error(wrap("Unable to verify whether BepInEx is correctly installed."));
@@ -472,9 +570,7 @@ if (!detectedGame && !detectedBepInEx) {
 } else if (!detectedBepInEx) {
   error(
     wrap(
-      `${
-        chalk.redBright("Error:")
-      } Failed to detect BepInEx. Did you forget to set Steam launch options?`,
+      `${err} Failed to detect BepInEx. Did you forget to set Steam launch options?`,
     ),
   );
   error(
