@@ -300,7 +300,7 @@ const bepinexPath = dirname(
         `Open the Finder window with your copy of BepInEx, locate the ${run_bepinex_sh} script file, then either:`,
       )
     }${EOL}${EOL}${providePathInstructions}${EOL}${EOL}${
-      wrap(`Enter the path here then ${code("press enter")}:`)
+      wrap(`Path to ${run_bepinex_sh}:`)
     }`,
     async (value) => {
       const input = unquote(value);
@@ -373,7 +373,7 @@ const gameAppPath = await prompt(
       }) and do the same thing as last time - either:`,
     )
   }${EOL}${EOL}${providePathInstructions}${EOL}${EOL}${
-    wrap(`Enter the path here then ${code("press enter")}:`)
+    wrap(`Path to Unity game app:`)
   }`,
   async (value) => {
     const input = unquote(value);
