@@ -269,15 +269,19 @@ const getNotAFolderError = (path: string) =>
     `${EOL}${err} Path is not a folder:${EOL}${pink(path)}`,
   );
 
+const providePathInstructions = list([
+  `Drag it into this window, or`,
+  `Select it and press ${copyPath} to copy the path to the script file, then press ${paste} to paste it here.`,
+], false);
+
 const bepinexPath = dirname(
   await getInput(
     `${EOL}${
-      list([
-        `Open the Finder window with your copy of BepInEx, find the ${run_bepinex_sh} script, select it and press ${copyPath} to copy the path to the script file`,
-        `Press ${paste} here to paste the path, and ${
-          chalk.yellowBright("press enter")
-        }:`,
-      ], true)
+      wrap(
+        `Open the Finder window with your copy of BepInEx, locate the ${run_bepinex_sh} script file, then either:`,
+      )
+    }${EOL}${EOL}${providePathInstructions}${EOL}${EOL}${
+      wrap(`Enter the path here then ${code("press enter")}:`)
     }`,
     async (value) => {
       const input = unquote(value);
@@ -344,14 +348,13 @@ const pleaseSelectAUnityGameAndTryAgain =
 
 const gameAppPath = await getInput(
   `${EOL}${
-    list([
+    wrap(
       `Open the Finder window where your Unity game is located, find the app (e.g. ${
         code("Subnautica.app")
-      }), select it and press ${copyPath} to copy the path to the app`,
-      `Then, press ${paste} here to paste the path and ${
-        chalk.yellowBright("press enter")
-      }:`,
-    ], true)
+      }) and do the same thing as last time - either:`,
+    )
+  }${EOL}${EOL}${providePathInstructions}${EOL}${EOL}${
+    wrap(`Enter the path here then ${code("press enter")}:`)
   }`,
   async (value) => {
     const input = unquote(value);
