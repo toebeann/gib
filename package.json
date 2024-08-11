@@ -29,9 +29,9 @@
     }
   ],
   "type": "module",
-  "bin": "src/index.ts",
+  "bin": "src/cli/index.ts",
   "scripts": {
-    "start": "bun src/index.ts"
+    "start": "bun src/cli/index.ts"
   },
   "engines": {
     "node": "22.6.0",

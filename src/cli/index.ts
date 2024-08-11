@@ -62,10 +62,10 @@ import open from "open";
 import terminalLink from "terminal-link";
 import { match, P } from "ts-pattern";
 import wrapAnsi from "wrap-ansi";
-import { renderLogo } from "./cli/renderLogo.ts";
-import "./cli/polyfills/index.ts";
-import { findPlistPath } from "./utils/findPlistPath.ts";
-import { hasUnityAppIndicators } from "./unity/hasUnityAppIndicators.ts";
+import { renderLogo } from "./renderLogo.ts";
+import "./polyfills/index.ts";
+import { findPlistPath } from "../utils/findPlistPath.ts";
+import { hasUnityAppIndicators } from "../unity/hasUnityAppIndicators.ts";
 
 const ensureDir = fs.ensureDir;
 
