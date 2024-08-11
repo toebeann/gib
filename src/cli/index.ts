@@ -39,16 +39,11 @@
  *
  *****************************************************************************/
 
-import {
-  chmod,
-  copyFile,
-  readFile,
-  stat,
-  writeFile,
-} from "node:fs/promises";
+import { writeSync } from "node:fs";
+import { chmod, copyFile, readFile, stat, writeFile } from "node:fs/promises";
 import { EOL } from "node:os";
 import { basename, dirname, extname, join, sep } from "node:path";
-import { exit, platform } from "node:process";
+import { exit, platform, stdout } from "node:process";
 import chalk from "chalk";
 import { watch } from "chokidar";
 import clipboard from "clipboardy";
@@ -57,16 +52,41 @@ import findProcess from "find-process";
 import fs from "fs-extra";
 import { Glob } from "glob";
 import open from "open";
+import readlineSync from "readline-sync";
 import terminalLink from "terminal-link";
 import wrapAnsi from "wrap-ansi";
 import { renderLogo } from "./renderLogo.ts";
-import "./polyfills/index.ts";
 import { findPlistPath } from "../utils/findPlistPath.ts";
 import { hasUnityAppIndicators } from "../unity/hasUnityAppIndicators.ts";
 import unquote from "unquote";
 import { getFixedPath } from "../utils/getFixedPath.ts";
-
 const ensureDir = fs.ensureDir;
+
+function alertShim(message: string) {
+  writeSync(stdout.fd, new TextEncoder().encode(`${message} [Enter] `));
+  readlineSync.question();
+}
+
+function confirmShim(message: string) {
+  writeSync(stdout.fd, new TextEncoder().encode(`${message} [y/N] `));
+  const result = readlineSync.question();
+  return ["y", "Y"].includes(result);
+}
+
+function promptShim(message = "Prompt", defaultValue?: string) {
+  writeSync(
+    stdout.fd,
+    new TextEncoder().encode(
+      `${message}${defaultValue ? ` [${defaultValue}]` : ""} `,
+    ),
+  );
+  const result = readlineSync.question();
+  return result.length > 0
+    ? result
+    : defaultValue !== null && defaultValue !== void 0
+    ? defaultValue
+    : null;
+}
 
 const pink = chalk.hex("#ae0956");
 const code = chalk.yellowBright;
@@ -177,7 +197,7 @@ log(
 
 const pressHeartToContinue = (message = "to continue") => {
   log();
-  alert(wrap(chalk.yellowBright(`Press enter ${message}`)));
+  alertShim(wrap(chalk.yellowBright(`Press enter ${message}`)));
   log();
 };
 
@@ -214,7 +234,7 @@ log(
   ),
 );
 
-const getInput = async (
+const prompt = async (
   message: string,
   validator:
     | ((value: string) => string | false)
@@ -224,9 +244,7 @@ const getInput = async (
   let value: string | undefined;
 
   do {
-    value = defaultValue !== undefined
-      ? prompt(message, defaultValue)?.trim()
-      : prompt(message)?.trim();
+    value = promptShim(message, defaultValue)?.trim();
 
     if (!value) {
       error(
@@ -278,7 +296,7 @@ const providePathInstructions = list([
 ], false);
 
 const bepinexPath = dirname(
-  await getInput(
+  await prompt(
     `${EOL}${
       wrap(
         `Open the Finder window with your copy of BepInEx, locate the ${run_bepinex_sh} script file, then either:`,
@@ -349,7 +367,7 @@ log(
 const pleaseSelectAUnityGameAndTryAgain =
   "Please make sure you are selecting a Unity game app and try again.";
 
-const gameAppPath = await getInput(
+const gameAppPath = await prompt(
   `${EOL}${
     wrap(
       `Open the Finder window where your Unity game is located, find the app (e.g. ${
@@ -438,8 +456,8 @@ log();
 log(wrap("You may be required to grant permission to the Terminal."));
 log();
 
-if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
-  error(wrap(`${err} User cancelled installation.`));
+if (!confirmShim(wrap(chalk.yellowBright("Proceed?")))) {
+  error(`${err} User cancelled installation.`);
   exit(1);
 }
 
