@@ -218,7 +218,9 @@ log(
 
 const getInput = async (
   message: string,
-  validator: (value: string) => boolean | Promise<boolean>,
+  validator:
+    | ((value: string) => string | false)
+    | ((value: string) => Promise<string | false>),
   defaultValue?: string,
 ) => {
   let value: string | undefined;
@@ -236,8 +238,11 @@ const getInput = async (
           }. Otherwise, please try again.`,
         ),
       );
+      continue;
     }
-  } while (!value || !await validator(value));
+
+    value = await validator(value) || "";
+  } while (!value);
 
   return value;
 };
@@ -331,7 +336,7 @@ const bepinexPath = dirname(
         return false;
       }
 
-      return true;
+      return path;
     },
   ),
 );
@@ -413,7 +418,7 @@ const gameAppPath = await getInput(
       return false;
     }
 
-    return true;
+    return path;
   },
 );
 const gamePath = dirname(gameAppPath);
