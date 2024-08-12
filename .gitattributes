@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text eol=lf
+
+# Treat bun lockfile as binary and diff correctly
+*.lockb binary diff=lockb
