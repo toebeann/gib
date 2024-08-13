@@ -509,9 +509,7 @@ log(wrap("Now let's set the Steam launch options for the game:"));
 log();
 log(
   list([
-    `In Steam, right-click the game and click ${
-      chalk.italic("Manage -> Properties...")
-    }`,
+    `In Steam, right-click the game and click ${chalk.italic("Properties...")}`,
     `Select the ${
       chalk.italic("launch options")
     } field and press ${paste} to paste the following:${EOL}${
