@@ -1,5 +1,5 @@
 import { readFile, realpath } from "node:fs/promises";
-import { basename, join } from "node:path";
+import { basename, join, resolve } from "node:path";
 import type { platform } from "node:process";
 import { Glob } from "glob";
 import open from "open";
@@ -113,15 +113,13 @@ export class Launcher implements LauncherBase<AppManifest> {
   }
 
   /**
-   * Gets information about an installed Steam app. Useful to determine whether
-   * a given path refers to an app installed by Steam.
+   * Retrives information about installed Steam apps found at `path`.
    *
-   * Resolves `undefined` if the path does not seem to refer to a Steam app.
-   *
-   * @param path The path to the folder where the Steam app is installed.
+   * @param path The path to the folder where the Steam app(s) are installed.
    */
-  async getAppByPath(path: string) {
-    let folderPath = join(path, "..", "..", "..");
+  async *getAppsByPath(path: string) {
+    const resolved = resolve(path);
+    let folderPath = join(resolved, "..", "..", "..");
 
     try {
       folderPath = await realpath(folderPath);
@@ -152,7 +150,7 @@ export class Launcher implements LauncherBase<AppManifest> {
         parse(await readFile(manifestPath, { encoding: "utf8" })),
       );
 
-      if (basename(path) === manifest.appState.installdir) {
+      if (basename(resolved) === manifest.appState.installdir) {
         yield new App(this, manifest, manifestPath);
       }
     }
@@ -168,23 +166,25 @@ export class Launcher implements LauncherBase<AppManifest> {
   async launch(app: App): Promise<void>;
 
   /**
-   * Launches a Steam app by id or path.
+   * Launches a Steam app by id.
    *
-   * @param app The app id or path of the app to launch.
+   * @param id The app id of the app to launch.
    */
-  async launch(app: string): Promise<void>;
+  async launch(id: string): Promise<void>;
 
   /**
    * Launches a Steam app.
    *
-   * @param app The app, app id or path of the app to launch.
+   * @param app The app or app id of the app to launch.
    */
+  async launch(app: App | string): Promise<void>;
+
   async launch(app: App | string) {
     const id = await match(app)
       .returnType<string | Promise<string | undefined>>()
-      .with(P.string, (idOrPath) => basename(idOrPath) === idOrPath, (id) => id)
-      .with(P.string, async (path) => (await this.getAppByPath(path))?.id)
-      .otherwise((app) => app.id);
+      .with(P.instanceOf(App), (app) => app.id)
+      .with(P.string, (id) => id)
+      .exhaustive();
 
     if (!id) return;
 
