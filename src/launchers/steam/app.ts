@@ -1,11 +1,11 @@
 import { join } from "node:path";
 import { z } from "zod";
 import { toCamelCaseKeys } from "../../zod/toCamelCaseKeys.ts";
-import type { App } from "../app.ts";
-import type { SteamLauncher } from "./launcher.ts";
+import type { App as AppBase } from "../app.ts";
+import type { Launcher } from "./launcher.ts";
 
 /** State flags used in Steam's app manifest files. */
-export enum SteamAppState {
+export enum AppState {
   Invalid = 0,
   Uninstalled = 1 << 0,
   UpdateRequired = 1 << 1,
@@ -94,10 +94,10 @@ export const appManifestSchema = toCamelCaseKeys(
 );
 
 /** A parsed Steam app manifest. */
-export type SteamAppManifest = z.infer<typeof appManifestSchema>;
+export type AppManifest = z.infer<typeof appManifestSchema>;
 
 /** An abstraction for working with an installed Steam app. */
-export class SteamApp implements App<SteamLauncher, SteamAppManifest> {
+export class App implements AppBase<Launcher, AppManifest> {
   /**
    * @param launcher The launcher which manages the app.
    * @param manifest The data manifest the launcher holds about the app.
@@ -107,8 +107,8 @@ export class SteamApp implements App<SteamLauncher, SteamAppManifest> {
    * @param [path] The path to the folder where the app is installed on disk.
    */
   constructor(
-    public readonly launcher: SteamLauncher,
-    public readonly manifest: SteamAppManifest,
+    public readonly launcher: Launcher,
+    public readonly manifest: AppManifest,
     manifestPath: string,
     public readonly id = manifest.appState.appid.toString(),
     public readonly name = manifest.appState.name,
@@ -126,11 +126,11 @@ export class SteamApp implements App<SteamLauncher, SteamAppManifest> {
    *
    * @param state The state flag to check for.
    */
-  hasState = (state: SteamAppState) =>
+  hasState = (state: AppState) =>
     (this.manifest.appState.stateFlags & state) === state;
 
   get fullyInstalled() {
-    return this.hasState(SteamAppState.FullyInstalled);
+    return this.hasState(AppState.FullyInstalled);
   }
 
   /**

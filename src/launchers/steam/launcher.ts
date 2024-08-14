@@ -8,8 +8,8 @@ import { parse } from "@node-steam/vdf";
 import { z } from "zod";
 import { booleanRace } from "../../utils/booleanRace.ts";
 import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.ts";
-import type { Launcher } from "../launcher.ts";
-import { appManifestSchema, SteamApp, type SteamAppManifest } from "./app.ts";
+import type { Launcher as LauncherBase } from "../launcher.ts";
+import { appManifestSchema, App, type AppManifest } from "./app.ts";
 import { getLibraryfoldersPath } from "./getLibraryfoldersPath.ts";
 
 /** Zod schema for working with Steam's `libraryfolders.vdf` file. */
@@ -28,10 +28,10 @@ export const libraryfoldersSchema = z.object({
 });
 
 /** Steam's `libraryfolders.vdf` file, parsed. */
-export type SteamLibraryFolders = z.infer<typeof libraryfoldersSchema>;
+export type LibraryFolders = z.infer<typeof libraryfoldersSchema>;
 
 /** An abstraction for working with Steam and its apps. */
-export class SteamLauncher implements Launcher<SteamAppManifest> {
+export class Launcher implements LauncherBase<AppManifest> {
   readonly name = "Steam";
   readonly supportedPlatforms = [
     "darwin",
@@ -72,7 +72,7 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
         })
       ) {
         try {
-          yield new SteamApp(
+          yield new App(
             this,
             appManifestSchema.parse(
               parse(await readFile(manifestPath, { encoding: "utf8" })),
@@ -103,7 +103,7 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
       `appmanifest_${id}.acf`,
     );
 
-    return new SteamApp(
+    return new App(
       this,
       appManifestSchema.parse(
         parse(await readFile(manifestPath, { encoding: "utf8" })),
@@ -153,7 +153,7 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
       );
 
       if (basename(path) === manifest.appState.installdir) {
-        return new SteamApp(this, manifest, manifestPath);
+        yield new App(this, manifest, manifestPath);
       }
     }
   }
@@ -165,7 +165,7 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
    *
    * @param app The app to launch.
    */
-  async launch(app: SteamApp): Promise<void>;
+  async launch(app: App): Promise<void>;
 
   /**
    * Launches a Steam app by id or path.
@@ -179,7 +179,7 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
    *
    * @param app The app, app id or path of the app to launch.
    */
-  async launch(app: SteamApp | string) {
+  async launch(app: App | string) {
     const id = await match(app)
       .returnType<string | Promise<string | undefined>>()
       .with(P.string, (idOrPath) => basename(idOrPath) === idOrPath, (id) => id)

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { toCamelCaseKeys } from "../../zod/toCamelCaseKeys.ts";
-import type { App } from "../app.ts";
-import type { EpicGamesLauncher } from "./launcher.ts";
+import type { App as AppBase } from "../app.ts";
+import type { Launcher } from "./launcher.ts";
 
 /**
  * Zod schema for working with the Epic Games Launcher's
@@ -79,13 +79,12 @@ export const appManifestSchema = toCamelCaseKeys(
 );
 
 /** A parsed Epic Games Launcher app manifest. */
-export type EpicGamesAppManifest =
+export type AppManifest =
   & z.infer<typeof launcherInstalledSchema>["installationList"][number]
   & z.infer<typeof appManifestSchema>;
 
 /** An abstraction for working with an installed Epic Games Launcher app. */
-export class EpicGamesApp
-  implements App<EpicGamesLauncher, EpicGamesAppManifest> {
+export class App implements AppBase<Launcher, AppManifest> {
   /**
    * @param launcher The launcher which manages the app.
    * @param manifest The data manifest the launcher holds about the app.
@@ -97,8 +96,8 @@ export class EpicGamesApp
    * app is fully installed.
    */
   constructor(
-    public launcher: EpicGamesLauncher,
-    public manifest: EpicGamesAppManifest,
+    public launcher: Launcher,
+    public manifest: AppManifest,
     public id = manifest.artifactId ?? manifest.appName,
     public name = manifest.displayName,
     public path = manifest.installLocation,

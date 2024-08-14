@@ -5,17 +5,17 @@ import { Glob } from "glob";
 import open from "open";
 import { match, P } from "ts-pattern";
 import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.ts";
-import type { Launcher } from "../index.ts";
+import type { Launcher as LauncherBase } from "../index.ts";
 import {
+  App,
+  type AppManifest,
   appManifestSchema,
-  EpicGamesApp,
-  type EpicGamesAppManifest,
   launcherInstalledSchema,
 } from "./app.ts";
 import { getAppDataPath } from "./getAppDataPath.ts";
 
 /** An abstraction for working with the Epic Games Launcher and its apps. */
-export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
+export class Launcher implements LauncherBase<AppManifest> {
   readonly name = "Epic Games Launcher";
   readonly supportedPlatforms = [
     "darwin",
@@ -118,7 +118,7 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
       const info = (await launcherInstalled)
         .find((x) => [x.artifactId, x.appName].includes(manifest.appName));
 
-      if (info) yield new EpicGamesApp(this, { ...info, ...manifest });
+      if (info) yield new App(this, { ...info, ...manifest });
     }
   }
 
@@ -139,9 +139,9 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
         this.getManifestById(id),
       ]),
     )
-      .returnType<EpicGamesApp | undefined>()
+      .returnType<App | undefined>()
       .with([P.not(P.nullish), P.not(P.nullish)], ([info, manifest]) =>
-        new EpicGamesApp(this, { ...info, ...manifest }))
+        new App(this, { ...info, ...manifest }))
       .otherwise(() =>
         undefined
       );
@@ -160,7 +160,7 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    *
    * @param app The app to launch.
    */
-  launch(app: EpicGamesApp): Promise<void>;
+  launch(app: App): Promise<void>;
 
   /**
    * Launches an Epic Games Launcher app.
@@ -174,7 +174,7 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    *
    * @param app The app, ArtifactId, AppName or InstallLocation of the app.
    */
-  async launch(app: EpicGamesApp | string): Promise<void> {
+  async launch(app: App | string): Promise<void> {
     const launchId = await match(app)
       .returnType<string | Promise<string | undefined>>()
       .with(
