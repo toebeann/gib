@@ -157,7 +157,7 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
     match(
       await Promise.all([
         this.getLauncherInstalled()
-          .then((apps) => apps.find((app) => app.InstallLocation === path)),
+          .then((apps) => apps.find((app) => app.installLocation === path)),
         this.getManifestByPath(path),
       ]),
     )
