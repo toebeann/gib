@@ -1,12 +1,9 @@
-import { homedir } from "node:os";
 import { join } from "node:path";
+import { getSteamPath } from "./getSteamPath.ts";
 
 export const getLibraryfoldersPath = () =>
   join(
-    homedir(),
-    "Library",
-    "Application Support",
-    "Steam",
+    getSteamPath(),
     "config",
     "libraryfolders.vdf",
   );
