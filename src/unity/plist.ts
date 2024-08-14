@@ -26,6 +26,7 @@ type Key = keyof PlistStrict | (string & {});
 
 /**
  * Parses the plist file at `path` and returns it.
+ * 
  * @param path The path to an `Info.plist` file to parse.
  */
 
@@ -43,10 +44,12 @@ export const readFile = (path: string) =>
 
 /**
  * Retrieves a value from the plist file at `path` with given `key`.
+ * 
  * @param path The path to an `Info.plist` file to parse.
  * @param key The key to look up in the `Info.plist` file.
+ * 
  * @returns A string representation of the value in the plist file matching `key`,
- * or `undefined` if no matching key found.
+ * or `undefined` if no matching key was found.
  */
 
 export const getValue = (path: string, key: Key) =>
