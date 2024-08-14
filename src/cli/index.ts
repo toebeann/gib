@@ -57,7 +57,7 @@ import terminalLink from "terminal-link";
 import wrapAnsi from "wrap-ansi";
 import { renderLogo } from "./renderLogo.ts";
 import { findPlistPath } from "../utils/findPlistPath.ts";
-import { hasUnityAppIndicators } from "../unity/hasUnityAppIndicators.ts";
+import { hasUnityAppIndicators } from "../unity/plist.ts";
 import unquote from "unquote";
 import { getFixedPath } from "../utils/getFixedPath.ts";
 const ensureDir = fs.ensureDir;
