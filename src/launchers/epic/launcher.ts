@@ -153,6 +153,21 @@ export class Launcher implements LauncherBase<AppManifest> {
    *
    * @param path The InstallLocation of the app.
    */
+  getAppByPath = async (path: string) =>
+    match(
+      await Promise.all([
+        this.getLauncherInstalled()
+          .then((apps) => apps.find((app) => app.installLocation === path)),
+        this.getManifestByPath(path),
+      ]),
+    )
+      .returnType<App | undefined>()
+      .with([P.not(P.nullish), P.not(P.nullish)], ([info, manifest]) =>
+        new App(this, { ...info, ...manifest }))
+      .otherwise(() =>
+        undefined
+      );
+
   getApp = this.getAppById;
 
   /**
