@@ -158,19 +158,7 @@ export class SteamLauncher implements Launcher<SteamAppManifest> {
     }
   }
 
-  /**
-   * Gets information about an installed Steam app.
-   *
-   * Resolves `undefined` if a matching app cannot be found.
-   *
-   * @param idOrPath The Steam app id of the app, or the path to a folder where
-   * the app is installed.
-   * ```
-   */
-  getApp = (idOrPath: string) =>
-    basename(idOrPath) === idOrPath
-      ? this.getAppById(idOrPath)
-      : this.getAppByPath(idOrPath);
+  getApp = this.getAppById;
 
   /**
    * Launches a Steam app.

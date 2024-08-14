@@ -153,32 +153,7 @@ export class EpicGamesLauncher implements Launcher<EpicGamesAppManifest> {
    *
    * @param path The InstallLocation of the app.
    */
-  getAppByPath = async (path: string) =>
-    match(
-      await Promise.all([
-        this.getLauncherInstalled()
-          .then((apps) => apps.find((app) => app.installLocation === path)),
-        this.getManifestByPath(path),
-      ]),
-    )
-      .returnType<EpicGamesApp | undefined>()
-      .with([P.not(P.nullish), P.not(P.nullish)], ([info, manifest]) =>
-        new EpicGamesApp(this, { ...info, ...manifest }))
-      .otherwise(() =>
-        undefined
-      );
-
-  /**
-   * Gets information about an installed Epic Games Launcher app.
-   *
-   * Resolves `undefined` if a matching app cannot be found.
-   *
-   * @param idOrPath The ArtifactId, AppName or InstallLocation of the app.
-   */
-  getApp = (idOrPath: string) =>
-    basename(idOrPath) === idOrPath
-      ? this.getAppById(idOrPath)
-      : this.getAppByPath(idOrPath);
+  getApp = this.getAppById;
 
   /**
    * Launches an Epic Games Launcher app.
