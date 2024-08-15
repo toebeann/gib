@@ -1,8 +1,15 @@
-import { join } from "node:path";
-import { z } from "zod";
-import { toCamelCaseKeys } from "../../zod/toCamelCaseKeys.ts";
+import { readFile, realpath } from "node:fs/promises";
+import { basename, join, resolve } from "node:path";
+import { Glob } from "glob";
+import { parse } from "@node-steam/vdf";
+import open from "open";
+import { match, P } from "ts-pattern";
+import { booleanRace } from "../../utils/booleanRace.ts";
 import type { App as AppBase } from "../app.ts";
-import type { Launcher } from "./launcher.ts";
+import { getLibraryfolders } from "./libraryfolders.ts";
+import { appManifestSchema, type AppManifest } from "./manifest.ts";
+
+const launcher = "steam";
 
 /** State flags used in Steam's app manifest files. */
 export enum AppState {
@@ -30,111 +37,162 @@ export enum AppState {
   UpdateStopping = 1 << 20,
 }
 
-const manifestConfigSchema = toCamelCaseKeys(
-  z.object({
-    language: z.string().optional(),
-    betaKey: z.string().optional(),
-  }).passthrough(),
-);
+/** An installed Steam app. */
+export interface App extends AppBase<AppManifest> {
+  launcher: typeof launcher;
+}
 
-/** Zod schema for working with Steam app manifest files. */
-export const appManifestSchema = toCamelCaseKeys(
-  z.object({
-    appState: toCamelCaseKeys(z.object({
-      appid: z.number(),
-      name: z.string(),
-      installdir: z.string(),
-      stateFlags: z.number(),
-      universe: z.number(),
-      lastUpdated: z.number().optional(),
-      sizeOnDisk: z.number().optional(),
-      stagingSize: z.number().optional(),
-      buildid: z.number().optional(),
-      lastOwner: z.number().optional(),
-      updateResult: z.number().optional(),
-      bytesToDownload: z.number().optional(),
-      bytesDownloaded: z.number().optional(),
-      bytesToStage: z.number().optional(),
-      bytesStaged: z.number().optional(),
-      targetBuildId: z.number().optional(),
-      autoUpdateBehavior: z.number().optional(),
-      allowOtherDownloadsWhileRunning: z.number().optional(),
-      scheduledAutoUpdate: z.number().optional(),
-      sharedDepots: z.record(z.union([z.string(), z.number()])).optional(),
-      installedDepots: z.record(
-        toCamelCaseKeys(
-          z.object({
-            manifest: z.number().optional(),
-            size: z.number().optional(),
-          }).passthrough(),
-        ),
-      ).optional(),
-      stagedDepots: z.record(
-        toCamelCaseKeys(
-          z.object({
-            manifest: z.number().optional(),
-            size: z.number().optional(),
-            dlcappid: z.number().optional(),
-          }).passthrough(),
-        ),
-      ).optional(),
-      dlcDownloads: z.record(
-        toCamelCaseKeys(
-          z.object({
-            bytesDownloaded: z.number().optional(),
-            bytesToDownload: z.number().optional(),
-          }).passthrough(),
-        ),
-      ).optional(),
-      userConfig: manifestConfigSchema.optional(),
-      mountedConfig: manifestConfigSchema.optional(),
-    })),
-  })
-    .passthrough(),
-);
+export const hasState = (app: App, state: AppState) =>
+  (app.manifest.appState.stateFlags & state) === state;
 
-/** A parsed Steam app manifest. */
-export type AppManifest = z.infer<typeof appManifestSchema>;
+export const isFullyInstalled = (app: App) =>
+  hasState(app, AppState.FullyInstalled);
 
-/** An abstraction for working with an installed Steam app. */
-export class App implements AppBase<Launcher, AppManifest> {
-  /**
-   * @param launcher The launcher which manages the app.
-   * @param manifest The data manifest the launcher holds about the app.
-   * @param manifestPath The path to the manifest on disk.
-   * @param [id=manifest.appState.appid.toString()] The Steam app id of the app.
-   * @param [name=manifest.appState.name] The display name of the app.
-   * @param [path] The path to the folder where the app is installed on disk.
-   */
-  constructor(
-    public readonly launcher: Launcher,
-    public readonly manifest: AppManifest,
-    manifestPath: string,
-    public readonly id = manifest.appState.appid.toString(),
-    public readonly name = manifest.appState.name,
-    public readonly path = join(
-      manifestPath,
-      "..",
-      "common",
-      manifest.appState.installdir,
-    ),
-  ) {}
+/**
+ * Gets information about installed Steam apps.
+ */
+export async function* getApps() {
+  for (const folder of await getLibraryfolders()) {
+    const folderPath = join(folder.path, "steamapps");
+    for await (
+      const manifestPath of new Glob("/appmanifest_*.acf", {
+        absolute: true,
+        nodir: true,
+        root: folderPath,
+      })
+    ) {
+      try {
+        const manifest = appManifestSchema.parse(
+          parse(await readFile(manifestPath, { encoding: "utf-8" })),
+        );
 
-  /**
-   * Determines whether the app has a given state flag registered in it's Steam
-   * app manifest.
-   *
-   * @param state The state flag to check for.
-   */
-  hasState = (state: AppState) =>
-    (this.manifest.appState.stateFlags & state) === state;
+        return {
+          launcher,
+          manifest,
+          id: manifest.appState.appid.toString(),
+          name: manifest.appState.name,
+          path: join(
+            manifestPath,
+            "..",
+            "common",
+            manifest.appState.installdir,
+          ),
+        } satisfies App;
+      } catch {}
+    }
+  }
+}
 
-  get fullyInstalled() {
-    return this.hasState(AppState.FullyInstalled);
+/**
+ * Gets information about an installed Steam app.
+ *
+ * Resolves `undefined` if an app with a matching id cannot be found.
+ *
+ * @param id The Steam app id of the app.
+ */
+export const getAppById = async (id: string) => {
+  const folder = (await getLibraryfolders()).find((folder) =>
+    Object.keys(folder.apps).includes(id)
+  );
+  if (!folder) return;
+
+  const manifestPath = join(
+    folder.path,
+    "steamapps",
+    `appmanifest_${id}.acf`,
+  );
+
+  const manifest = appManifestSchema.parse(
+    parse(await readFile(manifestPath, { encoding: "utf-8" })),
+  );
+
+  return {
+    launcher,
+    manifest,
+    id: manifest.appState.appid.toString(),
+    name: manifest.appState.name,
+    path: join(manifestPath, "..", "common", manifest.appState.installdir),
+  } satisfies App;
+};
+
+/**
+ * Retrives information about installed Steam apps found at `path`.
+ *
+ * @param path The path to the folder where the Steam app(s) are installed.
+ */
+export async function* getAppsByPath(path: string) {
+  const resolved = resolve(path);
+  let folderPath = join(resolved, "..", "..", "..");
+
+  try {
+    folderPath = await realpath(folderPath);
+  } catch {
+    return;
   }
 
-  /**
-   * Launches the app with Steam.
-   */
-  launch = () => this.launcher.launch(this);
+  if (
+    !(await booleanRace(
+      (await getLibraryfolders())
+        .map((folder) =>
+          realpath(folder.path)
+            .then((path) => path === folderPath)
+            .catch(() => false)
+        ),
+    ))
+  ) return;
+
+  const steamapps = join(folderPath, "steamapps");
+  for await (
+    const manifestPath of new Glob("/appmanifest_*.acf", {
+      absolute: true,
+      nodir: true,
+      root: steamapps,
+    })
+  ) {
+    const manifest = appManifestSchema.parse(
+      parse(await readFile(manifestPath, { encoding: "utf8" })),
+    );
+
+    if (basename(resolved) === manifest.appState.installdir) {
+      yield {
+        launcher,
+        manifest,
+        id: manifest.appState.appid.toString(),
+        name: manifest.appState.name,
+        path: join(manifestPath, "..", "common", manifest.appState.installdir),
+      } satisfies App;
+    }
+  }
+}
+
+/**
+ * Launches a Steam app.
+ *
+ * @param app The app to launch.
+ */
+export function launch(app: App): Promise<void>;
+
+/**
+ * Launches a Steam app by id.
+ *
+ * @param id The app id of the app to launch.
+ */
+export function launch(id: string): Promise<void>;
+
+/**
+ * Launches a Steam app.
+ *
+ * @param app The app or app id of the app to launch.
+ */
+export function launch(app: App | string): Promise<void>;
+
+export async function launch(app: App | string) {
+  const id = await match(app)
+    .returnType<string | Promise<string | undefined>>()
+    .with(P.string, (id) => id)
+    .otherwise((app) => app.id);
+
+  if (!id) return;
+
+  await open(`steam://rungameid/${id}`);
 }

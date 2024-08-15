@@ -1,122 +1,161 @@
-import { z } from "zod";
-import { toCamelCaseKeys } from "../../zod/toCamelCaseKeys.ts";
+import { basename } from "node:path";
+import open from "open";
+import { match, P } from "ts-pattern";
 import type { App as AppBase } from "../app.ts";
-import type { Launcher } from "./launcher.ts";
+import { getLauncherInstalled } from "./launcherInstalled.ts";
+import {
+  type AppManifest,
+  getManifestById,
+  getManifestByPath,
+  getManifests,
+} from "./manifest.ts";
+
+const launcher = "epic";
+
+/** An installed Epic Games Launcher app. */
+export interface App extends AppBase<AppManifest> {
+  launcher: typeof launcher;
+  launchId: string;
+}
+
+export const isFullyInstalled = (app: App) =>
+  app.manifest.bIsIncompleteInstall !== true;
+
+/** Gets information about installed Epic Games Launcher apps. */
+export async function* getApps() {
+  const launcherInstalled = getLauncherInstalled();
+
+  for await (const manifest of getManifests()) {
+    const info = (await launcherInstalled)
+      .find((x) => [x.artifactId, x.appName].includes(manifest.appName));
+
+    if (info) {
+      const merged = { ...info, ...manifest };
+      yield {
+        launcher,
+        manifest: merged,
+        id: merged.artifactId ?? merged.appName,
+        name: merged.displayName,
+        path: merged.installLocation,
+        launchId: [
+          merged.namespaceId ?? merged.catalogNamespace,
+          merged.itemId ?? merged.catalogItemId,
+          merged.artifactId ?? merged.appName,
+        ]
+          .filter(Boolean)
+          .join(":"),
+      } satisfies App;
+    }
+  }
+}
 
 /**
- * Zod schema for working with the Epic Games Launcher's
- * `LauncherInstalled.dat` file.
+ * Gets information about an installed Epic Games Launcher app.
+ *
+ * Resolves `undefined` if an app with a matching id cannot be found.
+ *
+ * @param id The ArtifactId or AppName of the app.
  */
-export const launcherInstalledSchema = toCamelCaseKeys(
-  z.object({
-    installationList: toCamelCaseKeys(
-      z.object({
-        installLocation: z.string(),
-        namespaceId: z.string().optional(),
-        itemId: z.string().optional(),
-        artifactId: z.string().optional(),
-        appVersion: z.string().optional(),
-        appName: z.string(),
-      }).passthrough(),
-    ).array(),
-  }).passthrough(),
-);
+export const getAppById = async (id: string) =>
+  match(
+    await Promise.all([
+      getLauncherInstalled()
+        .then((apps) =>
+          apps.find((app) => [app.ArtifactId, app.AppName].includes(id))
+        ),
+      getManifestById(id),
+    ]),
+  )
+    .returnType<App | undefined>()
+    .with([P.not(P.nullish), P.not(P.nullish)], ([info, manifest]) => {
+      const merged = { ...info, ...manifest };
+      return {
+        launcher,
+        manifest: merged,
+        id: merged.artifactId ?? merged.appName,
+        name: merged.displayName,
+        path: merged.installLocation,
+        launchId: [
+          merged.namespaceId ?? merged.catalogNamespace,
+          merged.itemId ?? merged.catalogItemId,
+          merged.artifactId ?? merged.appName,
+        ]
+          .filter(Boolean)
+          .join(":"),
+      } satisfies App;
+    })
+    .otherwise(() => undefined);
 
-/** Zod schema for working with Epic Games Launcher app manifest files. */
-export const appManifestSchema = toCamelCaseKeys(
-  z.object({
-    formatVersion: z.number(),
-    bIsIncompleteInstall: z.boolean().optional(),
-    launchCommand: z.string().optional(),
-    launchExecutable: z.string().optional(),
-    manifestLocation: z.string().optional(),
-    manifestHash: z.string().optional(),
-    bIsApplication: z.boolean().optional(),
-    bIsExecutable: z.boolean().optional(),
-    bIsManaged: z.boolean().optional(),
-    bNeedsValidation: z.boolean().optional(),
-    bRequiresAuth: z.boolean().optional(),
-    bAllowMultipleInstances: z.boolean().optional(),
-    bCanRunOffline: z.boolean().optional(),
-    bAllowUriCmdArgs: z.boolean().optional(),
-    bLaunchElevated: z.boolean().optional(),
-    baseUrLs: z.string().array().optional(),
-    buildLabel: z.string().optional(),
-    appCategories: z.string().array().optional(),
-    chunkDbs: z.unknown().array().optional(),
-    compatibleApps: z.unknown().array().optional(),
-    displayName: z.string(),
-    installationGuid: z.string().optional(),
-    installLocation: z.string(),
-    installSessionId: z.string().optional(),
-    installTags: z.unknown().array().optional(),
-    installComponents: z.unknown().array().optional(),
-    hostInstallationGuid: z.string().optional(),
-    prereqIds: z.unknown().array().optional(),
-    prereqSha1Hash: z.string().optional(),
-    lastPrereqSucceededSha1Hash: z.string().optional(),
-    stagingLocation: z.string().optional(),
-    technicalType: z.string().optional(),
-    vaultThumbnailUrl: z.string().optional(),
-    vaultTitleText: z.string().optional(),
-    installSize: z.number().optional(),
-    mainWindowProcessName: z.string().optional(),
-    processNames: z.unknown().array().optional(),
-    backgroundProcessNames: z.unknown().array().optional(),
-    ignoredProcessNames: z.unknown().array().optional(),
-    dlcProcessNames: z.unknown().array().optional(),
-    mandatoryAppFolderName: z.string().optional(),
-    ownershipToken: z.string().optional(),
-    catalogNamespace: z.string(),
-    catalogItemId: z.string(),
-    appName: z.string(),
-    appVersionString: z.string().optional(),
-    mainGameCatalogNamespace: z.string().optional(),
-    mainGameCatalogItemId: z.string().optional(),
-    mainGameAppName: z.string().optional(),
-    allowedUriEnvVars: z.unknown().array().optional(),
-  }).passthrough(),
-);
+/**
+ * Gets information about an installed Epic Games Launcher app.
+ *
+ * Resolves `undefined` if an app with a matching path cannot be found.
+ *
+ * @param path The InstallLocation of the app.
+ */
+export const getAppByPath = async (path: string) =>
+  match(
+    await Promise.all([
+      getLauncherInstalled()
+        .then((apps) => apps.find((app) => app.installLocation === path)),
+      getManifestByPath(path),
+    ]),
+  )
+    .returnType<App | undefined>()
+    .with([P.not(P.nullish), P.not(P.nullish)], ([info, manifest]) => {
+      const merged = { ...info, ...manifest };
+      return {
+        launcher,
+        manifest: merged,
+        id: merged.artifactId ?? merged.appName,
+        name: merged.displayName,
+        path: merged.installLocation,
+        launchId: [
+          merged.namespaceId ?? merged.catalogNamespace,
+          merged.itemId ?? merged.catalogItemId,
+          merged.artifactId ?? merged.appName,
+        ]
+          .filter(Boolean)
+          .join(":"),
+      } satisfies App;
+    })
+    .otherwise(() => undefined);
 
-/** A parsed Epic Games Launcher app manifest. */
-export type AppManifest =
-  & z.infer<typeof launcherInstalledSchema>["installationList"][number]
-  & z.infer<typeof appManifestSchema>;
+/**
+ * Launches an Epic Games Launcher app.
+ *
+ * @param app The app to launch.
+ */
+export function launch(app: App): Promise<void>;
 
-/** An abstraction for working with an installed Epic Games Launcher app. */
-export class App implements AppBase<Launcher, AppManifest> {
-  /**
-   * @param launcher The launcher which manages the app.
-   * @param manifest The data manifest the launcher holds about the app.
-   * @param [id=manifest.artifactId ?? manifest.appName] The ArtifactId or
-   * AppName of the app.
-   * @param [name=manifest.displayName] The DisplayName of the app.
-   * @param [path=manifest.installLocation] The InstallLocation of the app.
-   * @param [fullyInstalled=manifest.bIsIncompleteInstall !== true] Whether the
-   * app is fully installed.
-   */
-  constructor(
-    public launcher: Launcher,
-    public manifest: AppManifest,
-    public id = manifest.artifactId ?? manifest.appName,
-    public name = manifest.displayName,
-    public path = manifest.installLocation,
-    public fullyInstalled = manifest.bIsIncompleteInstall !== true,
-  ) {}
+/**
+ * Launches an Epic Games Launcher app.
+ *
+ * @param app The ArtifactId, AppName or InstallLocation of the app.
+ */
+export function launch(app: string): Promise<void>;
 
-  /**
-   * Parses the manifest to construct a id string used to launch the app.
-   */
-  get launchId() {
-    return [
-      this.manifest.NamespaceId ?? this.manifest.CatalogNamespace,
-      this.manifest.ItemId ?? this.manifest.CatalogItemId,
-      this.manifest.ArtifactId ?? this.manifest.AppName,
-    ]
-      .filter(Boolean)
-      .join(":");
-  }
+/**
+ * Launches an Epic Games Launcher app.
+ *
+ * @param app The app, ArtifactId, AppName or InstallLocation of the app.
+ */
+export function launch(app: App | string): Promise<void>;
 
-  /** Launches the app with the Epic Games Launcher. */
-  launch = () => this.launcher.launch(this);
+export async function launch(app: App | string): Promise<void> {
+  const launchId = await match(app)
+    .returnType<string | Promise<string | undefined>>()
+    .with(
+      P.string,
+      (idOrPath) => basename(idOrPath) === idOrPath,
+      async (id) => (await getAppById(id))?.launchId,
+    )
+    .with(P.string, (path) => path)
+    .otherwise((app) => app.launchId);
+
+  if (!launchId) return;
+
+  await open(
+    `com.epicgames.launcher://apps/${launchId}?action=launch&silent=true`,
+  );
 }

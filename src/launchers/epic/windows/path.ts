@@ -2,6 +2,10 @@ import { join } from "node:path";
 import { env } from "node:process";
 import { enumerateValues, HKEY, RegistryValueType } from "registry-js";
 
+/**
+ * Retrieves the path to the Epic Games Launcher's AppData folder on this
+ * computer.
+ */
 export const getAppDataPath = () =>
   enumerateValues(
     HKEY.HKEY_LOCAL_MACHINE,

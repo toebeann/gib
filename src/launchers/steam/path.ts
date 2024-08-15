@@ -1,10 +1,10 @@
 import { match } from "ts-pattern";
-import { getLibraryfoldersPath as getLibraryfoldersPathLinux } from "./linux/paths.ts";
+import { getLibraryfoldersPath as getLibraryfoldersPathLinux } from "./linux/path.ts";
 import {
   getLibraryfoldersPath as getLibraryfoldersPathMac,
   getLoginUsersPath as getLoginUsersPathMac,
   getSteamPath as getSteamPathMac,
-} from "./macos/paths.ts";
+} from "./macos/path.ts";
 import {
   getLibraryfoldersPath as getLibraryfoldersPathWin,
   getLoginUsersPath as getLoginUsersPathWin,

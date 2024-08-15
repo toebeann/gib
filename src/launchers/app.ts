@@ -1,5 +1,3 @@
-import type { Launcher } from "./launcher.ts";
-
 /** An app data manifest. */
 export type AppManifest = Record<string, unknown> | undefined;
 
@@ -8,7 +6,6 @@ export type AppManifest = Record<string, unknown> | undefined;
  * installed on this computer.
  */
 export interface App<
-  TLauncher extends Launcher<TManifest>,
   TManifest extends AppManifest = undefined,
 > {
   /** An id which identifies the app with its launcher. */
@@ -21,14 +18,8 @@ export interface App<
   readonly path: string;
 
   /** The launcher which installed and manages the app. */
-  readonly launcher: TLauncher;
+  readonly launcher: string;
 
   /** The data manifest the launcher holds about the app. */
   readonly manifest: TManifest;
-
-  /** Whether the app is fully installed. */
-  readonly fullyInstalled?: boolean;
-
-  /** Launches the app with its launcher. */
-  launch?(): Promise<void>;
 }
