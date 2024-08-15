@@ -9,7 +9,7 @@ import { z } from "zod";
 import { booleanRace } from "../../utils/booleanRace.ts";
 import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.ts";
 import type { Launcher as LauncherBase } from "../launcher.ts";
-import { getLibraryfolders } from "./libraryfolders.ts";
+import { getLibraryFolders } from "./libraryfolders.ts";
 
 const numericBooleanSchema = z.union([z.literal(0), z.literal(1)]);
 
@@ -111,7 +111,7 @@ export class Launcher implements LauncherBase<AppManifest> {
    * Gets information about installed Steam apps.
    */
   async *getApps() {
-    for (const folder of await getLibraryfolders()) {
+    for (const folder of await getLibraryFolders()) {
       const folderPath = join(folder.path, "steamapps");
       for await (
         const manifestPath of new Glob("/appmanifest_*.acf", {
@@ -141,7 +141,7 @@ export class Launcher implements LauncherBase<AppManifest> {
    * @param id The Steam app id of the app.
    */
   async getAppById(id: string) {
-    const folder = (await getLibraryfolders()).find((folder) =>
+    const folder = (await getLibraryFolders()).find((folder) =>
       Object.keys(folder.apps).includes(id)
     );
     if (!folder) return;
@@ -178,7 +178,7 @@ export class Launcher implements LauncherBase<AppManifest> {
 
     if (
       !(await booleanRace(
-        (await getLibraryfolders())
+        (await getLibraryFolders())
           .map((folder) =>
             realpath(folder.path)
               .then((path) => path === folderPath)
