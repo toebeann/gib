@@ -4,7 +4,7 @@ import findProcess from "find-process";
 import { getSteamPath } from "./path.ts";
 
 /** Get running Steam processes, if any. */
-export const get = () =>
+export const getProcess = () =>
   findProcess("name", "steam")
     .then((processes) =>
       processes.filter((process) => {
@@ -21,11 +21,11 @@ export const get = () =>
     );
 
 /** Checks whether Steam appears to be running. */
-export const isOpen = () => get().then((process) => process.length > 0);
+export const isOpen = () => getProcess().then((process) => process.length > 0);
 
 /** Attempts to kill all running Steam processes. */
 export const kill = () =>
-  get()
+  getProcess()
     .then((processes) =>
       processes.every((process) => _kill(process.pid, "SIGKILL"))
     );
