@@ -41,7 +41,14 @@
 
 import { Glob } from "bun";
 import { writeSync } from "node:fs";
-import { chmod, copyFile, readFile, stat, writeFile } from "node:fs/promises";
+import {
+  access,
+  chmod,
+  copyFile,
+  readFile,
+  stat,
+  writeFile,
+} from "node:fs/promises";
 import { EOL } from "node:os";
 import { basename, dirname, extname, join, sep } from "node:path";
 import { exit, platform, stdout } from "node:process";
@@ -56,8 +63,7 @@ import readlineSync from "readline-sync";
 import terminalLink from "terminal-link";
 import wrapAnsi from "wrap-ansi";
 import { renderLogo } from "./renderLogo.ts";
-import { findPlistPath } from "../utils/findPlistPath.ts";
-import { hasUnityAppIndicators } from "../unity/plist.ts";
+import { hasUnityAppIndicators } from "../utils/unity.ts";
 import unquote from "unquote";
 import { getFixedPath } from "../utils/getFixedPath.ts";
 const ensureDir = fs.ensureDir;
@@ -409,8 +415,8 @@ const gameAppPath = await prompt(
       return false;
     }
 
-    const plist = await findPlistPath(path);
-    if (!plist) {
+    const plist = join(path, "Contents", "Info.plist");
+    if (await access(plist).catch((_) => true).then((_) => false)) {
       error(
         wrap(
           `${EOL}${err} Could not find app plist for app:${EOL}${

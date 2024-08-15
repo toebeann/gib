@@ -1,67 +1,45 @@
 import { stat } from "node:fs/promises";
-import { join } from "node:path";
+import { basename, dirname, extname, join, normalize, sep } from "node:path";
 import { quote } from "shell-quote";
-import { z } from "zod";
 import { exec } from "../fs/exec.ts";
-import { booleanRace } from "../utils/booleanRace.ts";
-
-const plistStrictSchema = z.object({
-  CFBundleName: z.string().optional(),
-  CFBundleExecutable: z.string().optional(),
-  UnityBuildNumber: z.unknown().optional(),
-  CFBundleShortVersionString: z.string().optional(),
-  CFBundleGetInfoString: z.string().optional(),
-});
-type PlistStrict = z.infer<typeof plistStrictSchema>;
-
-/** Zod schema for working with macOS Unity app Info.plist files. */
-export const plistSchema = plistStrictSchema.passthrough();
-
-/** A parsed macOS Unity app Info.plist. */
-export type Plist = z.infer<typeof plistSchema>;
-
-type Key = keyof PlistStrict | (string & {});
+import { booleanRace } from "./booleanRace.ts";
+import { getValue, readFile, search as searchPlists } from "./plist.ts";
 
 /**
- * Parses the plist file at `path` and returns it.
+ * Searches the given `path` for native macOS Unity apps.
  *
- * @param path The path to an `Info.plist` file to parse.
+ * @param path
+ * @param indicators
  */
-export const readFile = (path: string) =>
-  exec(
-    quote([
-      "plutil",
-      "-convert",
-      "json",
-      "-o",
-      "-",
-      path,
-    ]),
-  ).then(({ stdout }) => plistSchema.parse(JSON.parse(stdout.trim())));
+export const search = async function* (
+  path: string,
+  indicators?: number,
+) {
+  const parts = normalize(path).split(sep);
+  const index = parts.lastIndexOf("Contents");
+  const isDir = stat(path).then((stats) => stats.isDirectory());
+  const searchDir =
+    (extname(path) === ".app" || basename(path) === "Contents") && await isDir
+      ? path
+      : index >= 0
+      ? parts.slice(0, index + 1).join(sep)
+      : await isDir
+      ? path
+      : dirname(path);
 
-/**
- * Retrieves a value from the plist file at `path` with given `key`.
- *
- * @param path The path to an `Info.plist` file to parse.
- * @param key The key to look up in the `Info.plist` file.
- *
- * @returns A string representation of the value in the plist file matching `key`,
- * or `undefined` if no matching key was found.
- */
-export const getValue = (path: string, key: Key) =>
-  exec(
-    quote([
-      "plutil",
-      "-extract",
-      key,
-      "raw",
-      "-o",
-      "-",
-      path,
-    ]),
-  )
-    .then(({ stdout }) => stdout.trim())
-    .catch(() => undefined);
+  for await (const path of searchPlists(searchDir)) {
+    if (await hasUnityAppIndicators(path, indicators)) {
+      const plist = await readFile(path);
+      yield {
+        name: plist.CFBundleName,
+        bundle: dirname(dirname(path)),
+        executable: plist.CFBundleExecutable &&
+          join(path, "..", "MacOS", plist.CFBundleExecutable),
+        plist,
+      };
+    }
+  }
+};
 
 /**
  * Determines whether the macOS Application corresponding with the provided
