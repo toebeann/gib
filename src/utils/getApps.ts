@@ -1,4 +1,5 @@
-import { Glob } from "glob";
+import { Glob } from "bun";
+import { basename, dirname, extname, resolve } from "node:path";
 
 /**
  * Retrieves the paths to the `Info.plist` file for every macOS Application in
@@ -10,14 +11,21 @@ import { Glob } from "glob";
  */
 
 export const getApps = async function* (path: string) {
+  const resolved = resolve(path);
+  const glob = new Glob("**/Info.plist");
+  console.log(resolved);
   for await (
-    const plist of new Glob("/**/Info.plist", {
-      absolute: true,
-      ignore: "/**/*.bundle/**/Info.plist",
-      nodirs: true,
-      root: path,
+    const relativePath of glob.scan({
+      onlyFiles: true,
+      cwd: resolved,
     })
   ) {
-    yield plist;
+    const plist = resolve(resolved, relativePath);
+    if (
+      basename(dirname(plist)) === "Contents" &&
+      extname(dirname(dirname(plist))) !== ".bundle"
+    ) {
+      yield plist;
+    }
   }
 };

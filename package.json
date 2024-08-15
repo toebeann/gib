@@ -76,7 +76,6 @@
     "figlet": "^1.7.0",
     "find-process": "^1.4.7",
     "fs-extra": "^11.2.0",
-    "glob": "^11.0.0",
     "gradient-string": "^2.0.2",
     "open": "^10.1.0",
     "readline-sync": "^1.4.10",

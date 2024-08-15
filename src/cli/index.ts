@@ -39,6 +39,7 @@
  *
  *****************************************************************************/
 
+import { Glob } from "bun";
 import { writeSync } from "node:fs";
 import { chmod, copyFile, readFile, stat, writeFile } from "node:fs/promises";
 import { EOL } from "node:os";
@@ -50,7 +51,6 @@ import clipboard from "clipboardy";
 import cliWidth from "cli-width";
 import findProcess from "find-process";
 import fs from "fs-extra";
-import { Glob } from "glob";
 import open from "open";
 import readlineSync from "readline-sync";
 import terminalLink from "terminal-link";
@@ -460,15 +460,17 @@ if (!confirmShim(wrap(chalk.yellowBright("Proceed?")))) {
 }
 
 const i = bepinexPath.split(sep).length;
+const glob = new Glob("**/*");
 for await (
-  const path of new Glob("/**/*", {
+  const path of glob.scan({
     absolute: true,
     dot: true,
-    ignore: "/**/.DS_Store",
-    nodir: true,
-    root: bepinexPath,
+    onlyFiles: true,
+    cwd: bepinexPath,
   })
 ) {
+  if (basename(path) === ".DS_Store") continue;
+
   const destination = join(gamePath, path.split(sep).slice(i).join(sep));
   await ensureDir(dirname(destination));
   await copyFile(path, destination);
