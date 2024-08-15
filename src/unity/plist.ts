@@ -15,21 +15,18 @@ const plistStrictSchema = z.object({
 type PlistStrict = z.infer<typeof plistStrictSchema>;
 
 /** Zod schema for working with macOS Unity app Info.plist files. */
-
 export const plistSchema = plistStrictSchema.passthrough();
 
 /** A parsed macOS Unity app Info.plist. */
-
 export type Plist = z.infer<typeof plistSchema>;
 
 type Key = keyof PlistStrict | (string & {});
 
 /**
  * Parses the plist file at `path` and returns it.
- * 
+ *
  * @param path The path to an `Info.plist` file to parse.
  */
-
 export const readFile = (path: string) =>
   exec(
     quote([
@@ -44,14 +41,13 @@ export const readFile = (path: string) =>
 
 /**
  * Retrieves a value from the plist file at `path` with given `key`.
- * 
+ *
  * @param path The path to an `Info.plist` file to parse.
  * @param key The key to look up in the `Info.plist` file.
- * 
+ *
  * @returns A string representation of the value in the plist file matching `key`,
  * or `undefined` if no matching key was found.
  */
-
 export const getValue = (path: string, key: Key) =>
   exec(
     quote([
@@ -74,7 +70,6 @@ export const getValue = (path: string, key: Key) =>
  *
  * @param plist The path to the `Info.plist` of the macOS Application to check.
  */
-
 export const hasCommonUnityFiles = (plist: string) =>
   booleanRace([
     stat(join(plist, "..", "Data", "boot.config")),
@@ -95,7 +90,6 @@ export const hasCommonUnityFiles = (plist: string) =>
  *
  * @param plist The path to the `Info.plist` of the macOS Application to check.
  */
-
 export const hasCommonUnityString = async (plist: string) =>
   exec(
     quote([
@@ -116,7 +110,6 @@ export const hasCommonUnityString = async (plist: string) =>
  * @param plist The path to the `Info.plist` of the macOS Application to check.
  * @param n The number of indicators required to pass. Defaults to 2.
  */
-
 export const hasUnityAppIndicators = (plist: string, n = 2) =>
   booleanRace(
     [
@@ -134,7 +127,6 @@ export const hasUnityAppIndicators = (plist: string, n = 2) =>
  *
  * @param plist The path to the `Info.plist` of the macOS Application to check.
  */
-
 export const hasUnityBuildNumber = async (plist: string) =>
   getValue(plist, "UnityBuildNumber")
     .then(() => true)
@@ -147,7 +139,6 @@ export const hasUnityBuildNumber = async (plist: string) =>
  *
  * @param plist The path to the `Info.plist` of the macOS Application to check.
  */
-
 export const hasUnityPlayerDylib = (plist: string) =>
   stat(join(plist, "..", "Frameworks", "UnityPlayer.dylib"))
     .then((stats) => stats.isFile())
