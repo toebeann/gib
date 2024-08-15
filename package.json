@@ -42,6 +42,7 @@
     "darwin"
   ],
   "devDependencies": {
+    "@node-steam/id": "^1.2.0",
     "@node-steam/vdf": "^2.2.0",
     "@total-typescript/ts-reset": "^0.5.1",
     "@types/bun": "^1.1.6",
