@@ -30,6 +30,86 @@ export const libraryfoldersSchema = z.object({
 /** Steam's `libraryfolders.vdf` file, parsed. */
 export type LibraryFolders = z.infer<typeof libraryfoldersSchema>;
 
+const numericBooleanSchema = z.union([z.literal(0), z.literal(1)]);
+
+/** Zod schema for working with Steam's `loginusers.vdf` file. */
+export const loginusersSchema = z.object({
+  users: z.record(
+    z.object({
+      AccountName: z.string(),
+      PersonaName: z.unknown().optional(),
+      RememberPassword: numericBooleanSchema.optional(),
+      WantsOfflineMode: numericBooleanSchema.optional(),
+      SkipOfflineModeWarning: numericBooleanSchema.optional(),
+      AllowAutoLogin: numericBooleanSchema.optional(),
+      MostRecent: numericBooleanSchema,
+      Timestamp: z.number().optional(),
+    }).passthrough(),
+  ),
+});
+
+/** Steam's `loginusers.vdf` file, parsed. */
+export type LoginUsers = z.infer<typeof loginusersSchema>;
+
+/** Zod schema for working with Steam's `localconfig.vdf` files. */
+export const localconfigSchema = z.object({
+  UserLocalConfigStore: z.object({
+    Software: z.object({
+      Valve: z.object({
+        Steam: z.object({
+          apps: z.record(
+            z.object({
+              LastPlayed: z.number().optional(),
+              Playtime2wks: z.number().optional(),
+              Playtime: z.number().optional(),
+              cloud: z.object({
+                last_sync_state: z.string().optional(),
+              }).passthrough().optional(),
+              autocloud: z.object({
+                lastlaunch: z.number().optional(),
+                lastexit: z.number().optional(),
+              }).passthrough().optional(),
+              BadgeData: z.number().optional(),
+              LaunchOptions: z.union([z.string(), z.number()]).optional(),
+            }).passthrough(),
+          ),
+          LastPlayedTimesSyncTime: z.number().optional(),
+          PlayerLevel: z.number().optional(),
+          SmallMode: numericBooleanSchema.optional(),
+        }).passthrough(),
+      }).passthrough(),
+    }).passthrough(),
+  }).passthrough(),
+});
+
+/** One of Steam's `localconfig.vdf` files, parsed. */
+export type LocalConfig = z.infer<typeof localconfigSchema>;
+
+/** Zod schema for working with Steam's binary `shortcuts.vdf` files. */
+export const shortcutsSchema = z.object({
+  shortcuts: z.record(
+    z.object({
+      appid: z.number().optional(),
+      AppName: z.string().optional(),
+      Exe: z.string().optional(),
+      StartDir: z.string().optional(),
+      icon: z.string().optional(),
+      ShortcutPath: z.string().optional(),
+      LaunchOptions: z.string().optional(),
+      IsHidden: numericBooleanSchema.optional(),
+      AllowDesktopConfig: numericBooleanSchema.optional(),
+      AllowOverlay: numericBooleanSchema.optional(),
+      LastPlayTime: z.number().optional(),
+    }).passthrough(),
+  ),
+});
+
+/** One of Steam's binary `shortcuts.vdf` files, parsed. */
+export type Shortcuts = z.infer<typeof shortcutsSchema>;
+
+/** A Shortcut entry for Steam's binary `shortcuts.vdf` files.s */
+export type Shortcut = Shortcuts["shortcuts"][string];
+
 /** An abstraction for working with Steam and its apps. */
 export class Launcher implements LauncherBase<AppManifest> {
   readonly name = "Steam";
