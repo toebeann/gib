@@ -9,26 +9,7 @@ import { z } from "zod";
 import { booleanRace } from "../../utils/booleanRace.ts";
 import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.ts";
 import type { Launcher as LauncherBase } from "../launcher.ts";
-import { appManifestSchema, App, type AppManifest } from "./app.ts";
-import { getLibraryfoldersPath } from "./getLibraryfoldersPath.ts";
-
-/** Zod schema for working with Steam's `libraryfolders.vdf` file. */
-export const libraryfoldersSchema = z.object({
-  libraryfolders: z.record(
-    z.object({
-      apps: z.record(z.number()),
-      path: z.string(),
-      label: z.string().optional(),
-      contentid: z.number().optional(),
-      totalsize: z.number().optional(),
-      update_clean_bytes_tally: z.number().optional(),
-      time_last_update_corruption: z.number().optional(),
-    }).passthrough(),
-  ),
-});
-
-/** Steam's `libraryfolders.vdf` file, parsed. */
-export type LibraryFolders = z.infer<typeof libraryfoldersSchema>;
+import { getLibraryfolders } from "./libraryfolders.ts";
 
 const numericBooleanSchema = z.union([z.literal(0), z.literal(1)]);
 
@@ -120,18 +101,6 @@ export class Launcher implements LauncherBase<AppManifest> {
   ] satisfies typeof platform[];
 
   /**
-   * Gets information about Steam Library folders on this computer, parsed from
-   * Steam's `libraryfolders.vdf` file.
-   */
-  private getLibraryfolders = () =>
-    readFile(
-      getLibraryfoldersPath(),
-      { encoding: "utf8" },
-    ).then((text) =>
-      Object.values(libraryfoldersSchema.parse(parse(text)).libraryfolders)
-    );
-
-  /**
    * Determines whether Steam appears to be installed by checking for a
    * `steam://` protocol handler. May open Steam in the background if it is
    * installed.
@@ -142,7 +111,7 @@ export class Launcher implements LauncherBase<AppManifest> {
    * Gets information about installed Steam apps.
    */
   async *getApps() {
-    for (const folder of await this.getLibraryfolders()) {
+    for (const folder of await getLibraryfolders()) {
       const folderPath = join(folder.path, "steamapps");
       for await (
         const manifestPath of new Glob("/appmanifest_*.acf", {
@@ -172,7 +141,7 @@ export class Launcher implements LauncherBase<AppManifest> {
    * @param id The Steam app id of the app.
    */
   async getAppById(id: string) {
-    const folder = (await this.getLibraryfolders()).find((folder) =>
+    const folder = (await getLibraryfolders()).find((folder) =>
       Object.keys(folder.apps).includes(id)
     );
     if (!folder) return;
@@ -209,7 +178,7 @@ export class Launcher implements LauncherBase<AppManifest> {
 
     if (
       !(await booleanRace(
-        (await this.getLibraryfolders())
+        (await getLibraryfolders())
           .map((folder) =>
             realpath(folder.path)
               .then((path) => path === folderPath)
