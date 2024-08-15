@@ -9,7 +9,7 @@ import {
   getLibraryFoldersPath as getLibraryFoldersPathWin,
   getLoginUsersPath as getLoginUsersPathWin,
   getSteamPath as getSteamPathWin,
-} from "./windows/paths.ts";
+} from "./windows/path.ts";
 
 /** Retrieves the path to the Steam installation. */
 export const getSteamPath = match(process.platform)
