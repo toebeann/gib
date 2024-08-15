@@ -7,7 +7,7 @@ import { match, P } from "ts-pattern";
 import { booleanRace } from "../../utils/booleanRace.ts";
 import type { App as AppBase } from "../app.ts";
 import { getLibraryFolders } from "./libraryfolders.ts";
-import { appManifestSchema, type AppManifest } from "./manifest.ts";
+import { type AppManifest, appManifestSchema } from "./manifest.ts";
 
 const launcher = "steam";
 
