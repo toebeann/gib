@@ -20,7 +20,7 @@ export const getSteamPath = () =>
     ?.data as string | undefined ?? homedir();
 
 /** Retrieves the path to Steam's `libraryfolders.vdf` file. */
-export const getLibraryfoldersPath = () =>
+export const getLibraryFoldersPath = () =>
   join(getSteamPath(), "steamapps", "libraryfolders.vdf");
 
 /** Retrieves the path to Steam's `loginusers`.vdf` file. */

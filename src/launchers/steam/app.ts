@@ -6,7 +6,7 @@ import open from "open";
 import { match, P } from "ts-pattern";
 import { booleanRace } from "../../utils/booleanRace.ts";
 import type { App as AppBase } from "../app.ts";
-import { getLibraryfolders } from "./libraryfolders.ts";
+import { getLibraryFolders } from "./libraryfolders.ts";
 import { appManifestSchema, type AppManifest } from "./manifest.ts";
 
 const launcher = "steam";
@@ -52,7 +52,7 @@ export const isFullyInstalled = (app: App) =>
  * Gets information about installed Steam apps.
  */
 export async function* getApps() {
-  for (const folder of await getLibraryfolders()) {
+  for (const folder of await getLibraryFolders()) {
     const folderPath = join(folder.path, "steamapps");
     for await (
       const manifestPath of new Glob("/appmanifest_*.acf", {
@@ -91,7 +91,7 @@ export async function* getApps() {
  * @param id The Steam app id of the app.
  */
 export const getAppById = async (id: string) => {
-  const folder = (await getLibraryfolders()).find((folder) =>
+  const folder = (await getLibraryFolders()).find((folder) =>
     Object.keys(folder.apps).includes(id)
   );
   if (!folder) return;
@@ -132,7 +132,7 @@ export async function* getAppsByPath(path: string) {
 
   if (
     !(await booleanRace(
-      (await getLibraryfolders())
+      (await getLibraryFolders())
         .map((folder) =>
           realpath(folder.path)
             .then((path) => path === folderPath)

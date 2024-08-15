@@ -1,12 +1,12 @@
 import { match } from "ts-pattern";
-import { getLibraryfoldersPath as getLibraryfoldersPathLinux } from "./linux/path.ts";
+import { getLibraryFoldersPath as getLibraryFoldersPathLinux } from "./linux/path.ts";
 import {
-  getLibraryfoldersPath as getLibraryfoldersPathMac,
+  getLibraryFoldersPath as getLibraryFoldersPathMac,
   getLoginUsersPath as getLoginUsersPathMac,
   getSteamPath as getSteamPathMac,
 } from "./macos/path.ts";
 import {
-  getLibraryfoldersPath as getLibraryfoldersPathWin,
+  getLibraryFoldersPath as getLibraryFoldersPathWin,
   getLoginUsersPath as getLoginUsersPathWin,
   getSteamPath as getSteamPathWin,
 } from "./windows/paths.ts";
@@ -19,11 +19,11 @@ export const getSteamPath = match(process.platform)
   .otherwise(() => () => "");
 
 /** Retrieves the path to Steam's `libraryfolders.vdf` file. */
-export const getLibraryfoldersPath = match(process.platform)
+export const getLibraryFoldersPath = match(process.platform)
   .returnType<() => string>()
-  .with("linux", () => getLibraryfoldersPathLinux)
-  .with("darwin", () => getLibraryfoldersPathMac)
-  .with("win32", () => getLibraryfoldersPathWin)
+  .with("linux", () => getLibraryFoldersPathLinux)
+  .with("darwin", () => getLibraryFoldersPathMac)
+  .with("win32", () => getLibraryFoldersPathWin)
   .otherwise(() => () => "");
 
 /** Retrieves the path to Steam's `loginusers`.vdf` file. */

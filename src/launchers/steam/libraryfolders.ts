@@ -1,10 +1,10 @@
 import { readFile } from "node:fs/promises";
 import { parse } from "@node-steam/vdf";
 import { z } from "zod";
-import { getLibraryfoldersPath } from "./path.ts";
+import { getLibraryFoldersPath } from "./path.ts";
 
 /** Zod schema for working with Steam's `libraryfolders.vdf` file. */
-export const libraryfoldersSchema = z.object({
+export const libraryFoldersSchema = z.object({
   libraryfolders: z.record(
     z.object({
       apps: z.record(z.number()),
@@ -19,13 +19,13 @@ export const libraryfoldersSchema = z.object({
 });
 
 /** Steam's `libraryfolders.vdf` file, parsed. */
-export type Libraryfolders = z.infer<typeof libraryfoldersSchema>;
+export type LibraryFolders = z.infer<typeof libraryFoldersSchema>;
 
 /**
  * Retrieves information about Steam library folders on this computer, parsed
  * from Steam's `libraryfolders.vdf` file.
  */
-export const getLibraryfolders = async (path = getLibraryfoldersPath()) => {
+export const getLibraryFolders = async (path = getLibraryFoldersPath()) => {
   const data = await readFile(path, { encoding: "utf8" });
-  return Object.values(libraryfoldersSchema.parse(parse(data)).libraryfolders);
+  return Object.values(libraryFoldersSchema.parse(parse(data)).libraryfolders);
 };

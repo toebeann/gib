@@ -11,7 +11,7 @@ export const getSteamPath = () =>
   );
 
 /** Retrieves the path to Steam's `libraryfolders.vdf` file. */
-export const getLibraryfoldersPath = () =>
+export const getLibraryFoldersPath = () =>
   join(
     getSteamPath(),
     "config",
