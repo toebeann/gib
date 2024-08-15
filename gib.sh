@@ -26,7 +26,7 @@
 # TODO: Keep this script simple and easy to audit.
 
 { # this ensures the entire script is downloaded #
-    
+
     #ensure XCode Command Line Developer Tools are installed
     echo -ne "\033[K  ⏳ Setting up XCode, please confirm the pop-ups and get comfortable..."
 
@@ -54,12 +54,10 @@
 
     echo -ne "\r\033[2K"
 
-    if [ -n "${GIB_CLEAR_CACHE}" ] && [ ${GIB_CLEAR_CACHE} -eq 1 &>/dev/null ]; then
-        if ! bun pm cache rm -g &>/dev/null; then
-            bun i noop -g &>/dev/null
-            bun rm noop -g &>/dev/null
-            bun pm cache rm -g &>/dev/null
-        fi
+    if ! bun pm cache rm -g &>/dev/null; then
+        bun i noop -g &>/dev/null
+        bun rm noop -g &>/dev/null
+        bun pm cache rm -g &>/dev/null
     fi
 
     if [ -n "${GIB_VERSION}" ]; then
