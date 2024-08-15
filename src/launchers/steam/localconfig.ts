@@ -41,9 +41,10 @@ export const localConfigSchema = z.object({
 export type LocalConfig = z.infer<typeof localConfigSchema>;
 
 /**
- * Gets local config information for the most recent user of the Steam app on
- * this computer. Returns `undefined` if no user has logged in to Steam on this
+ * Gets local config information for the most recent user of Steam on this
  * computer.
+ *
+ * Returns `undefined` if no user has logged in to Steam on this computer.
  */
 export function getLocalConfig(): Promise<LocalConfig | undefined>;
 
@@ -63,7 +64,8 @@ export function getLocalConfig(userId: string): Promise<LocalConfig>;
 
 /**
  * Gets local config information for Steam user matching `userId`. Looks up the
- * most recent user of the Steam app on this computer if none specified.
+ * most recent user of Steam on this computer if none specified.
+ *
  * Returns `undefined` if no user has logged in to Steam on this computer.
  *
  * @param userId
@@ -86,12 +88,12 @@ export async function getLocalConfig(userId?: ID | string) {
 }
 
 /**
- * Sets local config information for the most recent user of the Steam app on
- * this computer.
+ * Sets local config information for the most recent user of Steam on this
+ * computer.
  *
  * It is highly advised to:
  * 1. Ensure Steam is not running,
- * 1. Call `getLocalConfig` and modify it in place as required,
+ * 1. Call `getLocalConfig` and modify as required,
  * 1. Finally, call `setLocalConfig` with the modified config.
  *
  * @param config The config to set. _**Do not construct this by hand**_, as it
@@ -104,7 +106,7 @@ export function setLocalConfig(config: LocalConfig): Promise<void>;
  *
  * It is highly advised to:
  * 1. Ensure Steam is not running,
- * 1. Call `getLocalConfig` and modify it in place as required,
+ * 1. Call `getLocalConfig` and modify as required,
  * 1. Finally, call `setLocalConfig` with the modified config.
  *
  * @param config The config to set. _**Do not construct this by hand**_, as it
@@ -121,7 +123,7 @@ export function setLocalConfig(
  *
  * It is highly advised to:
  * 1. Ensure Steam is not running,
- * 1. Call `getLocalConfig` and modify it in place as required,
+ * 1. Call `getLocalConfig` and modify as required,
  * 1. Finally, call `setLocalConfig` with the modified config.
  *
  * @param config The config to set. _**Do not construct this by hand**_, as it
@@ -135,11 +137,11 @@ export function setLocalConfig(
 
 /**
  * Sets local config information for Steam user matching `userId`. Looks up the
- * most recent user of the Steam app on this computer if none specified.
+ * most recent user of Steam on this computer if none specified.
  *
  * It is highly advised to:
  * 1. Ensure Steam is not running,
- * 1. Call `getLocalConfig` and modify it in place as required,
+ * 1. Call `getLocalConfig` and modify as required,
  * 1. Finally, call `setLocalConfig` with the modified config.
  *
  * @param config The config to set. _**Do not construct this by hand**_, as it

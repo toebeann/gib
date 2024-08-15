@@ -27,8 +27,8 @@ export const loginusersSchema = z.object({
 export type LoginUsers = z.infer<typeof loginusersSchema>;
 
 /**
- * Gets inforation about users who have logged in to the Steam app on this
- * computer, parsed from Steam's `loginusers.vdf` file.
+ * Gets inforation about users who have logged in to Steam on this computer,
+ * parsed from Steam's `loginusers.vdf` file.
  */
 export const getUsers = () =>
   readFile(
@@ -37,8 +37,8 @@ export const getUsers = () =>
   ).then((text) => Object.entries(loginusersSchema.parse(parse(text)).users));
 
 /**
- * Retrieves information about the most recent user of the Steam app on this
- * computer, parsed from Steam's `loginusers.vdf` file.
+ * Retrieves information about the most recent user of Steam on this computer,
+ * parsed from Steam's `loginusers.vdf` file.
  */
 export const getMostRecentUser = () =>
   getUsers()
@@ -46,10 +46,10 @@ export const getMostRecentUser = () =>
 
 /**
  * Attempts to determine the path to the `config` folder for the most recent
- * Steam app user on this computer. Returns `undefined` if no users have logged
- * in to the Steam app on this computer.
+ * user of Steam on this computer. Returns `undefined` if no users have logged
+ * in to Steam on this computer.
  *
- * @returns The path to the `config` folder for the most recent Steam app user
+ * @returns The path to the `config` folder for the most recent user of Steam
  * on this computer, or `undefined` if a user could not be found.
  */
 export function getUserConfigFolderPath(): Promise<string | undefined>;
@@ -75,11 +75,11 @@ export function getUserConfigFolderPath(userId: string): Promise<string>;
  * computer.
  *
  * @param userId ID of the steam user. If not specified, will attempt to look
- * up the most recent user of the Steam app on this computer.
+ * up the most recent user of Steam on this computer.
  *
  * @returns The path to the `config` folder for the relevant user, or
- * `undefined` if no user ID specified and a user of the Steam app could not be
- * found on this computer.
+ * `undefined` if `userId` not specified and a user of Steam on this computer
+ * could not be found.
  */
 export function getUserConfigFolderPath(
   userId?: ID | string,

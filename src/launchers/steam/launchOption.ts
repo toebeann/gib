@@ -8,8 +8,8 @@ import { kill } from "./process.ts";
 /**
  * Gets app launch options for the most recent user of Steam on this computer.
  *
- * Returns `undefined` if no user has logged in to the Steam app on this
- * computer, or if the no launch options for the specified app were found.
+ * Returns `undefined` if no user has logged in to Steam on this computer, or
+ * if the no launch options for the specified app were found.
  *
  * @param app
  */
@@ -18,8 +18,8 @@ export function getLaunchOptions(app: App): Promise<string | undefined>;
 /**
  * Gets app launch options for the most recent user of Steam on this computer.
  *
- * Returns `undefined` if no user has logged in to the Steam app on this
- * computer, or if the no launch options for the specified app were found.
+ * Returns `undefined` if no user has logged in to Steam on this computer, or
+ * if the no launch options for the specified app were found.
  *
  * @param app
  */
