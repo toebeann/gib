@@ -57,7 +57,7 @@ import { watch } from "chokidar";
 import clipboard from "clipboardy";
 import cliWidth from "cli-width";
 import findProcess from "find-process";
-import fs from "fs-extra";
+import { ensureDir } from "fs-extra";
 import open from "open";
 import readlineSync from "readline-sync";
 import terminalLink from "terminal-link";
@@ -67,7 +67,6 @@ import { hasUnityAppIndicators } from "../utils/unity.ts";
 import unquote from "unquote";
 import { getFixedPath } from "../utils/getFixedPath.ts";
 import { isInstalled } from "../launchers/steam/launcher.ts";
-const ensureDir = fs.ensureDir;
 
 function alertShim(message: string) {
   writeSync(stdout.fd, new TextEncoder().encode(`${message} [Enter] `));
