@@ -51,7 +51,7 @@ import {
 } from "node:fs/promises";
 import { EOL } from "node:os";
 import { basename, dirname, extname, join, sep } from "node:path";
-import { exit, platform, stdout } from "node:process";
+import { platform, stdout } from "node:process";
 import chalk from "chalk";
 import { watch } from "chokidar";
 import clipboard from "clipboardy";
@@ -66,6 +66,7 @@ import { renderLogo } from "./renderLogo.ts";
 import { hasUnityAppIndicators } from "../utils/unity.ts";
 import unquote from "unquote";
 import { getFixedPath } from "../utils/getFixedPath.ts";
+import { isInstalled } from "../launchers/steam/launcher.ts";
 const ensureDir = fs.ensureDir;
 
 function alertShim(message: string) {
@@ -140,52 +141,37 @@ const { error, log } = console;
 
 await renderLogo();
 
-const err = chalk.redBright("Error:");
-
 if (platform !== "darwin") {
-  error(
-    wrap(
-      `${err} detected platform ${chalk.yellow(platform)}`,
-    ),
-  );
-  error(
-    wrap(`Currently only ${chalk.yellow("darwin")} (macOS) is supported.`),
-  );
-  log();
-
-  if (platform === "win32") {
-    log(
-      wrap(
-        `${
-          link(
-            "Vortex Mod Manager",
-            "https://www.nexusmods.com/about/vortex/",
-            "https://tinyurl.com/3wjededw",
-          )
-        } or ${
-          link(
-            "Thunderstore Mod Manager",
-            "https://www.overwolf.com/oneapp/Thunderstore-Thunderstore_Mod_Manager",
-            "http://tinyurl.com/2kbt393c",
-          )
-        } are recommended for automated installation on Windows.`,
+  throw wrap(
+    `detected platform ${chalk.yellow(platform)}${EOL}` +
+      chalk.reset(
+        `Currently only ${
+          chalk.yellow("darwin")
+        } (macOS) is supported.${EOL}${EOL}` +
+          `For all other platforms, please see ${
+            link(
+              "the BepInEx documentation",
+              "https://docs.bepinex.dev/articles/user_guide/installation/index.html",
+              "https://tinyurl.com/yzp3evma",
+            )
+          } for manual installation instructions.`,
       ),
-    );
-    log();
-  }
-  log(
-    wrap(
-      `For all other platforms, please see ${
-        link(
-          "the BepInEx documentation",
-          "https://docs.bepinex.dev/articles/user_guide/installation/index.html",
-          "https://tinyurl.com/yzp3evma",
-        )
-      } for manual installation instructions.`,
-    ),
   );
+}
 
-  exit(1);
+if (!await isInstalled()) {
+  throw wrap(
+    `Steam is not installed. Please install Steam, then run gib again.${EOL}${EOL}` +
+      chalk.reset(
+        `gib will configure Steam to launch your game with BepInEx, and ` +
+          "then test that everything is working. You will need to use Steam " +
+          `to launch the game with mods.${EOL}${EOL}` +
+          link(
+            chalk.bold("Download Steam"),
+            "https://store.steampowered.com/about/download",
+          ),
+      ),
+  );
 }
 
 const run_bepinex_sh = code("run_bepinex.sh");
@@ -239,6 +225,8 @@ log(
     "First, we need to know the location of your unzipped copy of the BepInEx pack inside your Downloads folder.",
   ),
 );
+
+const err = `${chalk.red("error")}${chalk.gray(":")}`;
 
 const prompt = async (
   message: string,
@@ -461,8 +449,7 @@ log(wrap("You may be required to grant permission to the Terminal."));
 log();
 
 if (!confirmShim(wrap(chalk.yellowBright("Proceed?")))) {
-  error(`${err} User cancelled installation.`);
-  exit(1);
+  throw wrap("User cancelled installation");
 }
 
 const i = bepinexPath.split(sep).length;
@@ -583,30 +570,21 @@ var { detectedGame, detectedBepInEx } = await new Promise<
 log();
 
 if (!detectedGame && !detectedBepInEx) {
-  error(
-    wrap(
-      `${err} Timed out waiting for the game to launch. Test cancelled.`,
-    ),
+  throw wrap(
+    `Timed out waiting for the game to launch. Test cancelled.${EOL}` +
+      chalk.reset(
+        "Unable to verify whether BepInEx is correctly installed. We " +
+          "recommend running gib again, making sure to run the right game.",
+      ),
   );
-  error(wrap("Unable to verify whether BepInEx is correctly installed."));
-  error(
-    wrap(
-      "We recommend running gib again, making sure to run the right game.",
-    ),
-  );
-  exit(1);
 } else if (!detectedBepInEx) {
-  error(
-    wrap(
-      `${err} Failed to detect BepInEx. Did you forget to set Steam launch options?`,
-    ),
+  throw wrap(
+    `Failed to detect BepInEx. Did you forget to set Steam launch options?${EOL}` +
+      chalk.reset(
+        "We recommend running gib again, making sure to pay attention to the " +
+          "section for setting the launch options for the game in Steam.",
+      ),
   );
-  error(
-    wrap(
-      "We recommend running gib again, making sure to pay attention to the section for setting the launch options for the game in Steam.",
-    ),
-  );
-  exit(1);
 } else {
   await open("https://github.com/toebeann/gib/?sponsor=1", {
     background: true,
