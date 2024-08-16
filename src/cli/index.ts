@@ -238,13 +238,13 @@ const paste = code("Command V");
 const getInvalidPathError = (path: string) =>
   wrap(
     `${EOL}${err} Could not find path:${EOL}${
-      pink(path)
+      chalk.yellow(path)
     }${EOL}${EOL}Please try using ${copyPath} to copy the path from Finder, then ${paste} to paste it here.`,
   );
 
 const getUnknownErrorCheckingPath = (path: string) =>
   wrap(
-    `${EOL}${err} Unknown error checking path:${EOL}${pink(path)}`,
+    `${EOL}${err} Unknown error checking path:${EOL}${chalk.yellow(path)}`,
   );
 
 const getInvalidBepInExPackError = () =>
@@ -254,7 +254,7 @@ const getInvalidBepInExPackError = () =>
 
 const getNotAFolderError = (path: string) =>
   wrap(
-    `${EOL}${err} Path is not a folder:${EOL}${pink(path)}`,
+    `${EOL}${err} Path is not a folder:${EOL}${chalk.yellow(path)}`,
   );
 
 const providePathInstructions = list([
@@ -285,7 +285,7 @@ const bepinexPath = dirname(
         error(
           wrap(
             `${EOL}${err} Unexpected filename:${EOL}${
-              pink(filename)
+              chalk.yellow(filename)
             }${EOL}${EOL}If you are absolutely sure this is a valid ${run_bepinex_sh} script, rename it to ${run_bepinex_sh} and try again.`,
           ),
         );
@@ -297,7 +297,7 @@ const bepinexPath = dirname(
           error(
             wrap(
               `${EOL}${err} Path is not a file:${EOL}${
-                pink(path)
+                chalk.yellow(path)
               }${EOL}${EOL}Please make sure you are selecting the ${run_bepinex_sh} script and try again.`,
             ),
           );
@@ -321,6 +321,15 @@ const bepinexPath = dirname(
 
       return path;
     },
+  ),
+);
+
+log();
+log(
+  wrap(
+    `macOS BepInEx pack successfully detected at:${EOL}${
+      chalk.green.bold(bepinexPath)
+    }`,
   ),
 );
 
@@ -359,7 +368,7 @@ const gameAppPath = await prompt(
       error(
         wrap(
           `${EOL}${err} Invalid app extension:${EOL}${
-            pink(basename(path))
+            chalk.yellow(basename(path))
           }${EOL}${EOL}${pleaseSelectAUnityGameAndTryAgain}`,
         ),
       );
@@ -385,7 +394,7 @@ const gameAppPath = await prompt(
       error(
         wrap(
           `${EOL}${err} Could not find app plist for app:${EOL}${
-            pink(path)
+            chalk.yellow(path)
           }${EOL}${EOL}${pleaseSelectAUnityGameAndTryAgain}`,
         ),
       );
@@ -396,7 +405,7 @@ const gameAppPath = await prompt(
       error(
         wrap(
           `${EOL}${err} App does not appear to be a Unity game:${EOL}${
-            pink(path)
+            chalk.yellow(path)
           }${EOL}${EOL}BepInEx only works for Unity games. ${pleaseSelectAUnityGameAndTryAgain}`,
         ),
       );
@@ -409,10 +418,17 @@ const gameAppPath = await prompt(
 const gamePath = dirname(gameAppPath);
 
 log();
+log(
+  wrap(
+    `Unity app successfully detected at:${EOL}${chalk.green.bold(gamePath)}`,
+  ),
+);
+
+log();
 log(wrap("gib will now install the macOS BepInEx pack located at:"));
-log(wrap(pink(bepinexPath)));
+log(wrap(chalk.green.bold(bepinexPath)));
 log(wrap("to the Unity game located at:"));
-log(wrap(pink(gamePath)));
+log(wrap(chalk.green.bold(gamePath)));
 log();
 log(
   wrap(
