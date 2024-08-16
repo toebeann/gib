@@ -52,17 +52,18 @@
         fi
     fi
 
-    echo -ne "\r\033[2K"
-
     if ! bun pm cache rm -g &>/dev/null; then
         bun i noop -g &>/dev/null
         bun rm noop -g &>/dev/null
         bun pm cache rm -g &>/dev/null
     fi
 
+    echo -ne "\r\033[2K"
+
+    package=toebeann/gib
     if [ -n "${GIB_VERSION}" ]; then
-        bun x --bun toebeann/gib\#${GIB_VERSION}
-    else
-        bun x --bun toebeann/gib
+        package=${package}\#${GIB_VERSION}
     fi
+
+    bun x --bun ${package}
 } # this ensures the entire script is downloaded #
