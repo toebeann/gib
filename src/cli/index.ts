@@ -138,8 +138,6 @@ const list = (items: string[], ordered: boolean) => {
 
 const { error, log } = console;
 
-const steamInstalled = await isInstalled();
-
 await renderLogo();
 
 if (platform !== "darwin") {
@@ -160,7 +158,7 @@ if (platform !== "darwin") {
   );
 }
 
-if (!steamInstalled) {
+if (!await isInstalled()) {
   throw wrap(
     `Steam is not installed. Please install Steam, then run gib again.${EOL}${EOL}` +
       chalk.reset(
