@@ -96,7 +96,7 @@ function promptShim(message = "Prompt", defaultValue?: string) {
 }
 
 const pink = chalk.hex("#ae0956");
-const code = chalk.yellowBright;
+const code = chalk.yellowBright.bold;
 
 const link = (
   label: string,
@@ -139,6 +139,8 @@ const list = (items: string[], ordered: boolean) => {
 
 const { error, log } = console;
 
+const steamInstalled = await isInstalled();
+
 await renderLogo();
 
 if (platform !== "darwin") {
@@ -159,7 +161,7 @@ if (platform !== "darwin") {
   );
 }
 
-if (!await isInstalled()) {
+if (!steamInstalled) {
   throw wrap(
     `Steam is not installed. Please install Steam, then run gib again.${EOL}${EOL}` +
       chalk.reset(
@@ -181,7 +183,7 @@ log(
   list([
     chalk.green("install and configure BepInEx for a compatible game"),
     chalk.green(
-      "walk you through configuring Steam to launch the game with BepInEx",
+      "configure Steam to launch the game with BepInEx",
     ),
     chalk.green("test that BepInEx is working"),
   ], false),
@@ -195,34 +197,10 @@ const pressHeartToContinue = (message = "to continue") => {
 
 pressHeartToContinue();
 
-log(wrap("Before using gib, make sure that you have:"));
-log();
-log(
-  list([
-    "downloaded and unzipped the relevant BepInEx pack for the game to your Downloads folder, with a Finder window open at its location",
-    `have a Finder window open at the location of the Unity game, e.g. by clicking ${
-      chalk.italic("Manage -> Browse local files")
-    } in Steam`,
-  ], true),
-);
-log();
 log(
   wrap(
-    `Additionally, if you don't own the game with Steam, make sure to ${
-      link(
-        "add it to Steam as a non-Steam game",
-        "https://github.com/toebeann/gib/wiki/Adding-non%E2%80%90Steam-games-to-Steam",
-        "https://tinyurl.com/ywvm782r",
-      )
-    }.`,
-  ),
-);
-
-pressHeartToContinue();
-
-log(
-  wrap(
-    "First, we need to know the location of your unzipped copy of the BepInEx pack inside your Downloads folder.",
+    "If you haven't already, go ahead and download (and unzip) the relevant " +
+      "BepInEx pack for the game.",
   ),
 );
 
@@ -291,7 +269,7 @@ const bepinexPath = dirname(
   await prompt(
     `${EOL}${
       wrap(
-        `Open the Finder window with your copy of BepInEx, locate the ${run_bepinex_sh} script file, then either:`,
+        `In Finder, locate the ${run_bepinex_sh} script file within your downloaded BepInEx pack, then either:`,
       )
     }${EOL}${EOL}${providePathInstructions}${EOL}${EOL}${
       wrap(`Path to ${run_bepinex_sh}:`)
@@ -362,7 +340,9 @@ const pleaseSelectAUnityGameAndTryAgain =
 const gameAppPath = await prompt(
   `${EOL}${
     wrap(
-      `Open the Finder window where your Unity game is located, find the app (e.g. ${
+      `Open a Finder window at the game's location, (e.g. by clicking ${
+        code("Manage -> Browse local files")
+      } in Steam), find the app (e.g. ${
         code("Subnautica.app")
       }) and do the same thing as last time - either:`,
     )
