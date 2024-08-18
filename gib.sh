@@ -39,6 +39,16 @@
 
     echo -ne "\r\033[K  ⏳ Preparing to launch gib..."
 
+    # ensure bun env vars are set
+    if [ -z "$BUN_INSTALL" ]; then
+        export BUN_INSTALL="$HOME/.bun"
+    fi
+
+    case ":$PATH:" in
+        *":$BUN_INSTALL:"*) ;;
+        *) export PATH="$BUN_INSTALL/bin:$PATH" ;;
+    esac
+
     # ensure bun is installed
     if ! command -v bun >/dev/null; then
         curl -fsSL https://bun.sh/install | bash &>/dev/null
