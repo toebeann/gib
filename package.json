@@ -42,8 +42,6 @@
     "darwin"
   ],
   "devDependencies": {
-    "@node-steam/id": "^1.2.0",
-    "@node-steam/vdf": "^2.2.0",
     "@total-typescript/ts-reset": "^0.5.1",
     "@types/bun": "^1.1.6",
     "@types/center-align": "^1.0.2",
@@ -56,14 +54,15 @@
     "@types/readline-sync": "^1.4.8",
     "@types/shell-quote": "^1.7.5",
     "@types/unquote": "^1.1.0",
-    "async-wait-until": "^2.0.12",
     "ix": "^7.0.0",
-    "lodash": "^4.17.21",
     "protocol-registry": "^1.4.1",
     "registry-js": "^1.16.0",
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@node-steam/id": "^1.2.0",
+    "@node-steam/vdf": "^2.2.0",
+    "async-wait-until": "^2.0.12",
     "boxen": "^8.0.1",
     "center-align": "^1.0.1",
     "chalk": "^5.3.0",
