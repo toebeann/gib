@@ -67,7 +67,7 @@ export async function* getApps() {
           parse(await readFile(manifestPath, { encoding: "utf-8" })),
         );
 
-        return {
+        yield {
           launcher,
           manifest,
           id: manifest.appState.appid.toString(),
