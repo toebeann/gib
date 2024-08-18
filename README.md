@@ -158,6 +158,12 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
   plan to fix this in an update. In the meantime, you can workaround this by
   renaming the shell script to `run_bepinex.sh` as needed.
 
+- Relative paths are currently not supported and providing them will lead to
+  strange issues. If you encounter an issue after having provided a relative
+  path, please run the script again, this time providing absolute paths. You
+  can provide absolute paths easily by simply highlighting the file in Finder,
+  pressing `Option Command C`, then `Command V` in terminal to paste.
+
 ## License
 
 gib is licensed under the
