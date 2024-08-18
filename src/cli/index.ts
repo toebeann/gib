@@ -901,6 +901,7 @@ const steamApp = steamApps[0];
 
 if (steamApp) {
   await launch(steamApp);
+  log(wrap([`Launching ${steamApp.name} with Steam...`, null]));
 } else {
   await open(shortcutPath);
 }
