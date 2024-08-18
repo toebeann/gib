@@ -42,7 +42,7 @@ export const getUsers = () =>
  */
 export const getMostRecentUser = () =>
   getUsers()
-    .then((users) => users.find(([_, user]) => user.MostRecent));
+    .then((users) => users.find(([_, user]) => user.MostRecent) ?? []);
 
 /**
  * Attempts to determine the path to the `config` folder for the most recent
