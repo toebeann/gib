@@ -1013,13 +1013,16 @@ if (!detectedGame && !detectedBepInEx) {
       ),
   );
 } else if (!detectedBepInEx) {
-  throw wrap(
-    `Failed to detect BepInEx. Did you forget to set Steam launch options?${EOL}` +
-      chalk.reset(
-        "We recommend running gib again, making sure to pay attention to the " +
-          "section for setting the launch options for the game in Steam.",
-      ),
-  );
+  throw wrap([
+    "Failed to detect BepInEx",
+    chalk.reset(
+      [
+        "It seems BepInEx failed to inject into the game. Unfortunately,",
+        "some Unity games don't work with BepInEx on macOS for unknown",
+        "reasons, and this appears to be one of them 😔",
+      ].join(" "),
+    ),
+  ]);
 } else {
   await open("https://github.com/toebeann/gib/?sponsor=1", {
     background: true,
