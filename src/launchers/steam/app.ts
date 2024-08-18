@@ -2,12 +2,13 @@ import { Glob } from "bun";
 import { readFile, realpath } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { parse } from "@node-steam/vdf";
-import open from "open";
+import open, { openApp } from "open";
 import { match, P } from "ts-pattern";
 import { booleanRace } from "../../utils/booleanRace.ts";
 import type { App as AppBase } from "../app.ts";
 import { getLibraryFolders } from "./libraryfolders.ts";
 import { type AppManifest, appManifestSchema } from "./manifest.ts";
+import { isOpen } from "./process.ts";
 
 const launcher = "steam";
 
@@ -196,5 +197,15 @@ export async function launch(app: App | string) {
 
   if (!id) return;
 
-  await open(`steam://rungameid/${id}`);
+  if (await isOpen()) {
+    await open(`steam://rungameid/${id}`, {
+      background: true,
+    });
+    return;
+  }
+
+  await openApp("Steam", {
+    arguments: ["--args", "-silent", "-applaunch", id],
+    background: true,
+  });
 }
