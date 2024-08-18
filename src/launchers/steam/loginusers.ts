@@ -33,7 +33,7 @@ export type LoginUsers = z.infer<typeof loginusersSchema>;
 export const getUsers = () =>
   readFile(
     getLoginUsersPath(),
-    { encoding: "utf8" },
+    "utf8",
   ).then((text) => Object.entries(loginusersSchema.parse(parse(text)).users));
 
 /**

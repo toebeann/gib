@@ -37,6 +37,6 @@ export const getLauncherInstalled = async () =>
         "UnrealEngineLauncher",
         "LauncherInstalled.dat",
       ),
-      { encoding: "utf8" },
+      "utf8",
     ),
   )).installationList;

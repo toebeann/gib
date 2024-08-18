@@ -26,6 +26,6 @@ export type LibraryFolders = z.infer<typeof libraryFoldersSchema>;
  * from Steam's `libraryfolders.vdf` file.
  */
 export const getLibraryFolders = async (path = getLibraryFoldersPath()) => {
-  const data = await readFile(path, { encoding: "utf8" });
+  const data = await readFile(path, "utf8");
   return Object.values(libraryFoldersSchema.parse(parse(data)).libraryfolders);
 };

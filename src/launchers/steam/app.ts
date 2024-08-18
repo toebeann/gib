@@ -152,7 +152,7 @@ export async function* getAppsByPath(path: string) {
     })
   ) {
     const manifest = appManifestSchema.parse(
-      parse(await readFile(manifestPath, { encoding: "utf8" })),
+      parse(await readFile(manifestPath, "utf8")),
     );
 
     if (basename(resolved) === manifest.appState.installdir) {

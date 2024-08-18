@@ -80,9 +80,7 @@ export async function getLocalConfig(userId?: ID | string) {
 
   return localConfigSchema.parse(
     parse(
-      await readFile(join(configPath, "localconfig.vdf"), {
-        encoding: "utf8",
-      }),
+      await readFile(join(configPath, "localconfig.vdf"), "utf8"),
     ),
   );
 }
@@ -160,7 +158,9 @@ export async function setLocalConfig(
   const configPath = await getUserConfigFolderPath(userId);
   if (!configPath) return;
 
-  await writeFile(join(configPath, "localconfig.vdf"), stringify(config), {
-    encoding: "utf8",
-  });
+  await writeFile(
+    join(configPath, "localconfig.vdf"),
+    stringify(config),
+    "utf8",
+  );
 }

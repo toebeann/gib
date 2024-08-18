@@ -82,7 +82,7 @@ export async function* getManifests() {
   ) {
     yield appManifestSchema.parse(
       JSON.parse(
-        await readFile(path, { encoding: "utf8" }),
+        await readFile(path, "utf8"),
       ),
     );
   }
