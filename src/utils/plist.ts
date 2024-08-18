@@ -1,8 +1,8 @@
 import { Glob } from "bun";
+import { readFile as _readFile } from "node:fs/promises";
 import { basename, dirname, extname, resolve } from "node:path";
-import { quote } from "shell-quote";
+import { parse, type PlistValue } from "plist";
 import { z } from "zod";
-import { exec } from "../fs/exec.ts";
 
 const plistStrictSchema = z.object({
   CFBundleName: z.string().optional(),
@@ -10,6 +10,7 @@ const plistStrictSchema = z.object({
   UnityBuildNumber: z.unknown().optional(),
   CFBundleShortVersionString: z.string().optional(),
   CFBundleGetInfoString: z.string().optional(),
+  CFBundleIconFile: z.string().optional(),
 });
 type PlistStrict = z.infer<typeof plistStrictSchema>;
 
@@ -54,16 +55,8 @@ export const search = async function* (path: string) {
  * @param path The path to an `Info.plist` file to parse.
  */
 export const readFile = (path: string) =>
-  exec(
-    quote([
-      "plutil",
-      "-convert",
-      "json",
-      "-o",
-      "-",
-      path,
-    ]),
-  ).then(({ stdout }) => plistSchema.parse(JSON.parse(stdout.trim())));
+  _readFile(path, "utf8")
+    .then((text) => plistSchema.parse(parse(text)));
 
 /**
  * Retrieves a value from the plist file at `path` with given `key`.
@@ -75,16 +68,6 @@ export const readFile = (path: string) =>
  * `key`, or `undefined` if no matching key was found.
  */
 export const getValue = (path: string, key: Key) =>
-  exec(
-    quote([
-      "plutil",
-      "-extract",
-      key,
-      "raw",
-      "-o",
-      "-",
-      path,
-    ]),
-  )
-    .then(({ stdout }) => stdout.trim())
+  readFile(path)
+    .then((plist) => plist[key] as PlistValue)
     .catch(() => undefined);

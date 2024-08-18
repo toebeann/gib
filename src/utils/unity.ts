@@ -1,9 +1,11 @@
-import { stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { basename, dirname, extname, join, normalize, sep } from "node:path";
-import { quote } from "shell-quote";
-import { exec } from "../fs/exec.ts";
 import { booleanRace } from "./booleanRace.ts";
-import { getValue, readFile, search as searchPlists } from "./plist.ts";
+import {
+  getValue,
+  readFile as readPlist,
+  search as searchPlists,
+} from "./plist.ts";
 
 /**
  * Searches the given `path` for native macOS Unity apps.
@@ -29,7 +31,7 @@ export const search = async function* (
 
   for await (const path of searchPlists(searchDir)) {
     if (await hasUnityAppIndicators(path, indicators)) {
-      const plist = await readFile(path);
+      const plist = await readPlist(path);
       yield {
         name: plist.CFBundleName,
         bundle: dirname(dirname(path)),
@@ -69,17 +71,10 @@ export const hasCommonUnityFiles = (plist: string) =>
  * @param plist The path to the `Info.plist` of the macOS Application to check.
  */
 export const hasCommonUnityString = async (plist: string) =>
-  exec(
-    quote([
-      "plutil",
-      "-convert",
-      "json",
-      "-o",
-      plist,
-    ]),
-  ).then(({ stdout }) =>
-    !!stdout.trim().match(new RegExp("Unity Player|Unity Technologies", "g"))
-  );
+  readFile(plist, "utf8")
+    .then((text) =>
+      !!text.trim().match(new RegExp("Unity Player|Unity Technologies", "g"))
+    );
 
 /**
  * Determines whether the macOS Application corresponding with the provided
