@@ -900,9 +900,9 @@ pressHeartToContinue("when you're ready to run the test");
 const steamApp = steamApps[0];
 
 if (steamApp) {
-  launch(steamApp);
+  await launch(steamApp);
 } else {
-  open(shortcutPath);
+  await open(shortcutPath);
 }
 
 var { detectedGame, detectedBepInEx } = await new Promise<
