@@ -58,6 +58,10 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
     it and select `Manage`. In the window that opens, look for the folder icon
     and click it.
 
+  - For games you typically launch with Spotlight, search for the game as usual
+    in Spotlight, and when the game is highlighted in the drop-down, hold `⌘`
+    until the icon changes to Finder. With `⌘` still held down, press `Enter`.
+
 - You'll want a copy of BepInEx downloaded and unzipped in your Downloads
   folder.
 
