@@ -45,6 +45,7 @@ import {
   access,
   chmod,
   copyFile,
+  readFile,
   readFile as readFileSDGsd,
   stat,
   writeFile,
@@ -76,7 +77,7 @@ import unquote from "unquote";
 import wrapAnsi from "wrap-ansi";
 import { renderLogo } from "./renderLogo.ts";
 import { exec } from "../fs/exec.ts";
-import { getAppsByPath, launch } from "../launchers/steam/app.ts";
+import { getAppById, getAppsByPath, launch } from "../launchers/steam/app.ts";
 import { isInstalled } from "../launchers/steam/launcher.ts";
 import { isOpen, quit } from "../launchers/steam/process.ts";
 import {
@@ -85,7 +86,7 @@ import {
   setShortcuts,
   type Shortcut,
 } from "../launchers/steam/shortcut.ts";
-import { hasUnityAppIndicators } from "../utils/unity.ts";
+import { hasUnityAppIndicators, search } from "../utils/unity.ts";
 import { getFixedPath } from "../utils/getFixedPath.ts";
 import { setLaunchOptions } from "../launchers/steam/launchOption.ts";
 import { getMostRecentUser } from "../launchers/steam/loginusers.ts";
@@ -418,6 +419,37 @@ const gameAppPath = await prompt(
         ]),
       );
       return false;
+    }
+
+    const { CFBundleExecutable } = await parsePlistFromFile(plist);
+    if (CFBundleExecutable && extname(CFBundleExecutable) === ".sh") {
+      const text = await readFile(
+        join(plist, "..", "MacOS", CFBundleExecutable),
+        "utf8",
+      );
+      const lines = text
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => !line.startsWith("#") && Boolean(line));
+
+      if (lines.length === 1 && lines[0].startsWith("open steam://")) {
+        const [command, ...args] = lines[0].split("open steam://")[1]?.split(
+          "/",
+        );
+        if (
+          ["launch", "run", "rungameid"].includes(command.toLowerCase()) &&
+          !!+args[0]
+        ) {
+          const steamApp = await getAppById(args[0]);
+          if (steamApp) {
+            const unityApps = await Array.fromAsync(search(steamApp.path));
+            if (unityApps.length === 1) {
+              const [app] = unityApps;
+              return app.bundle;
+            }
+          }
+        }
+      }
     }
 
     if (!await hasUnityAppIndicators(plist)) {
