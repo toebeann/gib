@@ -71,6 +71,7 @@
     "find-process": "^1.4.7",
     "fs-extra": "^11.2.0",
     "gradient-string": "^2.0.2",
+    "lodash": "^4.17.21",
     "open": "^10.1.0",
     "plist": "^3.1.0",
     "protocol-registry": "^1.4.1",
