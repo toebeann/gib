@@ -3,7 +3,7 @@ import { addSlashes, removeSlashes } from "slashes";
 import { match, P } from "ts-pattern";
 import { type App, getAppById } from "./app.ts";
 import { getLocalConfig, setLocalConfig } from "./localconfig.ts";
-import { kill } from "./process.ts";
+import { quit } from "./process.ts";
 
 /**
  * Gets app launch options for the most recent user of Steam on this computer.
@@ -258,7 +258,7 @@ export async function setLaunchOptions(
   const config = await getLocalConfig(userId);
   if (!config) return false;
 
-  if (!await kill()) return false;
+  if (!await quit()) return false;
 
   if (!config.UserLocalConfigStore.Software.Valve.Steam.apps[resolved.id]) {
     return false;
