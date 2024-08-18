@@ -3,7 +3,7 @@ import { basename, dirname, extname, join, normalize, sep } from "node:path";
 import { booleanRace } from "./booleanRace.ts";
 import {
   getValue,
-  readFile as readPlist,
+  parsePlistFromFile as readPlist,
   search as searchPlists,
 } from "./plist.ts";
 

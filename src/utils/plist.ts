@@ -54,7 +54,7 @@ export const search = async function* (path: string) {
  *
  * @param path The path to an `Info.plist` file to parse.
  */
-export const readFile = (path: string) =>
+export const parsePlistFromFile = (path: string) =>
   _readFile(path, "utf8")
     .then((text) => plistSchema.parse(parse(text)));
 
@@ -68,6 +68,6 @@ export const readFile = (path: string) =>
  * `key`, or `undefined` if no matching key was found.
  */
 export const getValue = (path: string, key: Key) =>
-  readFile(path)
+  parsePlistFromFile(path)
     .then((plist) => plist[key] as PlistValue)
     .catch(() => undefined);

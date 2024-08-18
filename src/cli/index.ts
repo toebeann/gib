@@ -89,7 +89,7 @@ import { hasUnityAppIndicators } from "../utils/unity.ts";
 import { getFixedPath } from "../utils/getFixedPath.ts";
 import { setLaunchOptions } from "../launchers/steam/launchOption.ts";
 import { getMostRecentUser } from "../launchers/steam/loginusers.ts";
-import { type Plist, readFile } from "../utils/plist.ts";
+import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
 
 function alertShim(message: string) {
   writeSync(stdout.fd, new TextEncoder().encode(`${message} [Enter] `));
@@ -492,7 +492,9 @@ const installBepInEx = async () => {
   }
 };
 
-const plist = await readFile(join(gameAppPath, "Contents", "Info.plist"));
+const plist = await parsePlistFromFile(
+  join(gameAppPath, "Contents", "Info.plist"),
+);
 const operations: Promise<unknown>[] = [];
 const shortcutPath = join(
   homedir(),
