@@ -61,8 +61,7 @@
     "lodash": "^4.17.21",
     "protocol-registry": "^1.4.1",
     "registry-js": "^1.16.0",
-    "typescript": "^5.5.4",
-    "zod": "^3.23.8"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "boxen": "^8.0.1",
@@ -83,6 +82,7 @@
     "terminal-link": "^3.0.0",
     "ts-pattern": "^5.3.1",
     "unquote": "^1.1.1",
-    "wrap-ansi": "^9.0.0"
+    "wrap-ansi": "^9.0.0",
+    "zod": "^3.23.8"
   }
 }
