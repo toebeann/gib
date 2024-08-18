@@ -41,7 +41,17 @@
 
     # ensure bun is installed
     if ! command -v bun >/dev/null; then
+        # ensure bun env vars are set
+        if [ -z "$BUN_INSTALL" ]; then
+            export BUN_INSTALL="$HOME/.bun"
+        fi
+
         curl -fsSL https://bun.sh/install | bash &>/dev/null
+
+        case ":$PATH:" in
+            *":$BUN_INSTALL:"*) ;;
+            *) export PATH="$BUN_INSTALL/bin:$PATH" ;;
+        esac
 
         # check for bun command and let user know if not found
         if ! command -v bun >/dev/null; then
