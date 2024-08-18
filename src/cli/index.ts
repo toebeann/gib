@@ -917,38 +917,40 @@ var { detectedGame, detectedBepInEx } = await new Promise<
       ignorePermissionErrors: true,
     });
     let detectedGame = false, detectedBepInEx = false;
+    const getProcesses = () =>
+      findProcess("name", plist.CFBundleExecutable ?? basename(gameAppPath))
+        .then((processes) =>
+          processes.filter(
+            (process) => {
+              if (
+                !("bin" in process) || typeof process.bin !== "string"
+              ) return false;
+              const { bin } = process;
+              const relativePath = relative(gamePath, bin);
+              return relativePath && !relativePath.startsWith("..") &&
+                !isAbsolute(relativePath);
+            },
+          )
+        );
+
     const finish = async () => {
       await watcher.removeAllListeners().close();
       clearTimeout(timeout);
       clearInterval(interval);
-      if (!detectedBepInEx) pids.map((pid) => kill(pid, "SIGKILL"));
+      (await getProcesses()).map(({ pid }) => kill(pid, "SIGKILL"));
       resolve({ detectedGame, detectedBepInEx });
     };
     let timeout = setTimeout(finish, 30_000);
 
     const interval = setInterval(async () => {
-      const apps = (await findProcess(
-        "name",
-        plist.CFBundleExecutable ?? basename(gameAppPath),
-      )).filter(
-        (process) => {
-          if (
-            !("bin" in process) || typeof process.bin !== "string"
-          ) return false;
-          const { bin } = process;
-          const relativePath = relative(gamePath, bin);
-          return relativePath && !relativePath.startsWith("..") &&
-            !isAbsolute(relativePath);
-        },
-      );
+      const processes = await getProcesses();
 
-      if (!detectedGame && apps.length) {
+      if (!detectedGame && processes.length) {
         clearTimeout(timeout);
         detectedGame = true;
         timeout = setTimeout(finish, 30_000);
         log(`${code(basename(gameAppPath))}`, "running...");
-        pids = apps.map(({ pid }) => pid);
-      } else if (detectedGame && !apps.length) {
+      } else if (detectedGame && !processes.length) {
         log(code(basename(gameAppPath)), "closed.");
         await finish();
       }
@@ -956,7 +958,7 @@ var { detectedGame, detectedBepInEx } = await new Promise<
 
     const handleChange = async () => {
       detectedBepInEx = true;
-      pids.map((pid) => kill(pid, "SIGKILL"));
+      (await getProcesses()).map(({ pid }) => kill(pid, "SIGKILL"));
       await watcher.removeAllListeners().close();
     };
 
