@@ -55,7 +55,6 @@
     "@types/shell-quote": "^1.7.5",
     "@types/unquote": "^1.1.0",
     "ix": "^7.0.0",
-    "protocol-registry": "^1.4.1",
     "registry-js": "^1.16.0",
     "typescript": "^5.5.4"
   },
@@ -74,6 +73,7 @@
     "gradient-string": "^2.0.2",
     "open": "^10.1.0",
     "plist": "^3.1.0",
+    "protocol-registry": "^1.4.1",
     "readline-sync": "^1.4.10",
     "shell-quote": "^1.8.1",
     "slashes": "^3.0.12",
