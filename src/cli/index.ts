@@ -330,7 +330,10 @@ const bepinexPath = dirname(
       }
 
       try {
-        if (!(await stat(join(path, "..", "doorstop_libs"))).isDirectory()) {
+        if (
+          !(await stat(join(path, "..", "libdoorstop.dylib"))).isFile() &&
+          !(await stat(join(path, "..", "doorstop_libs"))).isDirectory()
+        ) {
           error(getInvalidBepInExPackError());
           return false;
         }
