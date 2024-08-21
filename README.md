@@ -149,7 +149,11 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 - Only BepInEx 5 is currently supported. Support for BepInEx 6 is being
   considered.
 
-- Users on Apple Silicon sometimes report that their game seems to take longer to start up than usual with only BepInEx installed. This is due to the fact that BepInEx is built for Intel-based chips, and therefore your Apple Silicon chip needs to run it through Rosetta. Unfortunately, there is nothing gib can do to resolve this.
+- Users on Apple Silicon sometimes report that their game seems to take longer
+  to start up than usual with only BepInEx installed. This is due to the fact
+  that BepInEx is built for Intel-based chips, and therefore your Apple Silicon
+  chip needs to run it through Rosetta. Unfortunately, there is nothing gib can
+  do to resolve this.
 
 ## Known issues
 
@@ -160,8 +164,8 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 - Relative paths are currently not supported and providing them will lead to
   strange issues. If you encounter an issue after having provided a relative
-  path, please run the script again, this time providing absolute paths. You
-  can provide absolute paths easily by simply highlighting the file in Finder,
+  path, please run the script again, this time providing absolute paths. You can
+  provide absolute paths easily by simply highlighting the file in Finder,
   pressing `Option Command C`, then `Command V` in terminal to paste.
 
 ## License
