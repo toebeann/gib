@@ -46,7 +46,6 @@ import {
   chmod,
   copyFile,
   readFile,
-  readFile as readFileSDGsd,
   stat,
   writeFile,
 } from "node:fs/promises";
@@ -502,7 +501,7 @@ const installBepInEx = async () => {
     await copyFile(path, destination);
 
     if (basename(path) === "run_bepinex.sh" && dirname(path) === bepinexPath) {
-      const bepinexScriptContents = await readFileSDGsd(destination, "utf8");
+      const bepinexScriptContents = await readFile(destination, "utf8");
       let output = bepinexScriptContents;
 
       // check if line endings are CRLF and fix them if needed
