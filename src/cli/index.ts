@@ -329,17 +329,18 @@ const bepinexPath = dirname(
         return false;
       }
 
-      try {
-        if (
-          !(await stat(join(path, "..", "libdoorstop.dylib"))).isFile() &&
-          !(await stat(join(path, "..", "doorstop_libs"))).isDirectory()
-        ) {
-          error(getInvalidBepInExPackError());
-          return false;
-        }
-      } catch {
+      const libdoorstop = join(path, "..", "libdoorstop.dylib");
+      const oldDoorstop = join(path, "..", "doorstop_libs");
+
+      if (
+        !await access(libdoorstop).then((_) =>
+          stat(libdoorstop).then((stats) => stats.isFile())
+        ).catch((_) => false) &&
+        !await access(oldDoorstop).then((_) =>
+          stat(oldDoorstop).then((stats) => stats.isDirectory())
+        ).catch((_) => false)
+      ) {
         error(getInvalidBepInExPackError());
-        error(getUnknownErrorCheckingPath(join(path, "..", "doorstop_libs")));
         return false;
       }
 
