@@ -948,7 +948,6 @@ var { detectedGame, detectedBepInEx } = await new Promise<
   { detectedGame: boolean; detectedBepInEx: boolean }
 >(
   (resolve) => {
-    let pids: number[] = [];
     const watcher = watch(join(gamePath, "BepInEx", "LogOutput.log"), {
       disableGlobbing: true,
       ignoreInitial: true,
