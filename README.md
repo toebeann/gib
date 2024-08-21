@@ -14,6 +14,8 @@ is _exceptionally_ cumbersome on this operating system.
 gib aims to automate whatever it can, and hold your hand through whatever it
 cannot.
 
+Supports both Intel-based and Apple Silicon chips.
+
 ## Usage
 
 ### TL;DR
@@ -147,9 +149,7 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 - Only BepInEx 5 is currently supported. Support for BepInEx 6 is being
   considered.
 
-- I have not personally tested gib on Apple silicon, i.e. M1, M2, M3 etc., but
-  it should work as long as the BepInEx pack you're downloading is compatible
-  with Apple silicon.
+- Users on Apple Silicon sometimes report that their game seems to take longer to start up than usual with only BepInEx installed. This is due to the fact that BepInEx is built for Intel-based chips, and therefore your Apple Silicon chip needs to run it through Rosetta. Unfortunately, there is nothing gib can do to resolve this.
 
 ## Known issues
 
