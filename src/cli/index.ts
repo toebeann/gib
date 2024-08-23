@@ -510,7 +510,7 @@ const installBepInEx = async () => {
       }
 
       // check if the run_bepinex.sh needs to be configured, and configure it
-      if (bepinexScriptContents.includes('\nexecutable_name=""')) {
+      if (output.includes('\nexecutable_name=""')) {
         output = output.replace(
           '\nexecutable_name=""',
           `\nexecutable_name="${basename(gameAppPath)}"`,
