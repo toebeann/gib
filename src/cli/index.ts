@@ -517,6 +517,20 @@ const installBepInEx = async () => {
         );
       }
 
+      // workaround for issue with BepInEx v5.4.23 run_bepinex.sh script not working
+      // for some games unless ran from the game folder for some reason
+      if (
+        output.includes("BASEDIR=") &&
+        !output.includes('cd "$BASEDIR"')
+      ) {
+        const index = output.indexOf("\n", output.indexOf("BASEDIR="));
+        output = `${
+          output.slice(0, index)
+        }\n\n# GIB: workaround for some games only working if script is run from game dir\ncd "$BASEDIR"${
+          output.slice(index)
+        }`;
+      }
+
       // write the changes, if any
       if (output !== bepinexScriptContents) {
         await writeFile(destination, output, "utf8");
