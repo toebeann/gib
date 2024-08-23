@@ -541,9 +541,28 @@ const installBepInEx = async () => {
   }
 };
 
-const plist = await parsePlistFromFile(
-  join(gameAppPath, "Contents", "Info.plist"),
-);
+const [plist, switchSupported] = await Promise.all([
+  parsePlistFromFile(
+    join(gameAppPath, "Contents", "Info.plist"),
+  ),
+  (async () => {
+    if (
+      !await access(join(bepinexPath, "libdoorstop.dylib"))
+        .then((_) => true)
+        .catch((_) => false)
+    ) return false;
+
+    try {
+      return (await readFile(
+        join(bepinexPath, "run_bepinex.sh"),
+        "utf8",
+      ))
+        .includes("--doorstop_enabled)");
+    } catch {
+      return false;
+    }
+  })(),
+]);
 const operations: Promise<unknown>[] = [];
 const shortcutPath = join(
   homedir(),
@@ -552,6 +571,7 @@ const shortcutPath = join(
     steamApps.length === 0 ? "BepInEx" : "Vanilla"
   }).app`,
 );
+let shouldAddShortcut: boolean;
 
 if (steamApps.length === 1) {
   /**
@@ -573,9 +593,10 @@ if (steamApps.length === 1) {
    *   the original .app, copy it to ~/Applications
    */
   const app = steamApps[0];
-  const [userId, user] = await getMostRecentUser();
-  const username = code(user.PersonaName ?? user.AccountName);
-  const game = code(app.name);
+  const { name, id } = app;
+  const game = code(name);
+  const [userId, { PersonaName, AccountName }] = await getMostRecentUser();
+  const username = code(PersonaName ?? AccountName);
 
   log(
     wrap([
@@ -589,22 +610,51 @@ if (steamApps.length === 1) {
       null,
       [
         "Additionally, gib can optionally add a Steam shortcut to launch the",
-        "game vanilla (without mods). This functionality is experimental and",
-        "may not work for all Steam games.",
+        "game vanilla (without mods). This feature is experimental, and is",
+        "only supported for BepInEx packs which support the",
+        code("--doorstop_enabled"),
+        "flag.",
       ].join(" "),
       null,
+      [
+        code("--doorstop_enabled"),
+        "support",
+        switchSupported
+          ? chalk.green.bold("detected")
+          : chalk.redBright.bold("not found"),
+        "in your BepInEx pack.",
+      ].join(" "),
+      switchSupported
+        ? [
+          "gib will set this flag in the vanilla shortcut. Steam may prompt",
+          "you about this flag whenever you launch the vanilla shortcut.",
+        ].join(" ")
+        : [
+          "As your BepInEx pack does not support this feature, we will not",
+          "add the vanilla shortcut. We recommend continuing this",
+          "installation so that so that any game-specific configuration or",
+          "features included with this pack are installed, and then running",
+          "gib a second time with the latest release of BepInEx 5, downloaded",
+          "directly from its official source:",
+          `${EOL}${link("https://github.com/BepInEx/BepInEx/releases/latest")}`,
+          `${EOL}This will allow gib to set up the vanilla shortcut while`,
+          "retaining any game-specific configuration or features of the pack.",
+        ].join(" "),
     ]),
   );
 
-  const shouldAddVanillaShortcut = confirmShim(
+  shouldAddShortcut = switchSupported && confirmShim(
     wrap(
-      `Add experimental Steam shortcut to launch ${game} without mods?`,
+      `${EOL}Add experimental Steam shortcut to launch ${game} without mods?`,
     ),
   );
 
+  if (!switchSupported) pressHeartToContinue();
+  else log();
+
   log(
     wrap(
-      chalk.bold(`${EOL}gib will now perform the following operations:${EOL}`),
+      chalk.bold(`gib will now perform the following operations:${EOL}`),
     ),
   );
   log(
@@ -616,7 +666,7 @@ if (steamApps.length === 1) {
           `configure Steam for user ${username} to launch ${game} modded`,
           "with BepInEx",
         ].join(" "),
-        shouldAddVanillaShortcut &&
+        shouldAddShortcut &&
         [
           `add a Steam shortcut for user ${username} to launch ${game}`,
           "vanilla",
@@ -660,11 +710,11 @@ if (steamApps.length === 1) {
           ).then((success) => {
             if (!success) throw wrap("Failed to set launch options");
           }),
-          shouldAddVanillaShortcut && getShortcuts(userId)
+          shouldAddShortcut && getShortcuts(userId)
             .then((shortcuts) =>
               shortcuts && setShortcuts(
                 addShortcut({
-                  AppName: `${app.name} (Vanilla)`,
+                  AppName: `${name} (Vanilla)`,
                   Exe: quote([shortcutPath]),
                   icon: join(
                     shortcutPath,
@@ -681,14 +731,14 @@ if (steamApps.length === 1) {
             }),
         ].filter(Boolean));
       }),
-    shouldAddVanillaShortcut
+    shouldAddShortcut
       ? Promise.all([
         ensureDir(join(
           shortcutPath,
           "Contents",
           "MacOS",
         ))
-          .then(() =>
+          .then((_) =>
             writeFile(
               join(
                 shortcutPath,
@@ -699,7 +749,10 @@ if (steamApps.length === 1) {
               [
                 "#!/bin/bash",
                 "# autogenerated file - do not edit",
-                quote(["open", gameAppPath]),
+                quote([
+                  "open",
+                  `steam://run/${id}//--doorstop_enabled false`,
+                ]),
               ].join(EOL),
               { encoding: "utf8", mode: 0o764 },
             )
@@ -732,7 +785,7 @@ if (steamApps.length === 1) {
                   buildPlist(
                     {
                       CFBundleIconFile,
-                      CFBundleName: `${CFBundleName ?? app.name} (Vanilla)`,
+                      CFBundleName: `${CFBundleName ?? name} (Vanilla)`,
                       CFBundleInfoDictionaryVersion: "1.0",
                       CFBundlePackageType: "APPL",
                       CFBundleVersion: "1.0",
@@ -780,11 +833,11 @@ if (steamApps.length === 1) {
     : [undefined, undefined];
   const username = user && code(user.PersonaName ?? user.AccountName);
 
-  const shouldAddModdedShortcut = await isInstalled() && confirmShim(wrap([
+  shouldAddShortcut = await isInstalled() && confirmShim(wrap([
     [
       game,
       "appears to be a non-Steam game. gib can optionally add a Steam",
-      "shortcut to launch the game modded with BepInEx. This functionality is",
+      "shortcut to launch the game modded with BepInEx. This feature is",
       "experimental and will require Steam to be closed.",
     ].join(" "),
     null,
@@ -800,11 +853,12 @@ if (steamApps.length === 1) {
     list(
       [
         "install and configure BepInEx for the selected Unity app",
-        shouldAddModdedShortcut &&
-        "quit Steam if it is open",
-        shouldAddModdedShortcut &&
-        [
-          `add a Steam shortcut for user ${username} to launch ${game}`,
+        shouldAddShortcut && "quit Steam if it is open",
+        shouldAddShortcut && [
+          "add a Steam shortcut for user",
+          username,
+          "to launch",
+          game,
           "with BepInEx",
         ].join(" "),
       ].filter(Boolean),
@@ -836,7 +890,7 @@ if (steamApps.length === 1) {
 
   operations.push(
     installBepInEx(),
-    shouldAddModdedShortcut
+    shouldAddShortcut
       ? isOpen()
         .then(async (isOpen) => {
           if (isOpen && !await quit()) {
@@ -894,7 +948,7 @@ if (steamApps.length === 1) {
           if (CFBundleIconFile) {
             await ensureDir(join(shortcutPath, "Contents", "Resources"));
             await Promise.all([
-              shouldAddModdedShortcut &&
+              shouldAddShortcut &&
               exec(quote([
                 "sips",
                 "-s",
@@ -952,7 +1006,7 @@ const steamApp = steamApps[0];
 
 if (steamApp) {
   await launch(steamApp);
-  log(wrap([`Launching ${steamApp.name} with Steam...`, null]));
+  log(wrap([`Launching ${code(steamApp.name)} with Steam...`, null]));
 } else {
   await open(shortcutPath);
 }
@@ -1053,26 +1107,55 @@ if (!detectedGame && !detectedBepInEx) {
       ...steamApp
         ? [
           "To launch the game modded, simply launch it from Steam as usual.",
-          ...await access(shortcutPath).then((_) => true).catch((_) => false)
+          ...shouldAddShortcut
             ? [
               null,
               [
-                "We also added a shortcut to Steam to launch the vanilla",
-                `game, you can find it in your Steam library named ${
-                  code(`${steamApp.name} (Vanilla)`)
-                }`,
+                "We also added a Steam shortut to launch the vanilla game.",
+                "You can find it in your Steam library named",
+                code(`${steamApp.name} (Vanilla)`),
               ].join(" "),
-              chalk.italic(
-                "Please be aware this shortcut may not work for all Steam games.",
-              ),
+              chalk.italic([
+                "Please be aware this feature is experimental.",
+                "Steam may prompt you about the",
+                code("--doorstop_enabled"),
+                "flag whenever you launch the vanilla shortcut.",
+              ].join(" ")),
             ]
-            : [],
+            : switchSupported
+            ? []
+            : chalk.italic([
+              "We recommend running gib again with an official release of the",
+              "latest BepInEx 5, so that gib can add a Steam shortcut to",
+              "launch the game vanilla.",
+            ].join(" ")),
         ]
         : [
           "To launch the game modded, launch the app found at:",
           chalk.green(shortcutPath),
           null,
-          "To launch the game without mods, simply launch it as usual.",
+          ...shouldAddShortcut
+            ? [
+              ...[
+                "We also added a shortcut to Steam to launch the game with",
+                "BepInEx. You can find it in your Steam library named",
+                code(
+                  `${plist.CFBundleName ?? basename(gameAppPath)} (BepInEx)`,
+                ),
+              ].join(" "),
+              null,
+            ]
+            : [],
+          [
+            "Please be aware that platform-specific features such as",
+            "achievements or in-game overlays will be unavailable when",
+            "running mods with non-Steam games.",
+          ].join(" "),
+          null,
+          [
+            "To launch the game vanilla, simply launch it as you normally",
+            "would, e.g. via the Epic Games launcher, etc.",
+          ].join(" "),
         ],
       null,
       "If you found gib helpful, please consider donating:",
