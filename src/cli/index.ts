@@ -67,6 +67,7 @@ import { watch } from "chokidar";
 import cliWidth from "cli-width";
 import findProcess from "find-process";
 import { ensureDir } from "fs-extra";
+import JSZip from "jszip";
 import open from "open";
 import { build as buildPlist } from "plist";
 import readlineSync from "readline-sync";
@@ -74,6 +75,7 @@ import { quote } from "shell-quote";
 import terminalLink from "terminal-link";
 import unquote from "unquote";
 import wrapAnsi from "wrap-ansi";
+import { z } from "zod";
 import { renderLogo } from "./renderLogo.ts";
 import { exec } from "../fs/exec.ts";
 import { getAppById, getAppsByPath, launch } from "../launchers/steam/app.ts";
@@ -483,6 +485,45 @@ log(
   ]),
 );
 
+const configureBepInExScript = async (path: string, executableName: string) => {
+  const bepinexScriptContents = await readFile(path, "utf8");
+  let output = bepinexScriptContents;
+
+  // check if line endings are CRLF and fix them if needed
+  if (output.includes("\r\n")) {
+    output = output.replaceAll("\r\n", "\n");
+  }
+
+  // check if the run_bepinex.sh needs to be configured, and configure it
+  if (output.includes('\nexecutable_name=""')) {
+    output = output.replace(
+      '\nexecutable_name=""',
+      `\nexecutable_name="${executableName}"`,
+    );
+  }
+
+  // workaround for issue with BepInEx v5.4.23 run_bepinex.sh script not working
+  // for some games unless ran from the game folder for some reason
+  if (
+    output.includes("BASEDIR=") &&
+    !output.includes('cd "$BASEDIR"')
+  ) {
+    const index = output.indexOf("\n", output.indexOf("BASEDIR="));
+    output = `${
+      output.slice(0, index)
+    }\n\n# GIB: workaround for some games only working if script is run from game dir\ncd "$BASEDIR"${
+      output.slice(index)
+    }`;
+  }
+
+  // write the changes, if any
+  if (output !== bepinexScriptContents) {
+    await writeFile(path, output, "utf8");
+  }
+
+  await chmod(path, 0o764);
+};
+
 const installBepInEx = async () => {
   const i = bepinexPath.split(sep).length;
   const glob = new Glob("**/*");
@@ -501,42 +542,7 @@ const installBepInEx = async () => {
     await copyFile(path, destination);
 
     if (basename(path) === "run_bepinex.sh" && dirname(path) === bepinexPath) {
-      const bepinexScriptContents = await readFile(destination, "utf8");
-      let output = bepinexScriptContents;
-
-      // check if line endings are CRLF and fix them if needed
-      if (output.includes("\r\n")) {
-        output = output.replaceAll("\r\n", "\n");
-      }
-
-      // check if the run_bepinex.sh needs to be configured, and configure it
-      if (output.includes('\nexecutable_name=""')) {
-        output = output.replace(
-          '\nexecutable_name=""',
-          `\nexecutable_name="${basename(gameAppPath)}"`,
-        );
-      }
-
-      // workaround for issue with BepInEx v5.4.23 run_bepinex.sh script not working
-      // for some games unless ran from the game folder for some reason
-      if (
-        output.includes("BASEDIR=") &&
-        !output.includes('cd "$BASEDIR"')
-      ) {
-        const index = output.indexOf("\n", output.indexOf("BASEDIR="));
-        output = `${
-          output.slice(0, index)
-        }\n\n# GIB: workaround for some games only working if script is run from game dir\ncd "$BASEDIR"${
-          output.slice(index)
-        }`;
-      }
-
-      // write the changes, if any
-      if (output !== bepinexScriptContents) {
-        await writeFile(destination, output, "utf8");
-      }
-
-      await chmod(destination, 0o764);
+      await configureBepInExScript(destination, basename(gameAppPath));
     }
   }
 };
@@ -624,35 +630,33 @@ if (steamApps.length === 1) {
           : chalk.redBright.bold("not found"),
         "in your BepInEx pack.",
       ].join(" "),
+      null,
       switchSupported
         ? [
           "gib will set this flag in the vanilla shortcut. Steam may prompt",
           "you about this flag whenever you launch the vanilla shortcut.",
         ].join(" ")
         : [
-          "As your BepInEx pack does not support this feature, we will not",
-          "add the vanilla shortcut. We recommend continuing this",
-          "installation so that so that any game-specific configuration or",
-          "features included with this pack are installed, and then running",
-          "gib a second time with the latest release of BepInEx 5,",
-          link(
-            "downloaded directly from its official source.",
-            "https://github.com/BepInEx/BepInEx/releases/latest",
-          ),
-          `${EOL}This will allow gib to set up the vanilla shortcut while`,
-          "retaining any game-specific configuration or features of the pack.",
+          "As your BepInEx pack does not support this feature, gib can",
+          "attempt to add support by downloading the latest version of",
+          "BepInEx and updating the provided pack. This will allow gib to set",
+          "up the vanilla shortcut while retaining any game-specific",
+          "customisations from the pack.",
         ].join(" "),
+      null,
     ]),
   );
 
-  shouldAddShortcut = switchSupported && confirmShim(
+  shouldAddShortcut = confirmShim(
     wrap(
-      `${EOL}Add experimental Steam shortcut to launch ${game} without mods?`,
+      switchSupported
+        ? `Add experimental Steam shortcut to launch ${game} without mods?`
+        : [
+          `Add experimental Steam shortcut to launch ${game} without mods by`,
+          "updating this pack to the latest BepInEx 5 release?",
+        ].join(" "),
     ),
   );
-
-  if (!switchSupported) pressHeartToContinue();
-  else log();
 
   log(
     wrap(
@@ -668,6 +672,8 @@ if (steamApps.length === 1) {
           `configure Steam for user ${username} to launch ${game} modded`,
           "with BepInEx",
         ].join(" "),
+        shouldAddShortcut && !switchSupported &&
+        "download the latest BepInEx 5 release to update your BepInex pack",
         shouldAddShortcut &&
         [
           `add a Steam shortcut for user ${username} to launch ${game}`,
@@ -695,7 +701,75 @@ if (steamApps.length === 1) {
   log();
 
   operations.push(
-    installBepInEx(),
+    (async () => {
+      const installing = installBepInEx();
+      if (shouldAddShortcut && !switchSupported) {
+        let response: Promise<Response>;
+        try {
+          const releases = z.object({
+            target_commitish: z.string(),
+            prerelease: z.boolean(),
+            assets: z.object({
+              name: z.string(),
+              browser_download_url: z.string(),
+            }).array(),
+          }).array()
+            .parse(
+              await (await fetch(
+                "https://api.github.com/repos/BepInEx/BepInEx/releases",
+              )).json(),
+            );
+          const { assets } = releases
+            .find(({ target_commitish, prerelease, assets }) =>
+              !prerelease &&
+              target_commitish === "v5-lts" &&
+              assets.find(({ name }) =>
+                name.toLowerCase().includes("macos_x64") &&
+                name.toLowerCase().endsWith(".zip")
+              )
+            ) ?? {};
+          const { browser_download_url } = assets?.find(({ name }) =>
+            name.toLowerCase().includes("macos_x64") &&
+            name.toLowerCase().endsWith(".zip")
+          ) ?? {};
+          if (!browser_download_url) {
+            throw "Couldn't get latest BepInEx 5 release asset";
+          }
+          response = fetch(browser_download_url);
+        } catch {
+          response = fetch(
+            "https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.2/BepInEx_macos_x64_5.4.23.2.zip",
+          );
+        }
+
+        const [archive] = await Promise.all([
+          response
+            .then((response) => response.arrayBuffer())
+            .then(JSZip.loadAsync),
+          installing,
+        ]);
+
+        const filenames = Object.keys(archive.files);
+        if (!filenames.includes("run_bepinex.sh")) {
+          throw "Downloded BepInEx pack appears invalid";
+        }
+        await Promise.all(filenames
+          .map((filename) =>
+            archive.file(filename)!
+              .async("uint8array")
+              .then((data) => writeFile(resolve(gamePath, filename), data))
+              .then((_) =>
+                filename === "run_bepinex.sh" &&
+                  configureBepInExScript(
+                    resolve(gamePath, filename),
+                    basename(gameAppPath),
+                  ) || undefined
+              )
+          ));
+      } else {
+        await installing;
+      }
+    })(),
     isOpen()
       .then(async (isOpen) => {
         if (isOpen && !await quit()) {
