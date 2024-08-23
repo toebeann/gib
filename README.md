@@ -80,8 +80,9 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
   If you can't find a BepInEx pack for the game, then the latest stable version
   of BepInEx from their official GitHub repo will do.
   [You can find it here](https://github.com/BepInEx/BepInEx/releases/latest) -
-  scroll down to the `Assets` section, then download the file with "unix" or "macos_x64" in the
-  name, e.g. `BepInEx_unix_5.4.22.0.zip`, `BepInEx_macos_x64_5.4.23.2.zip`
+  scroll down to the `Assets` section, then download the file with "unix" or
+  "macos_x64" in the name, e.g. `BepInEx_unix_5.4.22.0.zip`,
+  `BepInEx_macos_x64_5.4.23.2.zip`
 
   Make sure it is unzipped in your Downloads folder after downloading it, as
   presently gib requires this. By default, Safari will have unzipped it for you.
