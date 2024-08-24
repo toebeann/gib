@@ -34,7 +34,6 @@
     "start": "bun src/cli/index.ts"
   },
   "engines": {
-    "node": "22.6.0",
     "pnpm": ">=8",
     "bun": "^1.1"
   },
@@ -43,7 +42,7 @@
   ],
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
-    "@types/bun": "^1.1.6",
+    "@types/bun": "latest",
     "@types/center-align": "^1.0.2",
     "@types/figlet": "^1.5.8",
     "@types/fs-extra": "^11.0.4",
