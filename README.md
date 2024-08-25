@@ -119,19 +119,6 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 > [!TIP]\
 > You can press `⌃ C` at any time in the terminal to abort.
 
-> [!IMPORTANT]\
-> The first time you run gib, you may be prompted to install the XCode Command
-> Line Developer Tools. If you see a notice in the terminal about this, make
-> sure to check for a system prompt in a separate window - it might be hiding in
-> the background. You'll need to confirm the prompt and agree to Apple's
-> license, after which I recommend getting comfortable as the install process
-> tends to take a while. Thankfully, you'll only need to do this once!
-
-> [!NOTE]\
-> If you accidentally decline the prompts to install the XCode Command Line
-> Developer Tools, you'll need to abort the terminal with `⌃ C` and run the
-> command again.
-
 > [!TIP]\
 > If you ran into any unexpected issues while following these instructions or
 > need further assistance, please feel free to send a DM on discord to `toebean`
