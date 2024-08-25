@@ -27,17 +27,9 @@
 
 { # this ensures the entire script is downloaded #
 
-    #ensure XCode Command Line Developer Tools are installed
-    echo -ne "\033[K  ⏳ Setting up XCode, please confirm the pop-ups and get comfortable..."
-
-    xcode-select --install &>/dev/null
-    until xcode-select --print-path &>/dev/null; do
-        sleep 5
-    done
-
     set -e # exit on err
 
-    echo -ne "\r\033[K  ⏳ Preparing to launch gib..."
+    echo -ne "\033[K  ⏳ Setting up bun..."
 
     # ensure bun is installed
     if ! command -v bun >/dev/null; then
@@ -61,6 +53,8 @@
             exit 1
         fi
     fi
+
+    echo -ne "\r\033[K  ⏳ Preparing to launch gib..."
 
     if ! bun pm cache rm -g &>/dev/null; then
         bun i noop -g &>/dev/null
