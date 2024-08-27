@@ -28,6 +28,7 @@
       "url": "https://paypal.me/tobeyblaber"
     }
   ],
+  "sideEffects": false,
   "type": "module",
   "bin": "src/cli/index.ts",
   "scripts": {
