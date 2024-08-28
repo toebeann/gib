@@ -6,4 +6,4 @@ import { access } from "node:fs/promises";
  */
 
 export const exists = async (path: string) =>
-  access(path).then((_) => true).catch((_) => false);
+  access(path).then(() => true).catch(() => false);

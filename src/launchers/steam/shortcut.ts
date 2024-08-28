@@ -123,8 +123,8 @@ export async function getShortcuts(
 
   if (
     !await access(shortcutsPath, constants.R_OK)
-      .then((_) => true)
-      .catch((_) => false)
+      .then(() => true)
+      .catch(() => false)
   ) return { shortcuts: {} };
 
   return shortcutsSchema.parse(readVdf(await readFile(shortcutsPath)));

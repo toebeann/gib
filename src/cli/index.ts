@@ -336,12 +336,12 @@ export const run = async () => {
         const oldDoorstop = join(path, "..", "doorstop_libs");
 
         if (
-          !await access(libdoorstop).then((_) =>
+          !await access(libdoorstop).then(() =>
             stat(libdoorstop).then((stats) => stats.isFile())
-          ).catch((_) => false) &&
-          !await access(oldDoorstop).then((_) =>
+          ).catch(() => false) &&
+          !await access(oldDoorstop).then(() =>
             stat(oldDoorstop).then((stats) => stats.isDirectory())
-          ).catch((_) => false)
+          ).catch(() => false)
         ) {
           error(getInvalidBepInExPackError());
           return false;
@@ -415,7 +415,7 @@ export const run = async () => {
       }
 
       const plist = join(path, "Contents", "Info.plist");
-      if (await access(plist).catch((_) => true).then((_) => false)) {
+      if (await access(plist).catch(() => true).then(() => false)) {
         error(
           wrap([
             null,
@@ -561,8 +561,8 @@ export const run = async () => {
     (async () => {
       if (
         !await access(join(bepinexPath, "libdoorstop.dylib"))
-          .then((_) => true)
-          .catch((_) => false)
+          .then(() => true)
+          .catch(() => false)
       ) return false;
 
       try {
@@ -765,7 +765,7 @@ export const run = async () => {
               archive.file(filename)!
                 .async("uint8array")
                 .then((data) => writeFile(resolve(gamePath, filename), data))
-                .then((_) =>
+                .then(() =>
                   filename === "run_bepinex.sh" &&
                     configureBepInExScript(
                       resolve(gamePath, filename),
@@ -821,7 +821,7 @@ export const run = async () => {
             "Contents",
             "MacOS",
           ))
-            .then((_) =>
+            .then(() =>
               writeFile(
                 join(
                   shortcutPath,
