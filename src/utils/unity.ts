@@ -1,5 +1,6 @@
 import { readFile, stat } from "node:fs/promises";
 import { basename, dirname, extname, join, normalize, sep } from "node:path";
+import { exists } from "../fs/exists.ts";
 import { booleanRace } from "./booleanRace.ts";
 import {
   getValue,
@@ -19,15 +20,22 @@ export const search = async function* (
 ) {
   const parts = normalize(path).split(sep);
   const index = parts.lastIndexOf("Contents");
-  const isDir = stat(path).then((stats) => stats.isDirectory());
+  const pathExists = exists(path);
+  const isDir = pathExists
+    .then((exists) => exists && stat(path).then((stats) => stats.isDirectory()))
+    .catch(() => false);
   const searchDir =
     (extname(path) === ".app" || basename(path) === "Contents") && await isDir
       ? path
       : index >= 0
       ? parts.slice(0, index + 1).join(sep)
+      : !await pathExists
+      ? undefined
       : await isDir
       ? path
       : dirname(path);
+
+  if (!searchDir) return;
 
   for await (const path of searchPlists(searchDir)) {
     if (await hasUnityAppIndicators(path, indicators)) {
