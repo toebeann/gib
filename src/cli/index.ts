@@ -78,6 +78,7 @@ import wrapAnsi from "wrap-ansi";
 import { z } from "zod";
 import { renderLogo } from "./renderLogo.ts";
 import { exec } from "../fs/exec.ts";
+import { exists } from "../fs/exists.ts";
 import { getAppById, getAppsByPath, launch } from "../launchers/steam/app.ts";
 import { isInstalled } from "../launchers/steam/launcher.ts";
 import { isOpen, quit } from "../launchers/steam/process.ts";
@@ -415,7 +416,7 @@ export const run = async () => {
       }
 
       const plist = join(path, "Contents", "Info.plist");
-      if (await access(plist).catch(() => true).then(() => false)) {
+      if (!await exists(plist)) {
         error(
           wrap([
             null,
