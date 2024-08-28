@@ -1226,7 +1226,7 @@ export const run = async () => {
             null,
             ...shouldAddShortcut
               ? [
-                ...[
+                [
                   "We also added a shortcut to Steam to launch the game with",
                   "BepInEx. You can find it in your Steam library named",
                   code(
