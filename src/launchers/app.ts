@@ -6,7 +6,7 @@ export type AppManifest = Record<string, unknown> | undefined;
  * installed on this computer.
  */
 export interface App<
-  TManifest extends AppManifest = undefined,
+  TManifest extends AppManifest = AppManifest,
 > {
   /** An id which identifies the app with its launcher. */
   readonly id: string;
