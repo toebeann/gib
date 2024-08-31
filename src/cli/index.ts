@@ -77,6 +77,7 @@ import unquote from "unquote";
 import wrapAnsi from "wrap-ansi";
 import { z } from "zod";
 import { renderLogo } from "./renderLogo.ts";
+import { exec } from "../fs/exec.ts";
 import { exists } from "../fs/exists.ts";
 import { getAppById, getAppsByPath, launch } from "../launchers/steam/app.ts";
 import { isInstalled } from "../launchers/steam/launcher.ts";
@@ -92,7 +93,6 @@ import { getFixedPath } from "../utils/getFixedPath.ts";
 import { setLaunchOptions } from "../launchers/steam/launchOption.ts";
 import { getMostRecentUser } from "../launchers/steam/loginusers.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
-import { $ } from "bun";
 
 export const run = async () => {
   function alertShim(message: string) {
@@ -846,16 +846,25 @@ export const run = async () => {
               const { CFBundleIconFile, CFBundleName } = plist;
               if (CFBundleIconFile) {
                 return Promise.all([
-                  $`sips -s format png ${
-                    join(gameAppPath, "Contents", "Resources", CFBundleIconFile)
-                  } --out ${
+                  exec(quote([
+                    "sips",
+                    "-s",
+                    "format",
+                    "png",
+                    join(
+                      gameAppPath,
+                      "Contents",
+                      "Resources",
+                      CFBundleIconFile,
+                    ),
+                    "--out",
                     join(
                       shortcutPath,
                       "Contents",
                       "Resources",
                       "PlayerIcon.png",
-                    )
-                  }`.quiet(),
+                    ),
+                  ])),
                   copyFile(
                     join(
                       gameAppPath,
@@ -1043,11 +1052,15 @@ export const run = async () => {
               await ensureDir(join(shortcutPath, "Contents", "Resources"));
               await Promise.all([
                 shouldAddShortcut &&
-                $`sips -s format png ${
-                  join(gameAppPath, "Contents", "Resources", CFBundleIconFile)
-                } --out ${
-                  join(shortcutPath, "Contents", "Resources", "PlayerIcon.png")
-                }`.quiet(),
+                exec(quote([
+                  "sips",
+                  "-s",
+                  "format",
+                  "png",
+                  join(gameAppPath, "Contents", "Resources", CFBundleIconFile),
+                  "--out",
+                  join(shortcutPath, "Contents", "Resources", "PlayerIcon.png"),
+                ])),
                 copyFile(
                   join(gameAppPath, "Contents", "Resources", CFBundleIconFile),
                   join(
