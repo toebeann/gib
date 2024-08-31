@@ -13,10 +13,10 @@ import {
 const launcher = "epic";
 
 /** An installed Epic Games Launcher app. */
-export interface App extends AppBase<AppManifest> {
+export type App = AppBase<AppManifest> & {
   launcher: typeof launcher;
   launchId: string;
-}
+};
 
 export const isFullyInstalled = (app: App) =>
   app.manifest.bIsIncompleteInstall !== true;

@@ -39,9 +39,7 @@ export enum AppState {
 }
 
 /** An installed Steam app. */
-export interface App extends AppBase<AppManifest> {
-  launcher: typeof launcher;
-}
+export type App = AppBase<AppManifest> & { launcher: typeof launcher };
 
 export const hasState = (app: App, state: AppState) =>
   (app.manifest.appState.stateFlags & state) === state;
