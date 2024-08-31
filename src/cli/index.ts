@@ -39,7 +39,7 @@
  *
  *****************************************************************************/
 
-import { Glob } from "bun";
+import { $, Glob } from "bun";
 import { writeSync } from "node:fs";
 import {
   access,
@@ -92,7 +92,6 @@ import { getFixedPath } from "../utils/getFixedPath.ts";
 import { setLaunchOptions } from "../launchers/steam/launchOption.ts";
 import { getMostRecentUser } from "../launchers/steam/loginusers.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
-import { $ } from "bun";
 
 export const run = async () => {
   function alertShim(message: string) {
