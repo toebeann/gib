@@ -1,6 +1,6 @@
-import { Glob } from "bun";
 import { readFile, realpath } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
+import { Glob } from "glob";
 import { parse } from "@node-steam/vdf";
 import open, { openApp } from "open";
 import { match, P } from "ts-pattern";
@@ -51,16 +51,13 @@ export const isFullyInstalled = (app: App) =>
  * Gets information about installed Steam apps.
  */
 export async function* getApps() {
-  const glob = new Glob("appmanifest_*.acf");
   for (const folder of await getLibraryFolders()) {
-    const folderPath = join(folder.path, "steamapps");
-    for await (
-      const manifestPath of glob.scan({
-        absolute: true,
-        onlyFiles: true,
-        cwd: folderPath,
-      })
-    ) {
+    const glob = new Glob("appmanifest_*.acf", {
+      absolute: true,
+      nodir: true,
+      cwd: join(folder.path, "steamapps"),
+    });
+    for await (const manifestPath of glob) {
       try {
         const manifest = appManifestSchema.parse(
           parse(await readFile(manifestPath, { encoding: "utf-8" })),
@@ -141,15 +138,12 @@ export async function* getAppsByPath(path: string) {
     ))
   ) return;
 
-  const steamapps = join(folderPath, "steamapps");
-  const glob = new Glob("appmanifest_*.acf");
-  for await (
-    const manifestPath of glob.scan({
-      absolute: true,
-      onlyFiles: true,
-      cwd: steamapps,
-    })
-  ) {
+  const glob = new Glob("appmanifest_*.acf", {
+    absolute: true,
+    nodir: true,
+    cwd: join(folderPath, "steamapps"),
+  });
+  for await (const manifestPath of glob) {
     const manifest = appManifestSchema.parse(
       parse(await readFile(manifestPath, "utf8")),
     );

@@ -1,6 +1,6 @@
-import { Glob } from "bun";
 import { readFile as _readFile } from "node:fs/promises";
 import { basename, dirname, extname, resolve } from "node:path";
+import { Glob } from "glob";
 import { parse, type PlistValue } from "plist";
 import { z } from "zod";
 
@@ -32,13 +32,11 @@ type Key = keyof PlistStrict | (string & {});
  */
 export const search = async function* (path: string) {
   const resolved = resolve(path);
-  const glob = new Glob("**/Info.plist");
-  for await (
-    const relPath of glob.scan({
-      onlyFiles: true,
-      cwd: resolved,
-    })
-  ) {
+  const glob = new Glob("**/Info.plist", {
+    nodir: true,
+    cwd: resolved,
+  });
+  for await (const relPath of glob) {
     const plist = resolve(resolved, relPath);
     if (
       basename(dirname(plist)) === "Contents" &&
