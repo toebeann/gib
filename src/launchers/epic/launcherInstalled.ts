@@ -13,10 +13,14 @@ export const launcherInstalledSchema = toCamelCaseKeys(
     installationList: toCamelCaseKeys(
       z.object({
         installLocation: z.string(),
-        namespaceId: z.string().optional(),
-        itemId: z.string().optional(),
-        artifactId: z.string().optional(),
-        appVersion: z.string().optional(),
+        /** @type {string | undefined} */
+        namespaceId: z.unknown().optional(),
+        /** @type {string | undefined} */
+        itemId: z.unknown().optional(),
+        /** @type {string | undefined} */
+        artifactId: z.unknown().optional(),
+        /** @type {string | undefined} */
+        appVersion: z.unknown().optional(),
         appName: z.string(),
       }).passthrough(),
     ).array(),

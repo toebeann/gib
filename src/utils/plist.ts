@@ -5,12 +5,15 @@ import { parse, type PlistValue } from "plist";
 import { z } from "zod";
 
 const plistStrictSchema = z.object({
-  CFBundleName: z.string().optional(),
-  CFBundleExecutable: z.string().optional(),
+  /** @type {string | undefined} */
+  CFBundleName: z.unknown().optional(),
+  CFBundleExecutable: z.string(),
   UnityBuildNumber: z.unknown().optional(),
-  CFBundleShortVersionString: z.string().optional(),
-  CFBundleGetInfoString: z.string().optional(),
-  CFBundleIconFile: z.string().optional(),
+  /** @type {string | undefined} */
+  CFBundleShortVersionString: z.unknown().optional(),
+  /** @type {string | undefined} */
+  CFBundleGetInfoString: z.unknown().optional(),
+  CFBundleIconFile: z.string(),
 });
 type PlistStrict = z.infer<typeof plistStrictSchema>;
 

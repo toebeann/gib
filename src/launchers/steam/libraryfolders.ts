@@ -9,11 +9,16 @@ export const libraryFoldersSchema = z.object({
     z.object({
       apps: z.record(z.number()),
       path: z.string(),
-      label: z.string().optional(),
-      contentid: z.number().optional(),
-      totalsize: z.number().optional(),
-      update_clean_bytes_tally: z.number().optional(),
-      time_last_update_corruption: z.number().optional(),
+      /** @type {string | undefined} */
+      label: z.unknown().optional(),
+      /** @type {number | undefined} */
+      contentid: z.unknown().optional(),
+      /** @type {number | undefined} */
+      totalsize: z.unknown().optional(),
+      /** @type {number | undefined} */
+      update_clean_bytes_tally: z.unknown().optional(),
+      /** @type {number | undefined} */
+      time_last_update_corruption: z.unknown().optional(),
     }).passthrough(),
   ),
 });

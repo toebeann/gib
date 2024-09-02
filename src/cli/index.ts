@@ -874,7 +874,9 @@ export const run = async () => {
                     buildPlist(
                       {
                         CFBundleIconFile,
-                        CFBundleName: `${CFBundleName ?? name} (Vanilla)`,
+                        CFBundleName: `${
+                          typeof CFBundleName === "string" ? CFBundleName : name
+                        } (Vanilla)`,
                         CFBundleInfoDictionaryVersion: "1.0",
                         CFBundlePackageType: "APPL",
                         CFBundleVersion: "1.0",
@@ -913,14 +915,21 @@ export const run = async () => {
      *   - get current shortcuts, add new shortcut
      */
     const { CFBundleName, CFBundleIconFile } = plist;
-    const gameName = CFBundleName ?? basename(gameAppPath);
+    const gameName = typeof CFBundleName === "string"
+      ? CFBundleName
+      : basename(gameAppPath);
     const game = code(gameName);
 
     const steamInstalled = await isInstalled();
     const [userId, user] = steamInstalled
       ? await getMostRecentUser()
       : [undefined, undefined];
-    const username = user && code(user.PersonaName ?? user.AccountName);
+    const username = user &&
+      code(
+        typeof user.PersonaName === "string"
+          ? user.PersonaName
+          : user.AccountName,
+      );
 
     shouldAddShortcut = await isInstalled() && confirmShim(wrap([
       [
@@ -1229,7 +1238,11 @@ export const run = async () => {
                   "We also added a shortcut to Steam to launch the game with",
                   "BepInEx. You can find it in your Steam library named",
                   code(
-                    `${plist.CFBundleName ?? basename(gameAppPath)} (BepInEx)`,
+                    `${
+                      typeof plist.CFBundleName === "string"
+                        ? plist.CFBundleName
+                        : basename(gameAppPath)
+                    } (BepInEx)`,
                   ),
                 ].join(" "),
                 null,

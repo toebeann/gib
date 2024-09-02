@@ -12,13 +12,19 @@ export const loginusersSchema = z.object({
   users: z.record(
     z.object({
       AccountName: z.string(),
+      /** @type {string | undefined} */
       PersonaName: z.unknown().optional(),
-      RememberPassword: numericBooleanSchema.optional(),
-      WantsOfflineMode: numericBooleanSchema.optional(),
-      SkipOfflineModeWarning: numericBooleanSchema.optional(),
-      AllowAutoLogin: numericBooleanSchema.optional(),
+      /** @type {0 | 1 | undefined} */
+      RememberPassword: z.unknown().optional(),
+      /** @type {0 | 1 | undefined} */
+      WantsOfflineMode: z.unknown().optional(),
+      /** @type {0 | 1 | undefined} */
+      SkipOfflineModeWarning: z.unknown().optional(),
+      /** @type {0 | 1 | undefined} */
+      AllowAutoLogin: z.unknown().optional(),
       MostRecent: numericBooleanSchema,
-      Timestamp: z.number().optional(),
+      /** @type {number | undefined} */
+      Timestamp: z.unknown().optional(),
     }).passthrough(),
   ),
 });

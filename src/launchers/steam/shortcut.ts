@@ -12,17 +12,28 @@ import { getSteamPath } from "./path.ts";
 export const shortcutsSchema = z.object({
   shortcuts: z.record(
     z.object({
-      appid: z.number().optional(),
-      AppName: z.string().optional(),
-      Exe: z.string().optional(),
-      StartDir: z.string().optional(),
-      icon: z.string().optional(),
-      ShortcutPath: z.string().optional(),
-      LaunchOptions: z.string().optional(),
-      IsHidden: numericBooleanSchema.optional(),
-      AllowDesktopConfig: numericBooleanSchema.optional(),
-      AllowOverlay: numericBooleanSchema.optional(),
-      LastPlayTime: z.number().optional(),
+      /** @type {number | undefined} */
+      appid: z.unknown().optional(),
+      /** @type {string | undefined} */
+      AppName: z.unknown().optional(),
+      /** @type {string | undefined} */
+      Exe: z.unknown().optional(),
+      /** @type {string | undefined} */
+      StartDir: z.unknown().optional(),
+      /** @type {string | undefined} */
+      icon: z.unknown().optional(),
+      /** @type {string | undefined} */
+      ShortcutPath: z.unknown().optional(),
+      /** @type {string | undefined} */
+      LaunchOptions: z.unknown().optional(),
+      /** @type {0 | 1 | undefined} */
+      IsHidden: z.unknown().optional(),
+      /** @type {0 | 1 | undefined} */
+      AllowDesktopConfig: z.unknown().optional(),
+      /** @type {0 | 1 | undefined} */
+      AllowOverlay: z.unknown().optional(),
+      /** @type {number | undefined} */
+      LastPlayTime: z.unknown().optional(),
     }).passthrough(),
   ),
 });

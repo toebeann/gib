@@ -137,7 +137,8 @@ export async function getLaunchOptions(
   )
     .returnType<string | undefined>()
     .with(P.number, (n) => n.toString())
-    .otherwise((x) => x);
+    .with(P.string, (s) => s)
+    .otherwise(() => undefined);
 
   return launchOptions && removeSlashes(launchOptions) || undefined;
 }

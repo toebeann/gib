@@ -3,8 +3,10 @@ import { toCamelCaseKeys } from "../../utils/zod.ts";
 
 const manifestConfigSchema = toCamelCaseKeys(
   z.object({
-    language: z.string().optional(),
-    betaKey: z.string().optional(),
+    /** @type {string | undefined} */
+    language: z.unknown().optional(),
+    /** @type {string | undefined} */
+    betaKey: z.unknown().optional(),
   }).passthrough(),
 );
 
@@ -17,46 +19,68 @@ export const appManifestSchema = toCamelCaseKeys(
       installdir: z.string(),
       stateFlags: z.number(),
       universe: z.number(),
-      lastUpdated: z.number().optional(),
-      sizeOnDisk: z.number().optional(),
-      stagingSize: z.number().optional(),
-      buildid: z.number().optional(),
-      lastOwner: z.number().optional(),
-      updateResult: z.number().optional(),
-      bytesToDownload: z.number().optional(),
-      bytesDownloaded: z.number().optional(),
-      bytesToStage: z.number().optional(),
-      bytesStaged: z.number().optional(),
-      targetBuildId: z.number().optional(),
-      autoUpdateBehavior: z.number().optional(),
-      allowOtherDownloadsWhileRunning: z.number().optional(),
-      scheduledAutoUpdate: z.number().optional(),
-      sharedDepots: z.record(z.union([z.string(), z.number()])).optional(),
+      /** @type {number | undefined} */
+      lastUpdated: z.unknown().optional(),
+      /** @type {number | undefined} */
+      sizeOnDisk: z.unknown().optional(),
+      /** @type {number | undefined} */
+      stagingSize: z.unknown().optional(),
+      /** @type {number | undefined} */
+      buildid: z.unknown().optional(),
+      /** @type {number | undefined} */
+      lastOwner: z.unknown().optional(),
+      /** @type {number | undefined} */
+      updateResult: z.unknown().optional(),
+      /** @type {number | undefined} */
+      bytesToDownload: z.unknown().optional(),
+      /** @type {number | undefined} */
+      bytesDownloaded: z.unknown().optional(),
+      /** @type {number | undefined} */
+      bytesToStage: z.unknown().optional(),
+      /** @type {number | undefined} */
+      bytesStaged: z.unknown().optional(),
+      /** @type {number | undefined} */
+      targetBuildId: z.unknown().optional(),
+      /** @type {number | undefined} */
+      autoUpdateBehavior: z.unknown().optional(),
+      /** @type {number | undefined} */
+      allowOtherDownloadsWhileRunning: z.unknown().optional(),
+      /** @type {number | undefined} */
+      scheduledAutoUpdate: z.unknown().optional(),
+      /** @type {Record<string, string | number> | undefined} */
+      sharedDepots: z.unknown().optional(),
       installedDepots: z.record(
         toCamelCaseKeys(
           z.object({
-            manifest: z.number().optional(),
-            size: z.number().optional(),
+            /** @type {number | undefined} */
+            manifest: z.unknown().optional(),
+            /** @type {number | undefined} */
+            size: z.unknown().optional(),
           }).passthrough(),
         ),
-      ).optional(),
+      ).or(z.unknown()).optional(),
       stagedDepots: z.record(
         toCamelCaseKeys(
           z.object({
-            manifest: z.number().optional(),
-            size: z.number().optional(),
-            dlcappid: z.number().optional(),
+            /** @type {number | undefined} */
+            manifest: z.unknown().optional(),
+            /** @type {number | undefined} */
+            size: z.unknown().optional(),
+            /** @type {number | undefined} */
+            dlcappid: z.unknown().optional(),
           }).passthrough(),
         ),
-      ).optional(),
+      ).or(z.unknown()).optional(),
       dlcDownloads: z.record(
         toCamelCaseKeys(
           z.object({
-            bytesDownloaded: z.number().optional(),
-            bytesToDownload: z.number().optional(),
+            /** @type {number | undefined} */
+            bytesDownloaded: z.unknown().optional(),
+            /** @type {number | undefined} */
+            bytesToDownload: z.unknown().optional(),
           }).passthrough(),
         ),
-      ).optional(),
+      ).or(z.unknown()).optional(),
       userConfig: manifestConfigSchema.optional(),
       mountedConfig: manifestConfigSchema.optional(),
     })),

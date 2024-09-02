@@ -18,32 +18,42 @@ export type App = AppBase<AppManifest> & {
   launchId: string;
 };
 
-export const isFullyInstalled = (app: App) =>
-  app.manifest.bIsIncompleteInstall !== true;
+export const isFullyInstalled = ({ manifest: { bIsIncompleteInstall } }: App) =>
+  bIsIncompleteInstall !== true;
 
 /** Gets information about installed Epic Games Launcher apps. */
 export async function* getApps() {
   const launcherInstalled = getLauncherInstalled();
 
-  for await (const manifest of getManifests()) {
+  for await (const _manifest of getManifests()) {
     const info = (await launcherInstalled)
-      .find((x) => [x.artifactId, x.appName].includes(manifest.appName));
+      .find((x) => [x.artifactId, x.appName].includes(_manifest.appName));
 
     if (info) {
-      const merged = { ...info, ...manifest };
+      const manifest = { ...info, ..._manifest };
+      const {
+        displayName: name,
+        installLocation: path,
+        namespaceId,
+        catalogNamespace,
+        itemId,
+        catalogItemId,
+        artifactId,
+        appName,
+      } = manifest;
+      const id = typeof artifactId === "string" ? artifactId : appName;
+      const launchId = [
+        typeof namespaceId === "string" ? namespaceId : catalogNamespace,
+        typeof itemId === "string" ? itemId : catalogItemId,
+        id,
+      ].filter(Boolean).join(":");
       yield {
         launcher,
-        manifest: merged,
-        id: merged.artifactId ?? merged.appName,
-        name: merged.displayName,
-        path: merged.installLocation,
-        launchId: [
-          merged.namespaceId ?? merged.catalogNamespace,
-          merged.itemId ?? merged.catalogItemId,
-          merged.artifactId ?? merged.appName,
-        ]
-          .filter(Boolean)
-          .join(":"),
+        manifest,
+        id,
+        name,
+        path,
+        launchId,
       } satisfies App;
     }
   }
@@ -67,21 +77,31 @@ export const getAppById = async (id: string) =>
     ]),
   )
     .returnType<App | undefined>()
-    .with([P.not(P.nullish), P.not(P.nullish)], ([info, manifest]) => {
-      const merged = { ...info, ...manifest };
+    .with([P.not(P.nullish), P.not(P.nullish)], ([info, _manifest]) => {
+      const manifest = { ...info, ..._manifest };
+      const {
+        displayName: name,
+        installLocation: path,
+        namespaceId,
+        catalogNamespace,
+        itemId,
+        catalogItemId,
+        artifactId,
+        appName,
+      } = manifest;
+      const id = typeof artifactId === "string" ? artifactId : appName;
+      const launchId = [
+        typeof namespaceId === "string" ? namespaceId : catalogNamespace,
+        typeof itemId === "string" ? itemId : catalogItemId,
+        id,
+      ].filter(Boolean).join(":");
       return {
         launcher,
-        manifest: merged,
-        id: merged.artifactId ?? merged.appName,
-        name: merged.displayName,
-        path: merged.installLocation,
-        launchId: [
-          merged.namespaceId ?? merged.catalogNamespace,
-          merged.itemId ?? merged.catalogItemId,
-          merged.artifactId ?? merged.appName,
-        ]
-          .filter(Boolean)
-          .join(":"),
+        manifest,
+        id,
+        name,
+        path,
+        launchId,
       } satisfies App;
     })
     .otherwise(() => undefined);
@@ -102,21 +122,31 @@ export const getAppByPath = async (path: string) =>
     ]),
   )
     .returnType<App | undefined>()
-    .with([P.not(P.nullish), P.not(P.nullish)], ([info, manifest]) => {
-      const merged = { ...info, ...manifest };
+    .with([P.not(P.nullish), P.not(P.nullish)], ([info, _manifest]) => {
+      const manifest = { ...info, ..._manifest };
+      const {
+        displayName: name,
+        installLocation: path,
+        namespaceId,
+        catalogNamespace,
+        itemId,
+        catalogItemId,
+        artifactId,
+        appName,
+      } = manifest;
+      const id = typeof artifactId === "string" ? artifactId : appName;
+      const launchId = [
+        typeof namespaceId === "string" ? namespaceId : catalogNamespace,
+        typeof itemId === "string" ? itemId : catalogItemId,
+        id,
+      ].filter(Boolean).join(":");
       return {
         launcher,
-        manifest: merged,
-        id: merged.artifactId ?? merged.appName,
-        name: merged.displayName,
-        path: merged.installLocation,
-        launchId: [
-          merged.namespaceId ?? merged.catalogNamespace,
-          merged.itemId ?? merged.catalogItemId,
-          merged.artifactId ?? merged.appName,
-        ]
-          .filter(Boolean)
-          .join(":"),
+        manifest,
+        id,
+        name,
+        path,
+        launchId,
       } satisfies App;
     })
     .otherwise(() => undefined);

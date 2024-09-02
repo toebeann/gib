@@ -40,11 +40,12 @@ export const search = async function* (
   for await (const path of searchPlists(searchDir)) {
     if (await hasUnityAppIndicators(path, indicators)) {
       const plist = await readPlist(path);
+      const { CFBundleName, CFBundleExecutable } = plist;
       yield {
-        name: plist.CFBundleName,
+        name: CFBundleName,
         bundle: dirname(dirname(path)),
-        executable: plist.CFBundleExecutable &&
-          join(path, "..", "MacOS", plist.CFBundleExecutable),
+        executable: CFBundleExecutable &&
+          join(path, "..", "MacOS", CFBundleExecutable),
         plist,
       };
     }

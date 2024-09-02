@@ -3,7 +3,6 @@ import { join } from "node:path";
 import type { ID } from "@node-steam/id";
 import { parse, stringify } from "@node-steam/vdf";
 import { z } from "zod";
-import { numericBooleanSchema } from "../../utils/zod.ts";
 import { getUserConfigFolderPath } from "./loginusers.ts";
 
 /** Zod schema for working with Steam's `localconfig.vdf` files. */
@@ -14,23 +13,34 @@ export const localConfigSchema = z.object({
         Steam: z.object({
           apps: z.record(
             z.object({
-              LastPlayed: z.number().optional(),
-              Playtime2wks: z.number().optional(),
-              Playtime: z.number().optional(),
+              /** @type {number | undefined} */
+              LastPlayed: z.unknown().optional(),
+              /** @type {number | undefined} */
+              Playtime2wks: z.unknown().optional(),
+              /** @type {number | undefined} */
+              Playtime: z.unknown().optional(),
               cloud: z.object({
-                last_sync_state: z.string().optional(),
-              }).passthrough().optional(),
+                /** @type {string | undefined} */
+                last_sync_state: z.unknown().optional(),
+              }).passthrough().or(z.unknown()).optional(),
               autocloud: z.object({
-                lastlaunch: z.number().optional(),
-                lastexit: z.number().optional(),
-              }).passthrough().optional(),
-              BadgeData: z.number().optional(),
-              LaunchOptions: z.union([z.string(), z.number()]).optional(),
+                /** @type {number | undefined} */
+                lastlaunch: z.unknown().optional(),
+                /** @type {number | undefined} */
+                lastexit: z.unknown().optional(),
+              }).passthrough().or(z.unknown()).optional(),
+              /** @type {string | number | undefined} */
+              BadgeData: z.unknown().optional(),
+              /** @type {string | number | undefined} */
+              LaunchOptions: z.unknown().optional(),
             }).passthrough(),
           ),
-          LastPlayedTimesSyncTime: z.number().optional(),
-          PlayerLevel: z.number().optional(),
-          SmallMode: numericBooleanSchema.optional(),
+          /** @type {number | undefined} */
+          LastPlayedTimesSyncTime: z.unknown().optional(),
+          /** @type {number | undefined} */
+          PlayerLevel: z.unknown().optional(),
+          /** @type {0 | 1 | undefined} */
+          SmallMode: z.unknown().optional(),
         }).passthrough(),
       }).passthrough(),
     }).passthrough(),

@@ -10,55 +10,99 @@ import type { launcherInstalledSchema } from "./launcherInstalled.ts";
 export const appManifestSchema = toCamelCaseKeys(
   z.object({
     formatVersion: z.number(),
-    bIsIncompleteInstall: z.boolean().optional(),
-    launchCommand: z.string().optional(),
-    launchExecutable: z.string().optional(),
-    manifestLocation: z.string().optional(),
-    manifestHash: z.string().optional(),
-    bIsApplication: z.boolean().optional(),
-    bIsExecutable: z.boolean().optional(),
-    bIsManaged: z.boolean().optional(),
-    bNeedsValidation: z.boolean().optional(),
-    bRequiresAuth: z.boolean().optional(),
-    bAllowMultipleInstances: z.boolean().optional(),
-    bCanRunOffline: z.boolean().optional(),
-    bAllowUriCmdArgs: z.boolean().optional(),
-    bLaunchElevated: z.boolean().optional(),
-    baseUrLs: z.string().array().optional(),
-    buildLabel: z.string().optional(),
-    appCategories: z.string().array().optional(),
-    chunkDbs: z.unknown().array().optional(),
-    compatibleApps: z.unknown().array().optional(),
+    /** @type {boolean | undefined} */
+    bIsIncompleteInstall: z.unknown().optional(),
+    /** @type {string | undefined} */
+    launchCommand: z.unknown().optional(),
+    /** @type {string | undefined} */
+    launchExecutable: z.unknown().optional(),
+    /** @type {string | undefined} */
+    manifestLocation: z.unknown().optional(),
+    /** @type {string | undefined} */
+    manifestHash: z.unknown().optional(),
+    /** @type {boolean | undefined} */
+    bIsApplication: z.unknown().optional(),
+    /** @type {boolean | undefined} */
+    bIsExecutable: z.unknown().optional(),
+    /** @type {boolean | undefined} */
+    bIsManaged: z.unknown().optional(),
+    /** @type {boolean | undefined} */
+    bNeedsValidation: z.unknown().optional(),
+    /** @type {boolean | undefined} */
+    bRequiresAuth: z.unknown().optional(),
+    /** @type {boolean | undefined} */
+    bAllowMultipleInstances: z.unknown().optional(),
+    /** @type {boolean | undefined} */
+    bCanRunOffline: z.unknown().optional(),
+    /** @type {boolean | undefined} */
+    bAllowUriCmdArgs: z.unknown().optional(),
+    /** @type {boolean | undefined} */
+    bLaunchElevated: z.unknown().optional(),
+    /** @type {string[] | undefined} */
+    baseUrLs: z.unknown().optional(),
+    /** @type {string | undefined} */
+    buildLabel: z.unknown().optional(),
+    /** @type {string[] | undefined} */
+    appCategories: z.unknown().optional(),
+    /** @type {unknown[] | undefined} */
+    chunkDbs: z.unknown().optional(),
+    /** @type {unknown[] | undefined} */
+    compatibleApps: z.unknown().optional(),
     displayName: z.string(),
-    installationGuid: z.string().optional(),
+    /** @type {string | undefined} */
+    installationGuid: z.unknown().optional(),
     installLocation: z.string(),
-    installSessionId: z.string().optional(),
-    installTags: z.unknown().array().optional(),
-    installComponents: z.unknown().array().optional(),
-    hostInstallationGuid: z.string().optional(),
-    prereqIds: z.unknown().array().optional(),
-    prereqSha1Hash: z.string().optional(),
-    lastPrereqSucceededSha1Hash: z.string().optional(),
-    stagingLocation: z.string().optional(),
-    technicalType: z.string().optional(),
-    vaultThumbnailUrl: z.string().optional(),
-    vaultTitleText: z.string().optional(),
-    installSize: z.number().optional(),
-    mainWindowProcessName: z.string().optional(),
-    processNames: z.unknown().array().optional(),
-    backgroundProcessNames: z.unknown().array().optional(),
-    ignoredProcessNames: z.unknown().array().optional(),
-    dlcProcessNames: z.unknown().array().optional(),
-    mandatoryAppFolderName: z.string().optional(),
-    ownershipToken: z.string().optional(),
+    /** @type {string | undefined} */
+    installSessionId: z.unknown().optional(),
+    /** @type {unknown[] | undefined} */
+    installTags: z.unknown().optional(),
+    /** @type {unknown[] | undefined} */
+    installComponents: z.unknown().optional(),
+    /** @type {string | undefined} */
+    hostInstallationGuid: z.unknown().optional(),
+    /** @type {unknown[] | undefined} */
+    prereqIds: z.unknown().optional(),
+    /** @type {string | undefined} */
+    prereqSha1Hash: z.unknown().optional(),
+    /** @type {string | undefined} */
+    lastPrereqSucceededSha1Hash: z.unknown().optional(),
+    /** @type {string | undefined} */
+    stagingLocation: z.unknown().optional(),
+    /** @type {string | undefined} */
+    technicalType: z.unknown().optional(),
+    /** @type {string | undefined} */
+    vaultThumbnailUrl: z.unknown().optional(),
+    /** @type {string | undefined} */
+    vaultTitleText: z.unknown().optional(),
+    /** @type {number | undefined} */
+    installSize: z.unknown().optional(),
+    /** @type {string | undefined} */
+    mainWindowProcessName: z.unknown().optional(),
+    /** @type {unknown[] | undefined} */
+    processNames: z.unknown().optional(),
+    /** @type {unknown[] | undefined} */
+    backgroundProcessNames: z.unknown().optional(),
+    /** @type {unknown[] | undefined} */
+    ignoredProcessNames: z.unknown().optional(),
+    /** @type {unknown[] | undefined} */
+    dlcProcessNames: z.unknown().optional(),
+    /** @type {string | undefined} */
+    mandatoryAppFolderName: z.unknown().optional(),
+    /** @type {string | undefined} */
+    ownershipToken: z.unknown().optional(),
     catalogNamespace: z.string(),
     catalogItemId: z.string(),
     appName: z.string(),
-    appVersionString: z.string().optional(),
-    mainGameCatalogNamespace: z.string().optional(),
-    mainGameCatalogItemId: z.string().optional(),
-    mainGameAppName: z.string().optional(),
-    allowedUriEnvVars: z.unknown().array().optional(),
+    /** @type {string | undefined} */
+    appVersionString: z.unknown().optional(),
+    /** @type {string | undefined} */
+    mainGameCatalogNamespace: z.unknown().optional(),
+    /** @type {string | undefined} */
+    mainGameCatalogItemId: z.unknown().optional(),
+    /** @type {string | undefined} */
+    mainGameAppName: z.unknown().optional(),
+    /** @type {unknown[] | undefined} */
+    allowedUriEnvVars: z.unknown().optional(),
   }).passthrough(),
 );
 
