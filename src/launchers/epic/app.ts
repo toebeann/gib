@@ -61,7 +61,7 @@ export const getAppById = async (id: string) =>
     await Promise.all([
       getLauncherInstalled()
         .then((apps) =>
-          apps.find((app) => [app.ArtifactId, app.AppName].includes(id))
+          apps.find((app) => [app.artifactId, app.appName].includes(id))
         ),
       getManifestById(id),
     ]),
