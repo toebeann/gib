@@ -141,7 +141,7 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
   diminish with only BepInEx installed. This is due to the fact that BepInEx is
   built for Intel-based chips, and therefore your Apple Silicon chip needs to
   run it through Rosetta. Unfortunately, there is nothing gib can do to resolve
-  this, since BepInEx does not currently support Apple silicon. If you find the
+  this, since BepInEx does not currently support Apple Silicon. If you find the
   performance impact too drastic, your only other option might be to use a
   Windows emulator like Parallels Desktop, Wine via Whisky or HyperPlay etc.,
   and then install and run the Windows versions of both the game and BepInEx.
