@@ -13,7 +13,8 @@ const plistStrictSchema = z.object({
   CFBundleShortVersionString: z.unknown().optional(),
   /** @type {string | undefined} */
   CFBundleGetInfoString: z.unknown().optional(),
-  CFBundleIconFile: z.string(),
+  /** @type {string | undefined} */
+  CFBundleIconFile: z.string().optional(),
 });
 type PlistStrict = z.infer<typeof plistStrictSchema>;
 
