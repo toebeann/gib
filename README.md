@@ -13,7 +13,7 @@ curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash
 ![Running gib in the Terminal](https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd)
 
 gib aims to automate whatever it can, and hold your hand through whatever it
-cannot.
+cannot. Check the [Features](#features) section for details.
 
 Currently only macOS is supported, as the process of manual BepInEx installation
 is _exceptionally_ cumbersome on this operating system. Both Intel-based and
@@ -23,6 +23,7 @@ Apple Silicon processors are supported.
 
 - [gib](#gib)
   - [Table of contents](#table-of-contents)
+  - [Features](#features)
   - [Usage](#usage)
     - [Quick start](#quick-start)
     - [Walkthrough](#walkthrough)
@@ -42,6 +43,26 @@ Apple Silicon processors are supported.
   - [Caveats](#caveats)
   - [Known issues](#known-issues)
   - [License](#license)
+
+## Features
+
+- Completely automates the process of installing BepInEx 5 for native unix
+  builds of Unity games on macOS - no more falling asleep or pulling your hair
+  out with frustration while trying to
+  [install it manually](https://github.com/toebeann/BepInEx.Subnautica/wiki/Idiot's-guide-to-macOS-installation#manual-installation)!
+- Takes care of all the annoying stuff like making the run script executable and
+  giving permission to run BepInEx which is where most people give up when
+  installing manually!
+- After installing BepInEx, runs an automated test to check that BepInEx is
+  actually loading when you run the game, so you know that everything is working
+  as it's supposed to!
+- Nifty Steam integrations:
+  - Automatically configures the launch options to run Steam games with BepInEx!
+  - Optionally adds Steam shortcuts to run Steam games vanilla (without mods) or
+    non-Steam games with mods!
+
+    _**Note:** The Steam shortcuts feature is experimental, please see
+    [Caveats](#caveats) below for details._
 
 ## Usage
 
