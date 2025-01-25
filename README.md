@@ -28,6 +28,17 @@ Apple Silicon processors are supported.
     - [Walkthrough](#walkthrough)
       - [Prerequisites](#prerequisites)
       - [Running gib](#running-gib)
+  - [Temporarily disabling mods for a game](#temporarily-disabling-mods-for-a-game)
+    - [Re-enabling mods after disabling them](#re-enabling-mods-after-disabling-them)
+  - [Uninstallation](#uninstallation)
+    - [Uninstalling BepInEx](#uninstalling-bepinex)
+      - [Clearing the Steam launch options](#clearing-the-steam-launch-options)
+      - [Removing Steam shortcuts](#removing-steam-shortcuts)
+      - [Removing shortcuts from Applications](#removing-shortcuts-from-applications)
+      - [Removing BepInEx from the game folder](#removing-bepinex-from-the-game-folder)
+    - [Uninstalling gib](#uninstalling-gib)
+      - [Clearing bun's cache](#clearing-buns-cache)
+      - [Removing bun](#removing-bun)
   - [Caveats](#caveats)
   - [Known issues](#known-issues)
   - [License](#license)
@@ -140,6 +151,216 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 > need further assistance, please feel free to send a DM on discord to `toebean`
 > (that's me) explaining the issue and I'll reply when I remember to check my
 > message requests.
+
+## Temporarily disabling mods for a game
+
+> [!NOTE]\
+> Please note that this section only applies to Steam games, For non-Steam
+> games, you can simply run the game normally - _without_ Steam - and it should
+> launch vanilla.
+
+If you have installed BepInEx with gib for a Steam game, you will have been
+given the option to add a shortcut to Steam to launch the game without mods
+(vanilla). However, this feature is experimental and for some games, it
+unfortunately cannot work due to the way the game is coded. Or, you may simply
+have declined the option and now find that you do indeed want to run the game
+without mods temporarily.
+
+In either case, you can temporarily disable mods by following these steps:
+
+1. Locate the game in your Steam library, then right-click it and choose
+   `Properties...`
+2. In the `General` tab of the window which opens, there should be a text input
+   for launch options. Add the following text to the _beginning_ of the text
+   field, so that it comes before _any_ other text:
+   ```sh
+   %command% #
+   ```
+3. Close the window.
+
+Now, when you run the game with Steam, it should run without any mods. If you
+instead get an error when you try and launch the game, it means you messed up
+when you were editing the launch options. Make sure that the `%command% #` comes
+before _any_ other text in the launch options!
+
+You may want to
+[remove the vanilla shortcut for the game](#removing-steam-shortcuts), if you
+added one when running gib.
+
+### Re-enabling mods after disabling them
+
+To re-enable mods after
+[temporarily disabling them](#temporarily-disabling-mods-for-a-game), you simply
+need to undo the changes you made to the launch options:
+
+1. Locate the game in your Steam library, then right-click it and choose
+   `Properties...`
+2. In the `General` tab of the window which opens, there should be a text input
+   for launch options. **Delete** the following text, which should be at the
+   start of the line:
+   ```sh
+   %command% #
+   ```
+3. Close the window.
+
+The game should now run with mods once more when launched through Steam. If you
+get an error when you try and launch the game, it means you made a mistake when
+editing the launch options. If you can't seem to fix it, you will need to run
+gib again to reinstall BepInEx for the game - don't delete any files, just run
+the gib command again and it will fix the launch options for you - you won't
+lose any mods or anything.
+
+## Uninstallation
+
+### Uninstalling BepInEx
+
+At present, uninstalling BepInEx is an entirely manual process which gib cannot
+automate, but it is fairly straightforward:
+
+1. Undo any changes gib made to your Steam library:
+   - **Steam games:**
+     [clear the Steam launch options](#clearing-the-steam-launch-options), and
+     [remove the vanilla shortcut added during instalation](#removing-steam-shortcuts),
+     if applicable.
+   - **Non-Steam games:**
+     [remove the Steam shortcut to launch the game with BepInEx]((#removing-steam-shortcuts)),
+     if applicable.
+2. You should also
+   [remove the shortcuts added to your Applications folder by gib for the game](#removing-shortcuts-from-applications).
+3. Optionally, you can reclaim the disk space used by BepInEx and your mods by
+   [removing BepInEx from the game folder](#removing-bepinex-from-the-game-folder).
+   As long as you've followed the previous steps this is entirely optional, but
+   probably a good idea since mods can take up a lot of space - and this _isn't_
+   taken care of for you when you uninstall the game!
+
+#### Clearing the Steam launch options
+
+> [!NOTE]\
+> Please note that this section only applies to Steam games.
+
+For Steam games, we should first clear the Steam launch options for the game
+which are responsible for injecting BepInEx when we launch the game from Steam:
+
+1. Locate the game in your Steam library, then right-click it and choose
+   `Properties...`
+2. In the `General` tab of the window which opens, there should be a text input
+   for launch options. Click into the text box, press `Command A` to select all
+   text, then `Backspace` or `Delete` to clear the launch options.
+3. Close the window.
+
+At this point, when you launch the game with Steam it will launch completely
+vanilla, with no mods.
+
+#### Removing Steam shortcuts
+
+When setting up BepInEx you may have optionally added a Steam shortcut, e.g. for
+Steam games you can add an optional shortcut to launch the game without mods
+(vanilla), and for non-Steam games it is often preferable to set up a Steam
+shortcut to launch the game with mods.
+
+In either case, if you're uninstalling BepInEx from the game you likely want to
+get rid of these shortcuts. To do so, follow these steps:
+
+1. Locate the shortcut in your Steam library. If you have trouble finding it,
+   you can use the search bar at the top to search for `(Vanilla)` or
+   `(BepInEx)` as applicable.
+2. Right-click the shortcut in your library and choose `Manage` ->
+   `Remove non-Steam game from your library`.
+
+#### Removing shortcuts from Applications
+
+When setting up BepInEx with gib, it often adds shortcuts to your Applications
+folder for easy use from Launchpad or Spotlight. If you're no longer planning to
+use BepInEx with the game, you should remove these shortcuts. To do so, follow
+these steps:
+
+1. Open Spotlight with `Command Space`, start typing the name until you find the
+   shortcut - it will have the suffix `(Vanilla)` or `(BepInEx)`. If you can't
+   find it then you don't have one and can skip this.
+2. With the shortcut selected in Spotlight, hold `Command` until the icon
+   changes to Finder. With `Command` still held down, press `Enter`.
+3. You should find yourself in a Finder window at the location of the shortcut.
+   Simply delete it as normal.
+
+#### Removing BepInEx from the game folder
+
+> [!IMPORTANT]\
+> Make sure you follow the first two steps of
+> [Uninstalling BepInEx](#uninstalling-bepinex) section before doing this.
+
+If you want to reclaim the disk space taken up by BepInEx and the mods you're no
+longer using, here are instructions on how to completely remove BepInEx and all
+mods from the game folder:
+
+1. Navigate to the game folder in Finder, the same way you found it when
+   installing BepInEx. If you can't remember how to find it, check the
+   [Prerequisites](#prerequisites) section for instructions.
+2. Delete the following files if present:
+   - `changelog.txt`
+   - `doorstop_config.ini`
+   - `libdoorstop.dylib`
+   - `run_bepinex.sh`
+   - `winhttp.dll`
+3. Delete the following folders if present:
+   - `doorstop_libs`
+   - `corlibs`
+4. Finally, delete the `BepInEx` folder itself. Be aware that deleting this
+   folder will delete not only BepInEx but also all mods you had installed, and
+   any stored configuration of those mods.
+
+### Uninstalling gib
+
+> [!NOTE]\
+> Uninstalling gib itself is optional and will not uninstall BepInEx, nor any
+> mods you have installed for any games. For that, see
+> [Uninstalling BepInEx](#uninstalling-bepinex).
+
+As of gib v0.2, gib is installed and executed with [bun](https://bun.sh/). gib
+itself (and its dependencies besides bun) takes up ~28 MB of space, and bun
+takes up ~59 MB, making for a total less than ~90 MB, which is pretty negligible
+all things considered.
+
+If you're a web developer you may want to keep bun installed as it's a fantastic
+alternative to Node.js - even if you are targeting Node.js for your work, try
+using `bun i` instead of `npm i` sometime.
+
+If you do want to delete gib for the miniscule space saving, you can choose to
+either [remove bun entirely](#removing-bun-entirely) which will also delete gib
+and all of its dependencies, or you can choose to
+[only clear bun's cache](#clearing-buns-cache) which will delete gib and its
+dependencies (and any other cached packages), but leave bun installed so that
+you can make use of it for development.
+
+#### Clearing bun's cache
+
+Clearing bun's cache will remove gib and all of its dependencies except for bun.
+To do so, follow these steps:
+
+1. Open Terminal with Spotlight (`Command Space`, type `terminal` and press
+   `Enter`).
+2. Enter the following command:
+   ```sh
+   bun pm cache rm -g
+   ```
+
+If the above command reports an error, then you can also try deleting the
+contents of the cache manually by entering the following command in Terminal:
+
+```sh
+rm -rf ~/.bun/install/cache
+```
+
+#### Removing bun
+
+To remove bun (which will also remove gib and all its dependencies), follow
+these steps:
+
+1. Open Terminal with Spotlight (`Command Space`, type `terminal` and press
+   `Enter`).
+2. Enter the following command:
+   ```sh
+   rm -rf ~/.bun
+   ```
 
 ## Caveats
 
