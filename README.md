@@ -334,8 +334,8 @@ mods from the game folder:
 ### Uninstalling gib
 
 > [!NOTE]\
-> Uninstalling gib itself is optional and will not uninstall BepInEx, nor any
-> mods you have installed for any games. For that, see
+> Uninstalling gib itself is entirely optional and will not uninstall BepInEx,
+> nor any mods you have installed for any games. For that, see
 > [Uninstalling BepInEx](#uninstalling-bepinex).
 
 As of gib v0.2, gib is installed and executed with [bun](https://bun.sh/). gib
