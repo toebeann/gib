@@ -172,34 +172,6 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
   provide absolute paths easily by simply highlighting the file in Finder,
   pressing `Option Command C`, then `Command V` in terminal to paste.
 
-- In some cases, when attempting to discern whether a game is part of your local
-  Steam library, gib might fail with a similar output to the following:
-  ```
-  Unity app successfully detected at:
-  /Users/<USERNAME>/Library/Application Support/Steam/steamapps/common/<GAME>
-
-  605 |      *   .app in the game folder that runs a bash script which simply executes
-  606 |      *   the original .app, copy it to ~/Applications
-  607 |      */
-  608 |     const app = steamApps[0];
-  609 |     const { name, id } = app;
-  610 |     const game = code(name);
-                                  ^
-  TypeError: Right side of assignment cannot be destructured
-        at /private/tmp/bunx-501-@toebeann/gib/node_modules/gib/src/cli/index.ts:610:27
-  ```
-
-  At this time it appears that the only known workaround is to completely
-  uninstall and then reinstall Steam and your games, or to manually install
-  BepInEx for your games (no gib, sorry). This issue should only affect a small
-  minority of users who have been tinkering with their Steam files and messed up
-  something that gib is relying on. I plan to make gib more resilient to
-  self-inflicted user tomfoolery in future releases, so that if gib runs into
-  issues working with Steam that it will offer to continue installing BepInEx
-  for the game without automated Steam integration (no automatically setting
-  launch options, no automatically created Steam shortcuts, no automatically
-  launching the game when testing that BepInEx is working, etc.)
-
 ## License
 
 gib is licensed under the
