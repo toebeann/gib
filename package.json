@@ -72,7 +72,7 @@
     "find-process": "^1.4.10",
     "fs-extra": "^11.3.0",
     "glob": "^11.0.1",
-    "gradient-string": "^2.0.2",
+    "gradient-string": "^3.0.0",
     "jszip": "^3.10.1",
     "lodash.camelcase": "^4.3.0",
     "lodash.mapkeys": "^4.6.0",
