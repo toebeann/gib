@@ -201,7 +201,7 @@ In either case, you can temporarily disable mods by following these steps:
 3. Close the window.
 
 Now, when you run the game with Steam, it should run without any mods. If you
-instead get an error when you try and launch the game, it means you messed up
+instead get an error when you try to launch the game, it means you messed up
 when you were editing the launch options. Make sure that the `%command% #` comes
 before _any_ other text in the launch options!
 
@@ -226,7 +226,7 @@ need to undo the changes you made to the launch options:
 3. Close the window.
 
 The game should now run with mods once more when launched through Steam. If you
-get an error when you try and launch the game, it means you made a mistake when
+get an error when you try to launch the game, it means you made a mistake when
 editing the launch options. If you can't seem to fix it, you will need to run
 gib again to reinstall BepInEx for the game - don't delete any files, just run
 the gib command again and it will fix the launch options for you - you won't
