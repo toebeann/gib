@@ -74,8 +74,9 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
     and click it.
 
   - For games you typically launch with Spotlight, search for the game as usual
-    in Spotlight, and when the game is highlighted in the drop-down, hold `⌘`
-    until the icon changes to Finder. With `⌘` still held down, press `Enter`.
+    in Spotlight, and when the game is highlighted in the drop-down, hold
+    `Command` until the icon changes to Finder. With `Command` still held down,
+    press `Enter`.
 
 - You'll want a copy of BepInEx downloaded and unzipped in your Downloads
   folder.
@@ -116,13 +117,13 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 #### Running gib
 
-1. Open Terminal from Launchpad or Spotlight (press `⌘ Space`, type `terminal`
-   and press `Enter`).
+1. Open Terminal from Launchpad or Spotlight (press `Command Space`, type
+   `terminal` and press `Enter`).
 
    <img width="600" alt="Searching for Terminal with macOS Spotlight" src="https://github.com/toebeann/BepInEx.Subnautica/assets/45315526/f374da75-5c74-4b49-99c2-25daa296c504">
 
 1. Copy the command from the [Quick Start](#quick-start) section above and paste
-   it in your terminal window with `⌘ V`, then press `Enter` to run it.
+   it in your terminal window with `Command V`, then press `Enter` to run it.
 
    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd">
 
@@ -130,7 +131,7 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
    your game!
 
 > [!TIP]\
-> You can press `⌃ C` at any time in the terminal to abort.
+> You can press `Control C` at any time in the terminal to abort.
 
 > [!TIP]\
 > If you ran into any unexpected issues while following these instructions or
