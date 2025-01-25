@@ -161,7 +161,7 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd">
 
-1. Now, simply follow the instructions in the terminal to install BepInEx to
+3. Now, simply follow the instructions in the terminal to install BepInEx to
    your game!
 
 > [!TIP]\
