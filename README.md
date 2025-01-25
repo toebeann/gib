@@ -17,7 +17,8 @@ cannot. Check the [Features](#features) section for details.
 
 Currently only macOS is supported, as the process of manual BepInEx installation
 is _exceptionally_ cumbersome on this operating system. Both Intel-based and
-Apple Silicon processors are supported.
+Apple Silicon processors are supported. For other limitations, see the
+[Caveats](#caveats) section.
 
 ## Table of contents
 
