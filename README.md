@@ -146,7 +146,7 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
   Windows emulator like Parallels Desktop, Wine via Whisky or HyperPlay etc.,
   and then install and run the Windows versions of both the game and BepInEx.
 
-## Known issues
+## Known Issues
 
 - If the shell script to launch BepInEx is named something other than
   `run_bepinex.sh` (e.g. `start_game_bepinex.sh`), gib will not recognise it. I
