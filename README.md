@@ -16,22 +16,22 @@ cannot.
 
 Supports both Intel-based and Apple Silicon chips.
 
-## Table of Contents
+## Table of contents
 
 - [gib](#gib)
-  - [Table of Contents](#table-of-contents)
+  - [Table of contents](#table-of-contents)
   - [Usage](#usage)
-    - [Quick Start](#quick-start)
+    - [Quick start](#quick-start)
     - [Walkthrough](#walkthrough)
       - [Prerequisites](#prerequisites)
       - [Running gib](#running-gib)
   - [Caveats](#caveats)
-  - [Known Issues](#known-issues)
+  - [Known issues](#known-issues)
   - [License](#license)
 
 ## Usage
 
-### Quick Start
+### Quick start
 
 Just run the following command in Terminal:
 
@@ -122,7 +122,7 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
    <img width="600" alt="Searching for Terminal with macOS Spotlight" src="https://github.com/toebeann/BepInEx.Subnautica/assets/45315526/f374da75-5c74-4b49-99c2-25daa296c504">
 
-1. Copy the command from the [Quick Start](#quick-start) section above and paste
+2. Copy the command from the [Quick start](#quick-start) section above and paste
    it in your terminal window with `Command V`, then press `Enter` to run it.
 
    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd">
@@ -160,7 +160,7 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
   Windows emulator like Parallels Desktop, Wine via Whisky or HyperPlay etc.,
   and then install and run the Windows versions of both the game and BepInEx.
 
-## Known Issues
+## Known issues
 
 - If the shell script to launch BepInEx is named something other than
   `run_bepinex.sh` (e.g. `start_game_bepinex.sh`), gib will not recognise it. I
