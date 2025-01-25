@@ -271,8 +271,8 @@ from Steam:
    text, then `Backspace` or `Delete` to clear the launch options.
 3. Close the window.
 
-At this point, when you launch the game with Steam it will launch completely
-vanilla, with no mods.
+Now, when you launch the game with Steam it will launch completely vanilla, with
+no mods.
 
 #### Removing Steam shortcuts
 
