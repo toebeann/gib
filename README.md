@@ -18,7 +18,7 @@ Supports both Intel-based and Apple Silicon chips.
 
 ## Usage
 
-### TL;DR
+### Quick Start
 
 Just run the following command in Terminal:
 
@@ -108,8 +108,8 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
    <img width="600" alt="Searching for Terminal with macOS Spotlight" src="https://github.com/toebeann/BepInEx.Subnautica/assets/45315526/f374da75-5c74-4b49-99c2-25daa296c504">
 
-1. Copy the command from the [TL;DR](#tldr) section above and paste it in your
-   terminal window with `⌘ V`, then press `Enter` to run it.
+1. Copy the command from the [Quick Start](#quick-start) section above and paste
+   it in your terminal window with `⌘ V`, then press `Enter` to run it.
 
    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd">
 
