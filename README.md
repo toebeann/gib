@@ -201,9 +201,9 @@ In either case, you can temporarily disable mods by following these steps:
 3. Close the window.
 
 Now, when you run the game with Steam, it should run without any mods. If you
-instead get an error when you try to launch the game, it means you messed up
-when you were editing the launch options. Make sure that the `%command% #` comes
-before _any_ other text in the launch options!
+instead get an error when you try to launch the game, it means you made a
+mistake when you were editing the launch options. Make sure that `%command% #`
+comes before _any_ other text in the launch options!
 
 You may want to
 [remove the vanilla shortcut for the game](#removing-steam-shortcuts), if you
