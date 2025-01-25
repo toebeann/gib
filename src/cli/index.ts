@@ -1114,7 +1114,6 @@ export const run = async () => {
   >(
     (resolve) => {
       const watcher = watch(join(gamePath, "BepInEx", "LogOutput.log"), {
-        disableGlobbing: true,
         ignoreInitial: true,
         ignorePermissionErrors: true,
       });
