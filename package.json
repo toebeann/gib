@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "gib",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "A TUI application for automating the installation of BepInEx",
   "license": "ISC",
   "author": "Tobey Blaber",
@@ -77,6 +77,7 @@
     "lodash.camelcase": "^4.3.0",
     "lodash.mapkeys": "^4.6.0",
     "open": "^10.1.0",
+    "path-equal": "^1.2.5",
     "plist": "^3.1.0",
     "protocol-registry": "^1.6.0",
     "readline-sync": "^1.4.10",
