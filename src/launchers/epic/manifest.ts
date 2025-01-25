@@ -157,16 +157,3 @@ export const getManifestByPath = async (path: string) => {
     if (manifest.installLocation === path) return manifest;
   }
 };
-
-/**
- * Gets information about an installed Epic Games Launcher app, parsed from
- * its `${InstallationGuid}.item` manifest file.
- *
- * Resolves `undefined` if a matching manifest cannot be found.
- *
- * @param idOrPath The ArtifactId, AppName or InstallLocation of the app.
- */
-export const getManifest = (idOrPath: string) =>
-  basename(idOrPath) === idOrPath
-    ? getManifestById(idOrPath)
-    : getManifestByPath(idOrPath);
