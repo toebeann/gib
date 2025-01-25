@@ -260,8 +260,9 @@ automate, but it is fairly straightforward:
 > [!NOTE]\
 > Please note that this section only applies to Steam games.
 
-For Steam games, we should first clear the Steam launch options for the game
-which are responsible for injecting BepInEx when we launch the game from Steam:
+To uninstall BepInEx from Steam games, we need to clear the launch options for
+the game which are responsible for injecting BepInEx when we launch the game
+from Steam:
 
 1. Locate the game in your Steam library, then right-click it and choose
    `Properties...`
