@@ -16,6 +16,19 @@ cannot.
 
 Supports both Intel-based and Apple Silicon chips.
 
+## Table of Contents
+
+- [gib](#gib)
+  - [Table of Contents](#table-of-contents)
+  - [Usage](#usage)
+    - [Quick Start](#quick-start)
+    - [Walkthrough](#walkthrough)
+      - [Prerequisites](#prerequisites)
+      - [Running gib](#running-gib)
+  - [Caveats](#caveats)
+  - [Known Issues](#known-issues)
+  - [License](#license)
+
 ## Usage
 
 ### Quick Start
