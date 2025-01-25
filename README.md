@@ -364,6 +364,18 @@ these steps:
 
 ## Caveats
 
+- Steam shortcuts are an experimental feature and may not work with all games -
+  particularly the shortcuts to launch the game vanilla (without mods). For
+  non-Steam games this isn't an issue - you can simply launch the game
+  "normally" (_without_ Steam) and as such we don't offer to create a vanilla
+  shortcut. For Steam games however this can be irksome if we want to
+  occasionally run the game without mods.
+
+  If the vanilla shortcut does not work for one of your Steam games, you are
+  encouraged to [remove the vanilla shortcut](#removing-steam-shortcuts) and
+  follow the guide to
+  [temporarily disable mods for the game](#temporarily-disabling-mods-for-a-game).
+
 - Only native macOS applications are currently supported.
 
   - Support for Windows apps on macOS (e.g. via CrossOver or Wine) is being
