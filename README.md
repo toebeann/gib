@@ -6,15 +6,18 @@ gib _(tobey's Guided Installer for BepInEx)_ is a TUI application for automating
 the installation of [BepInEx](https://github.com/BepInEx/BepInEx), the popular
 modding framework for Unity games.
 
-![Running gib in the Terminal](https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd)
+```sh
+curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash
+```
 
-Currently only macOS is supported, as the process of manual BepInEx installation
-is _exceptionally_ cumbersome on this operating system.
+![Running gib in the Terminal](https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd)
 
 gib aims to automate whatever it can, and hold your hand through whatever it
 cannot.
 
-Supports both Intel-based and Apple Silicon chips.
+Currently only macOS is supported, as the process of manual BepInEx installation
+is _exceptionally_ cumbersome on this operating system. Both Intel-based and
+Apple Silicon processors are supported.
 
 ## Table of contents
 
