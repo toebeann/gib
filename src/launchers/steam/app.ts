@@ -59,9 +59,13 @@ export async function* getApps() {
     });
     for await (const manifestPath of glob) {
       try {
-        const manifest = appManifestSchema.parse(
+        const parser = appManifestSchema.safeParse(
           parse(await readFile(manifestPath, { encoding: "utf-8" })),
         );
+
+        if (!parser.success) continue;
+
+        const { data: manifest } = parser;
 
         yield {
           launcher,
@@ -99,9 +103,13 @@ export const getAppById = async (id: string) => {
     `appmanifest_${id}.acf`,
   );
 
-  const manifest = appManifestSchema.parse(
+  const parser = appManifestSchema.safeParse(
     parse(await readFile(manifestPath, { encoding: "utf-8" })),
   );
+
+  if (!parser.success) return;
+
+  const { data: manifest } = parser;
 
   return {
     launcher,
@@ -144,9 +152,13 @@ export async function* getAppsByPath(path: string) {
     cwd: join(folderPath, "steamapps"),
   });
   for await (const manifestPath of glob) {
-    const manifest = appManifestSchema.parse(
+    const parser = appManifestSchema.safeParse(
       parse(await readFile(manifestPath, "utf8")),
     );
+
+    if (!parser.success) continue;
+
+    const { data: manifest } = parser;
 
     if (basename(resolved) === manifest.appState.installdir) {
       yield {

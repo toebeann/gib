@@ -4,7 +4,6 @@ import { ID } from "@node-steam/id";
 import { parse } from "@node-steam/vdf";
 import { match, P } from "ts-pattern";
 import { z } from "zod";
-import { numericBooleanSchema } from "../../utils/zod.ts";
 import { getLoginUsersPath, getSteamPath } from "./path.ts";
 
 /** Zod schema for working with Steam's `loginusers.vdf` file. */
@@ -22,7 +21,8 @@ export const loginusersSchema = z.object({
       SkipOfflineModeWarning: z.unknown().optional(),
       /** @type {0 | 1 | undefined} */
       AllowAutoLogin: z.unknown().optional(),
-      MostRecent: numericBooleanSchema,
+      /** @type {boolean} */
+      MostRecent: z.coerce.boolean(),
       /** @type {number | undefined} */
       Timestamp: z.unknown().optional(),
     }).passthrough(),
