@@ -34,7 +34,7 @@ Apple Silicon processors are supported. For other limitations, see the
     - [Re-enabling mods after disabling them](#re-enabling-mods-after-disabling-them)
   - [Uninstallation](#uninstallation)
     - [Uninstalling BepInEx](#uninstalling-bepinex)
-      - [Clearing the Steam launch options](#clearing-the-steam-launch-options)
+      - [Clearing Steam launch options](#clearing-steam-launch-options)
       - [Removing Steam shortcuts](#removing-steam-shortcuts)
       - [Removing shortcuts from Applications](#removing-shortcuts-from-applications)
       - [Removing BepInEx from the game folder](#removing-bepinex-from-the-game-folder)
@@ -241,7 +241,7 @@ automate, but it is fairly straightforward:
 
 1. Undo any changes gib made to your Steam library:
    - **Steam games:**
-     [clear the Steam launch options](#clearing-the-steam-launch-options), and
+     [clear the launch options](#clearing-steam-launch-options), and
      [remove the vanilla shortcut added during instalation](#removing-steam-shortcuts),
      if applicable.
    - **Non-Steam games:**
@@ -255,7 +255,7 @@ automate, but it is fairly straightforward:
    probably a good idea since mods can take up a lot of space - and this _isn't_
    taken care of for you when you uninstall the game!
 
-#### Clearing the Steam launch options
+#### Clearing Steam launch options
 
 > [!NOTE]\
 > Please note that this section only applies to Steam games.
