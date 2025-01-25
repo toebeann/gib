@@ -476,7 +476,6 @@ export const run = async () => {
     },
   );
   const gamePath = dirname(gameAppPath);
-  const steamApps = await Array.fromAsync(getAppsByPath(gamePath));
 
   log(
     wrap([
@@ -554,7 +553,8 @@ export const run = async () => {
     }
   };
 
-  const [plist, switchSupported] = await Promise.all([
+  const [steamApps, plist, switchSupported] = await Promise.all([
+    Array.fromAsync(getAppsByPath(gamePath)),
     parsePlistFromFile(
       join(gameAppPath, "Contents", "Info.plist"),
     ),
