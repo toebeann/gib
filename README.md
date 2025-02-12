@@ -39,8 +39,6 @@ Apple Silicon processors are supported. For other limitations, see the
       - [Removing shortcuts from Applications](#removing-shortcuts-from-applications)
       - [Removing BepInEx from the game folder](#removing-bepinex-from-the-game-folder)
     - [Uninstalling gib](#uninstalling-gib)
-      - [Clearing bun's cache](#clearing-buns-cache)
-      - [Removing bun](#removing-bun)
   - [Caveats](#caveats)
   - [Known issues](#known-issues)
   - [License](#license)
@@ -343,46 +341,15 @@ itself (and its dependencies besides bun) takes up ~28 MB of space, and bun
 takes up ~59 MB, making for a total less than ~90 MB, which is pretty negligible
 all things considered.
 
-If you're a web developer you may want to keep bun installed as it's a fantastic
-alternative to Node.js - even if you are targeting Node.js for your work, try
-using `bun i` instead of `npm i` sometime.
-
-If you do want to delete gib for the miniscule space saving, you can choose to
-either [remove bun entirely](#removing-bun-entirely) which will also delete gib
-and all of its dependencies, or you can choose to
-[only clear bun's cache](#clearing-buns-cache) which will delete gib and its
-dependencies (and any other cached packages), but leave bun installed so that
-you can make use of it for development.
-
-#### Clearing bun's cache
-
-Clearing bun's cache will remove gib and all of its dependencies except for bun.
-To do so, follow these steps:
+If you do want to uninstall gib for the miniscule space saving, follow these
+steps:
 
 1. Open Terminal with Spotlight (`Command Space`, type `terminal` and press
    `Enter`).
-2. Enter the following command:
+2. Enter the following commands:
    ```sh
-   bun pm cache rm -g
-   ```
-
-If the above command reports an error, then you can also try deleting the
-contents of the cache manually by entering the following command in Terminal:
-
-```sh
-rm -rf ~/.bun/install/cache
-```
-
-#### Removing bun
-
-To remove bun (which will also remove gib and all its dependencies), follow
-these steps:
-
-1. Open Terminal with Spotlight (`Command Space`, type `terminal` and press
-   `Enter`).
-2. Enter the following command:
-   ```sh
-   rm -rf ~/.bun
+   rm -rf ~/.gib # deletes gib's installation environment
+   rm -rf ~/.bun # if you're a developer and use bun at all, you may wish to skip this one!
    ```
 
 ## Caveats
