@@ -349,6 +349,8 @@ steps:
 2. Enter the following commands:
    ```sh
    rm -rf ~/.gib # deletes the installation environment
+   ```
+   ```sh
    rm -rf ~/.bun # if you are a developer and use bun at all, you may wish to skip this one!
    ```
 
