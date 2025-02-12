@@ -27,47 +27,39 @@
 
 { # this ensures the entire script is downloaded #
 
-    set -e # exit on err
+    set -euo pipefail # exit on err
 
-    echo -ne "\033[K  ⏳ Setting up bun..."
+    gib_version=v0.7.7
+    bun_version=bun-v1.2.2
+    gib_dir=${!GIB_INSTALL:-$HOME/.gib}
+
+    while getopts :v: arg; do
+        case $arg in
+        v) gib_version=$OPTARG ;;
+        esac
+    done
+
+    echo -ne "\033[K  ⏳ Preparing to launch gib..."
+
+    bun_dir=${gib_dir}/env/bun
+    bun=${bun_dir}/bin/bun
 
     # ensure bun is installed
-    if ! command -v bun >/dev/null; then
-        # ensure bun env vars are set
-        if [ -z "$BUN_INSTALL" ]; then
-            export BUN_INSTALL="$HOME/.bun"
-        fi
-
-        curl -fsSL https://bun.sh/install | bash &>/dev/null
-
-        case ":$PATH:" in
-            *":$BUN_INSTALL:"*) ;;
-            *) export PATH="$BUN_INSTALL/bin:$PATH" ;;
-        esac
+    if ! command -v $bun >/dev/null; then
+        (
+            export BUN_INSTALL=$bun_dir
+            export SHELL=""
+            curl -fsSL https://bun.sh/install | bash -s $bun_version &>/dev/null
+        )
 
         # check for bun command and let user know if not found
-        if ! command -v bun >/dev/null; then
+        if ! command -v $bun >/dev/null; then
             echo -e "\r\033[K  ❌ Installing bun failed"
-            echo "Bun not found in PATH!"
-            echo "Please reload your terminal and run this script again."
             exit 1
         fi
     fi
 
-    echo -ne "\r\033[K  ⏳ Preparing to launch gib..."
-
-    if ! bun pm cache rm -g &>/dev/null; then
-        bun i noop -g &>/dev/null
-        bun rm noop -g &>/dev/null
-        bun pm cache rm -g &>/dev/null
-    fi
-
     echo -ne "\r\033[2K"
 
-    package=toebeann/gib
-    if [ -n "${GIB_VERSION}" ]; then
-        package=${package}\#${GIB_VERSION}
-    fi
-
-    bun x --bun ${package}
+    $bun x --bun github:toebeann/gib#${!GIB_VERSION:-$gib_version} -- $@
 } # this ensures the entire script is downloaded #
