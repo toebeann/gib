@@ -31,7 +31,7 @@
 
     gib_version=v0.7.7
     bun_version=bun-v1.2.2
-    gib_dir=${!GIB_INSTALL:-$HOME/.gib}
+    gib_dir=${GIB_INSTALL:-$HOME/.gib}
 
     while getopts :v: arg; do
         case $arg in
