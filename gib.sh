@@ -61,5 +61,5 @@
 
     echo -ne "\r\033[2K"
 
-    $bun x --bun github:toebeann/gib#${!GIB_VERSION:-$gib_version} -- $@
+    $bun x --bun github:toebeann/gib#${GIB_VERSION:-$gib_version} -- $@
 } # this ensures the entire script is downloaded #
