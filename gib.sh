@@ -30,7 +30,7 @@
     set -euo pipefail # exit on err
 
     gib_version=v0.7.15
-    bun_version=bun-v1.2.16
+    bun_version=1.2.16
     gib_dir=${GIB_INSTALL:-$HOME/.gib}
 
     while getopts :v: arg; do
@@ -44,12 +44,12 @@
     bun_dir=${gib_dir}/env/bun
     bun=${bun_dir}/bin/bun
 
-    # ensure bun is installed
-    if ! command -v $bun >/dev/null; then
+    # ensure bun is installed and version is in sync
+    if ! command -v $bun >/dev/null; || [ $( $bun -v ) != $bun_version ] then
         (
             export BUN_INSTALL=$bun_dir
             export SHELL=""
-            curl -fsSL https://bun.sh/install | bash -s $bun_version &>/dev/null
+            curl -fsSL https://bun.sh/install | bash -s bun-v$bun_version &>/dev/null
         )
 
         # check for bun command and let user know if not found
