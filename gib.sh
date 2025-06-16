@@ -29,7 +29,7 @@
 
     set -euo pipefail # exit on err
 
-    gib_version=v0.7.15
+    gib_version=v0.7.17
     bun_version=1.2.16
     gib_dir=${GIB_INSTALL:-$HOME/.gib}
 
@@ -45,7 +45,7 @@
     bun=${bun_dir}/bin/bun
 
     # ensure bun is installed and version is in sync
-    if ! command -v $bun >/dev/null; || [ $( $bun -v ) != $bun_version ] then
+    if ! command -v $bun >/dev/null || [ $( $bun -v ) != $bun_version ]; then
         (
             export BUN_INSTALL=$bun_dir
             export SHELL=""
