@@ -1,5 +1,5 @@
 import { isProxy } from "node:util/types";
-import { isArray, isPlainObject } from "lodash";
+import isPlainObject from "lodash.isplainobject";
 
 export const caseInsensitiveProxy = {
   has(target: object, prop: PropertyKey) {
@@ -23,7 +23,7 @@ export const caseInsensitiveProxy = {
         const toProxy = (x: unknown): unknown =>
           isPlainObject(x) && !isProxy(x)
             ? new Proxy(x as object, caseInsensitiveProxy)
-            : isArray(x)
+            : Array.isArray(x)
             ? x.map((y) => toProxy(y))
             : x;
 
