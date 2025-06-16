@@ -7,7 +7,7 @@ the installation of [BepInEx](https://github.com/BepInEx/BepInEx), the popular
 modding framework for Unity games.
 
 ```sh
-curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib@0.7.17/gib.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash
 ```
 
 ![Running gib in the Terminal](https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd)
@@ -70,7 +70,7 @@ Apple Silicon processors are supported. For other limitations, see the
 Just run the following command in Terminal:
 
 ```sh
-curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib@0.7.17/gib.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash
 ```
 
 This command will make sure that [bun](https://bun.sh/) (a speedy JavaScript
