@@ -1,45 +1,31 @@
 import { access, constants, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { Readable } from "node:stream";
 import { ID } from "@node-steam/id";
-import { readVdf, type VdfMap, writeVdf } from "steam-binary-vdf";
+import { readVdf, writeVdf } from "steam-binary-vdf";
 import { match, P } from "ts-pattern";
-import { z } from "zod";
-import { numericBooleanSchema } from "../../utils/zod.ts";
+import { caseInsensitiveProxy } from "../../utils/proxy.ts";
 import { getMostRecentUser } from "./loginusers.ts";
 import { getSteamPath } from "./path.ts";
 
-/** Zod schema for working with Steam's binary `shortcuts.vdf` files. */
-export const shortcutsSchema = z.object({
-  shortcuts: z.record(
-    z.object({
-      /** @type {number | undefined} */
-      appid: z.unknown().optional(),
-      /** @type {string | undefined} */
-      AppName: z.unknown().optional(),
-      /** @type {string | undefined} */
-      Exe: z.unknown().optional(),
-      /** @type {string | undefined} */
-      StartDir: z.unknown().optional(),
-      /** @type {string | undefined} */
-      icon: z.unknown().optional(),
-      /** @type {string | undefined} */
-      ShortcutPath: z.unknown().optional(),
-      /** @type {string | undefined} */
-      LaunchOptions: z.unknown().optional(),
-      /** @type {0 | 1 | undefined} */
-      IsHidden: z.unknown().optional(),
-      /** @type {0 | 1 | undefined} */
-      AllowDesktopConfig: z.unknown().optional(),
-      /** @type {0 | 1 | undefined} */
-      AllowOverlay: z.unknown().optional(),
-      /** @type {number | undefined} */
-      LastPlayTime: z.unknown().optional(),
-    }).passthrough(),
-  ),
-});
+type numericBoolean = 0 | 1;
 
 /** One of Steam's binary `shortcuts.vdf` files, parsed. */
-export type Shortcuts = z.infer<typeof shortcutsSchema>;
+export type Shortcuts = {
+  shortcuts: Record<string, {
+    appid?: number;
+    AppName?: string;
+    Exe?: string;
+    StartDir?: string;
+    icon?: string;
+    ShortcutPath?: string;
+    LaunchOptions?: string;
+    IsHidden?: numericBoolean;
+    AllowDesktopConfig?: numericBoolean;
+    AllowOverlay?: numericBoolean;
+    LastPlayTime?: number;
+  }>;
+};
 
 /** A Shortcut entry for Steam's binary `shortcuts.vdf` files.s */
 export type Shortcut = Shortcuts["shortcuts"][string];
@@ -138,7 +124,10 @@ export async function getShortcuts(
       .catch(() => false)
   ) return { shortcuts: {} };
 
-  return shortcutsSchema.parse(readVdf(await readFile(shortcutsPath)));
+  return new Proxy(
+    readVdf(await readFile(shortcutsPath)),
+    caseInsensitiveProxy,
+  ) as Shortcuts;
 }
 
 /**

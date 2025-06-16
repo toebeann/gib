@@ -2,53 +2,35 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { ID } from "@node-steam/id";
 import { parse, stringify } from "@node-steam/vdf";
-import { z } from "zod";
+import { caseInsensitiveProxy } from "../../utils/proxy.ts";
 import { getUserConfigFolderPath } from "./loginusers.ts";
 
-/** Zod schema for working with Steam's `localconfig.vdf` files. */
-export const localConfigSchema = z.object({
-  UserLocalConfigStore: z.object({
-    Software: z.object({
-      Valve: z.object({
-        Steam: z.object({
-          apps: z.record(
-            z.object({
-              /** @type {number | undefined} */
-              LastPlayed: z.unknown().optional(),
-              /** @type {number | undefined} */
-              Playtime2wks: z.unknown().optional(),
-              /** @type {number | undefined} */
-              Playtime: z.unknown().optional(),
-              cloud: z.object({
-                /** @type {string | undefined} */
-                last_sync_state: z.unknown().optional(),
-              }).passthrough().or(z.unknown()).optional(),
-              autocloud: z.object({
-                /** @type {number | undefined} */
-                lastlaunch: z.unknown().optional(),
-                /** @type {number | undefined} */
-                lastexit: z.unknown().optional(),
-              }).passthrough().or(z.unknown()).optional(),
-              /** @type {string | number | undefined} */
-              BadgeData: z.unknown().optional(),
-              /** @type {string | number | undefined} */
-              LaunchOptions: z.unknown().optional(),
-            }).passthrough(),
-          ),
-          /** @type {number | undefined} */
-          LastPlayedTimesSyncTime: z.unknown().optional(),
-          /** @type {number | undefined} */
-          PlayerLevel: z.unknown().optional(),
-          /** @type {0 | 1 | undefined} */
-          SmallMode: z.unknown().optional(),
-        }).passthrough(),
-      }).passthrough(),
-    }).passthrough(),
-  }).passthrough(),
-});
-
 /** One of Steam's `localconfig.vdf` files, parsed. */
-export type LocalConfig = z.infer<typeof localConfigSchema>;
+export type LocalConfig = {
+  UserLocalConfigStore: {
+    Software: {
+      Valve: {
+        Steam: {
+          apps: Record<string, {
+            LastPlayed?: number;
+            Playtime2wks?: number;
+            Playtime?: number;
+            cloud?: { last_sync_state?: string };
+            autocloud?: {
+              lastlaunch?: number;
+              lastexit?: number;
+            };
+            BadgeData?: string | number;
+            LaunchOptions?: string | number;
+          }>;
+          LastPlayedTimesSyncTime?: number;
+          PlayerLevel?: number;
+          SmallMode?: 0 | 1;
+        };
+      };
+    };
+  };
+};
 
 /**
  * Gets local config information for the most recent user of Steam on this
@@ -88,11 +70,12 @@ export async function getLocalConfig(userId?: ID | string) {
   const configPath = await getUserConfigFolderPath(userId);
   if (!configPath) return;
 
-  return localConfigSchema.parse(
+  return new Proxy(
     parse(
       await readFile(join(configPath, "localconfig.vdf"), "utf8"),
     ),
-  );
+    caseInsensitiveProxy,
+  ) as LocalConfig;
 }
 
 /**

@@ -3,34 +3,24 @@ import { join } from "node:path";
 import { ID } from "@node-steam/id";
 import { parse } from "@node-steam/vdf";
 import { match, P } from "ts-pattern";
-import { z } from "zod";
+import { caseInsensitiveProxy } from "../../utils/proxy.ts";
 import { getLoginUsersPath, getSteamPath } from "./path.ts";
 
-/** Zod schema for working with Steam's `loginusers.vdf` file. */
-export const loginusersSchema = z.object({
-  users: z.record(
-    z.object({
-      AccountName: z.string(),
-      /** @type {string | undefined} */
-      PersonaName: z.unknown().optional(),
-      /** @type {0 | 1 | undefined} */
-      RememberPassword: z.unknown().optional(),
-      /** @type {0 | 1 | undefined} */
-      WantsOfflineMode: z.unknown().optional(),
-      /** @type {0 | 1 | undefined} */
-      SkipOfflineModeWarning: z.unknown().optional(),
-      /** @type {0 | 1 | undefined} */
-      AllowAutoLogin: z.unknown().optional(),
-      /** @type {boolean} */
-      MostRecent: z.coerce.boolean(),
-      /** @type {number | undefined} */
-      Timestamp: z.unknown().optional(),
-    }).passthrough(),
-  ),
-});
+type numericBoolean = 0 | 1;
 
 /** Steam's `loginusers.vdf` file, parsed. */
-export type LoginUsers = z.infer<typeof loginusersSchema>;
+export type LoginUsers = {
+  users: Record<string, {
+    AccountName: string;
+    PersonaName?: string;
+    RememberPassword?: numericBoolean;
+    WantsOfflineMode?: numericBoolean;
+    SkipOfflineModeWarning?: numericBoolean;
+    AllowAutoLogin?: numericBoolean;
+    MostRecent: numericBoolean;
+    Timestamp?: number;
+  }>;
+};
 
 /**
  * Gets inforation about users who have logged in to Steam on this computer,
@@ -40,7 +30,11 @@ export const getUsers = () =>
   readFile(
     getLoginUsersPath(),
     "utf8",
-  ).then((text) => Object.entries(loginusersSchema.parse(parse(text)).users));
+  ).then((text) =>
+    Object.entries(
+      (new Proxy(parse(text), caseInsensitiveProxy) as LoginUsers).users,
+    )
+  );
 
 /**
  * Retrieves information about the most recent user of Steam on this computer,

@@ -5,9 +5,10 @@ import { parse } from "@node-steam/vdf";
 import open, { openApp } from "open";
 import { match, P } from "ts-pattern";
 import { booleanRace } from "../../utils/booleanRace.ts";
+import { caseInsensitiveProxy } from "../../utils/proxy.ts";
 import type { App as AppBase } from "../app.ts";
 import { getLibraryFolders } from "./libraryfolders.ts";
-import { type AppManifest, appManifestSchema } from "./manifest.ts";
+import type { AppManifest } from "./manifest.ts";
 import { isOpen } from "./process.ts";
 
 const launcher = "steam";
@@ -42,10 +43,20 @@ export enum AppState {
 export type App = AppBase<AppManifest> & { launcher: typeof launcher };
 
 export const hasState = (app: App, state: AppState) =>
-  (app.manifest.appState.stateFlags & state) === state;
+  (app.manifest.AppState.StateFlags & state) === state;
 
 export const isFullyInstalled = (app: App) =>
   hasState(app, AppState.FullyInstalled);
+
+/**
+ * Gets a stored Steam app manifest.
+ */
+export async function getAppManifest(manifestPath: string) {
+  return new Proxy(
+    parse(await readFile(manifestPath, { encoding: "utf-8" })),
+    caseInsensitiveProxy,
+  ) as AppManifest;
+}
 
 /**
  * Gets information about installed Steam apps.
@@ -59,24 +70,18 @@ export async function* getApps() {
     });
     for await (const manifestPath of glob) {
       try {
-        const parser = appManifestSchema.safeParse(
-          parse(await readFile(manifestPath, { encoding: "utf-8" })),
-        );
-
-        if (!parser.success) continue;
-
-        const { data: manifest } = parser;
+        const manifest = await getAppManifest(manifestPath);
 
         yield {
           launcher,
           manifest,
-          id: manifest.appState.appid.toString(),
-          name: manifest.appState.name,
+          id: manifest.AppState.appid.toString(),
+          name: manifest.AppState.name,
           path: join(
             manifestPath,
             "..",
             "common",
-            manifest.appState.installdir,
+            manifest.AppState.installdir,
           ),
         } satisfies App;
       } catch {}
@@ -103,20 +108,14 @@ export const getAppById = async (id: string) => {
     `appmanifest_${id}.acf`,
   );
 
-  const parser = appManifestSchema.safeParse(
-    parse(await readFile(manifestPath, { encoding: "utf-8" })),
-  );
-
-  if (!parser.success) return;
-
-  const { data: manifest } = parser;
+  const manifest = await getAppManifest(manifestPath);
 
   return {
     launcher,
     manifest,
-    id: manifest.appState.appid.toString(),
-    name: manifest.appState.name,
-    path: join(manifestPath, "..", "common", manifest.appState.installdir),
+    id: manifest.AppState.appid.toString(),
+    name: manifest.AppState.name,
+    path: join(manifestPath, "..", "common", manifest.AppState.installdir),
   } satisfies App;
 };
 
@@ -152,21 +151,15 @@ export async function* getAppsByPath(path: string) {
     cwd: join(folderPath, "steamapps"),
   });
   for await (const manifestPath of glob) {
-    const parser = appManifestSchema.safeParse(
-      parse(await readFile(manifestPath, "utf8")),
-    );
+    const manifest = await getAppManifest(manifestPath);
 
-    if (!parser.success) continue;
-
-    const { data: manifest } = parser;
-
-    if (basename(resolved) === manifest.appState.installdir) {
+    if (basename(resolved) === manifest.AppState.installdir) {
       yield {
         launcher,
         manifest,
-        id: manifest.appState.appid.toString(),
-        name: manifest.appState.name,
-        path: join(manifestPath, "..", "common", manifest.appState.installdir),
+        id: manifest.AppState.appid.toString(),
+        name: manifest.AppState.name,
+        path: join(manifestPath, "..", "common", manifest.AppState.installdir),
       } satisfies App;
     }
   }
