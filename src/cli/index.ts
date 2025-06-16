@@ -1135,7 +1135,6 @@ export const run = async () => {
           );
 
       const finish = async () => {
-        // @ts-expect-error
         await watcher.removeAllListeners().close();
         clearTimeout(timeout);
         clearInterval(interval);
@@ -1161,12 +1160,10 @@ export const run = async () => {
       const handleChange = async () => {
         detectedBepInEx = true;
         (await getProcesses()).map(({ pid }) => kill(pid, "SIGKILL"));
-        // @ts-expect-error
         await watcher.removeAllListeners().close();
       };
 
       watcher
-        // @ts-expect-error
         .on("add", handleChange)
         .on("change", handleChange);
     },
