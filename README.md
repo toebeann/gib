@@ -393,9 +393,10 @@ steps:
     the game launches by setting `winhttp` as a DLL override from the `Libraries`
     tab of the game's Wine Configuration, otherwise the game will run without
     BepInEx and thus without mods. Google how to access the Wine Configuration
-    via whatever Wine-based solution you're using, e.g. "access Wine Configuration
-    via CrossOver". You also probably will need to Google "how to install Windows
-    versions of Steam games on mac with CrossOver" or similar to get started.
+    via whatever Wine-based solution you're using if you're unsure how, e.g.
+    "access Wine Configuration via CrossOver". You also probably will need to
+    Google "how to install Windows versions of Steam games on mac with CrossOver"
+    or similar to get started.
 
 ## Known issues
 
