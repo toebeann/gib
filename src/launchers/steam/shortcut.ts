@@ -235,6 +235,6 @@ export async function setShortcuts(shortcuts: Shortcuts, userId?: ID | string) {
   const shortcutsPath = await getPath(userId);
   if (!shortcutsPath) return false;
 
-  await writeFile(shortcutsPath, Readable.from(writeVdf(shortcuts)));
+  await writeFile(shortcutsPath, writeVdf(shortcuts as VdfMap));
   return true;
 }
