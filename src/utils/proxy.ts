@@ -5,9 +5,10 @@ export const caseInsensitiveProxy = {
   has(target: object, prop: PropertyKey) {
     if (typeof prop === "string") {
       return Reflect.ownKeys(target)
-        .filter((key) => typeof key === "string")
-        .map((key) => key.toLowerCase())
-        .includes(prop.toLowerCase());
+        .some((key) =>
+          typeof key === "string" &&
+          key.toLowerCase() === prop.toLowerCase()
+        );
     }
     // @ts-expect-error
     return Reflect.has(...arguments);
