@@ -102,7 +102,7 @@ export const run = async () => {
   function confirmShim(message: string) {
     writeSync(stdout.fd, new TextEncoder().encode(`${message} [y/N] `));
     const result = readlineSync.question();
-    return ["y", "Y"].includes(result);
+    return result.toLowerCase() === "y";
   }
 
   function promptShim(message = "Prompt", defaultValue?: string) {
@@ -493,30 +493,24 @@ export const run = async () => {
     const bepinexScriptContents = await readFile(path, "utf8");
     let output = bepinexScriptContents;
 
-    // check if line endings are CRLF and fix them if needed
-    if (output.includes("\r\n")) {
-      output = output.replaceAll("\r\n", "\n");
-    }
+    // fix CRLF line endings if needed
+    output = output.replaceAll("\r\n", "\n");
 
-    // check if the run_bepinex.sh needs to be configured, and configure it
-    if (output.includes('\nexecutable_name=""')) {
-      output = output.replace(
-        '\nexecutable_name=""',
-        `\nexecutable_name="${executableName}"`,
-      );
-    }
+    // configure run_bepinex.sh
+    output = output.replace(
+      '\nexecutable_name=""',
+      `\nexecutable_name="${executableName}"`,
+    );
 
     // workaround for issue with BepInEx v5.4.23 run_bepinex.sh script not working
     // for some games unless ran from the game folder for some reason
-    if (
-      output.includes("BASEDIR=") &&
-      !output.includes('cd "$BASEDIR"')
-    ) {
-      const index = output.indexOf("\n", output.indexOf("BASEDIR="));
+    const basedirIndex = output.indexOf("BASEDIR=");
+    if (basedirIndex !== -1 && !output.includes('cd "$BASEDIR"')) {
+      const EOLIndex = output.indexOf("\n", basedirIndex);
       output = `${
-        output.slice(0, index)
+        output.slice(0, EOLIndex)
       }\n\n# GIB: workaround for some games only working if script is run from game dir\ncd "$BASEDIR"${
-        output.slice(index)
+        output.slice(EOLIndex)
       }`;
     }
 
