@@ -29,7 +29,7 @@
 
     set -euo pipefail # exit on err
 
-    gib_version=v0.7.19
+    gib_version=v0.7.20
     bun_version=1.2.16
     gib_dir=${GIB_INSTALL:-$HOME/.gib}
 
@@ -44,10 +44,13 @@
     bun_dir=${gib_dir}/env/bun
     bun=${bun_dir}/bin/bun
 
+    # set custom bun install directory for installing and running gib
+    export BUN_INSTALL=$bun_dir
+
     # ensure bun is installed and version is in sync
-    if ! command -v $bun >/dev/null || [ $( $bun -v ) != $bun_version ]; then
+    if ! command -v $bun >/dev/null || [ $($bun -v) != $bun_version ]; then
         (
-            export BUN_INSTALL=$bun_dir
+            # prevent bun install script from setting shell environment variables
             export SHELL=""
             curl -fsSL https://bun.sh/install | bash -s bun-v$bun_version &>/dev/null
         )

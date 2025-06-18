@@ -338,22 +338,15 @@ mods from the game folder:
 > [Uninstalling BepInEx](#uninstalling-bepinex).
 
 As of gib v0.2, gib is installed and executed with [bun](https://bun.sh/). gib
-itself (and its dependencies besides bun) takes up ~28 MB of space, and bun
-takes up ~59 MB, making for a total less than ~90 MB, which is pretty negligible
-all things considered.
+and its dependencies (besides bun) take up ~32 MB of space, and bun takes up
+~64 MB, making for a total less than ~100 MB, which is pretty negligible.
 
-If you do want to uninstall gib for the miniscule space saving, follow these
-steps:
+If you do want to uninstall gib for the miniscule space saving, simply execute
+the following command in Terminal:
 
-1. Open Terminal with Spotlight (`Command Space`, type `terminal` and press
-   `Enter`).
-2. Enter the following commands:
-    ```sh
-    rm -rf ~/.gib # deletes the installation environment
-    ```
-    ```sh
-    rm -rf ~/.bun # if you are a developer and use bun, you may wish to skip this one!
-    ```
+```sh
+rm -rf ~/.gib
+```
 
 ## Caveats
 
