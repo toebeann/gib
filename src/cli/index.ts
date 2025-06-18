@@ -506,11 +506,11 @@ export const run = async () => {
     // for some games unless ran from the game folder for some reason
     const basedirIndex = output.indexOf("BASEDIR=");
     if (basedirIndex !== -1 && !output.includes('cd "$BASEDIR"')) {
-      const EOLIndex = output.indexOf("\n", basedirIndex);
+      const insertIndex = output.indexOf("\n", basedirIndex);
       output = `${
-        output.slice(0, EOLIndex)
-      }\n\n# GIB: workaround for some games only working if script is run from game dir\ncd "$BASEDIR"${
-        output.slice(EOLIndex)
+        output.slice(0, insertIndex)
+      }\ncd "$BASEDIR # GIB: workaround for some games only working if script is run from game dir"${
+        output.slice(insertIndex)
       }`;
     }
 
