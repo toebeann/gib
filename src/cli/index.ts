@@ -370,9 +370,9 @@ export const run = async () => {
       null,
       `Open a Finder window at the game's location, (e.g. by clicking ${
         code("Manage -> Browse local files")
-      } in Steam), find the app (e.g. ${
-        code("Subnautica.app")
-      }) and do the same thing as last time - either:`,
+      } in Steam), find the game's app (e.g. ${code("Subnautica.app")}) or ${
+        code("Contents")
+      } folder and do the same thing as last time - either:`,
       null,
       providePathInstructions,
       null,
@@ -387,11 +387,14 @@ export const run = async () => {
         return false;
       }
 
-      if (extname(path).toLowerCase() !== ".app") {
+      if (
+        extname(path).toLowerCase() !== ".app" &&
+        basename(path) !== "Contents"
+      ) {
         error(
           wrap([
             null,
-            `${err} Invalid app extension:`,
+            `${err} Invalid app path:`,
             chalk.yellow(basename(path)),
             null,
             pleaseSelectAUnityGameAndTryAgain,
@@ -414,7 +417,10 @@ export const run = async () => {
         return false;
       }
 
-      const plist = join(path, "Contents", "Info.plist");
+      const plist = basename(path) === "Contents"
+        ? join(path, "Info.plist")
+        : join(path, "Contents", "Info.plist");
+
       if (!await exists(plist)) {
         error(
           wrap([
@@ -472,10 +478,22 @@ export const run = async () => {
         return false;
       }
 
-      return path;
+      if (basename(path) === "Contents") {
+        return extname(dirname(path)) === ".app"
+          ? dirname(path)
+          : join(plist, "..", "MacOS", CFBundleExecutable);
+      }
+
+      return basename(path) === "Contents"
+        ? extname(dirname(path)) === ".app"
+          ? dirname(path)
+          : join(plist, "..", "MacOS", CFBundleExecutable)
+        : path;
     },
   );
-  const gamePath = dirname(gameAppPath);
+  const gamePath = extname(gameAppPath) === ".app"
+    ? dirname(gameAppPath)
+    : join(gameAppPath, "..", "..", "..");
 
   log(
     wrap([
@@ -488,7 +506,7 @@ export const run = async () => {
 
   const configureBepInExScript = async (
     path: string,
-    executableName: string,
+    executablePath: string,
   ) => {
     const bepinexScriptContents = await readFile(path, "utf8");
     let output = bepinexScriptContents;
@@ -499,7 +517,7 @@ export const run = async () => {
     // configure run_bepinex.sh
     output = output.replace(
       '\nexecutable_name=""',
-      `\nexecutable_name="${executableName}"`,
+      `\nexecutable_name="${relative(dirname(path), executablePath)}"`,
     );
 
     // workaround for issue with BepInEx v5.4.23 run_bepinex.sh script not working
@@ -513,6 +531,15 @@ export const run = async () => {
         output.slice(insertIndex)
       }`;
     }
+
+    // workaround for issue with doorstop 4 where specifying the direct path to
+    // the executable only works for games correctly packaged in a .app folder
+    output = output.replace(
+      String
+        .raw`if ! echo "$real_executable_name" | grep "^.*\.app/Contents/MacOS/.*";`,
+      String
+        .raw`if ! echo "$real_executable_name" | grep "^.*/Contents/MacOS/.*";`,
+    );
 
     // write the changes, if any
     if (output !== bepinexScriptContents) {
@@ -542,7 +569,7 @@ export const run = async () => {
       if (
         basename(path) === "run_bepinex.sh" && dirname(path) === bepinexPath
       ) {
-        await configureBepInExScript(destination, basename(gameAppPath));
+        await configureBepInExScript(destination, gameAppPath);
       }
     }
   };
@@ -550,7 +577,11 @@ export const run = async () => {
   const [steamApps, plist, switchSupported] = await Promise.all([
     Array.fromAsync(getAppsByPath(gamePath)),
     parsePlistFromFile(
-      join(gameAppPath, "Contents", "Info.plist"),
+      join(
+        extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
+        "Contents",
+        "Info.plist",
+      ),
     ),
     (async () => {
       if (
@@ -574,9 +605,11 @@ export const run = async () => {
   const shortcutPath = join(
     homedir(),
     "Applications",
-    `${parse(gameAppPath).name} (${
-      steamApps.length === 0 ? "BepInEx" : "Vanilla"
-    }).app`,
+    `${
+      extname(gameAppPath) === ".app"
+        ? parse(gameAppPath).name
+        : plist.CFBundleName || parse(plist.CFBundleExecutable).name
+    } (${steamApps.length === 0 ? "BepInEx" : "Vanilla"}).app`,
   );
   let shouldAddShortcut: boolean;
 
@@ -763,7 +796,7 @@ export const run = async () => {
                   filename === "run_bepinex.sh" &&
                     configureBepInExScript(
                       resolve(gamePath, filename),
-                      basename(gameAppPath),
+                      gameAppPath,
                     ) || undefined
                 )
             ));
@@ -840,7 +873,12 @@ export const run = async () => {
               if (CFBundleIconFile) {
                 return Promise.all([
                   $`sips -s format png ${
-                    join(gameAppPath, "Contents", "Resources", CFBundleIconFile)
+                    join(
+                      extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
+                      "Contents",
+                      "Resources",
+                      CFBundleIconFile,
+                    )
                   } --out ${
                     join(
                       shortcutPath,
@@ -851,7 +889,7 @@ export const run = async () => {
                   }`.quiet(),
                   copyFile(
                     join(
-                      gameAppPath,
+                      extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
                       "Contents",
                       "Resources",
                       CFBundleIconFile,
@@ -908,10 +946,12 @@ export const run = async () => {
      *
      *   - get current shortcuts, add new shortcut
      */
-    const { CFBundleName, CFBundleIconFile } = plist;
+    const { CFBundleName, CFBundleIconFile, CFBundleExecutable } = plist;
     const gameName = typeof CFBundleName === "string"
       ? CFBundleName
-      : basename(gameAppPath);
+      : extname(gameAppPath) === ".app"
+      ? parse(gameAppPath).name
+      : parse(CFBundleExecutable).name;
     const game = code(gameName);
 
     const steamInstalled = await isInstalled();
@@ -979,7 +1019,11 @@ export const run = async () => {
     const shortcutPath = join(
       homedir(),
       "Applications",
-      `${parse(gameAppPath).name} (BepInEx).app`,
+      `${
+        extname(gameAppPath) === ".app"
+          ? parse(gameAppPath).name
+          : CFBundleName || parse(CFBundleExecutable).name
+      } (BepInEx).app`,
     );
 
     operations.push(
@@ -1046,12 +1090,22 @@ export const run = async () => {
               await Promise.all([
                 shouldAddShortcut &&
                 $`sips -s format png ${
-                  join(gameAppPath, "Contents", "Resources", CFBundleIconFile)
+                  join(
+                    extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
+                    "Contents",
+                    "Resources",
+                    CFBundleIconFile,
+                  )
                 } --out ${
                   join(shortcutPath, "Contents", "Resources", "PlayerIcon.png")
                 }`.quiet(),
                 copyFile(
-                  join(gameAppPath, "Contents", "Resources", CFBundleIconFile),
+                  join(
+                    extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
+                    "Contents",
+                    "Resources",
+                    CFBundleIconFile,
+                  ),
                   join(
                     shortcutPath,
                     "Contents",
@@ -1230,13 +1284,7 @@ export const run = async () => {
                 [
                   "We also added a shortcut to Steam to launch the game with",
                   "BepInEx. You can find it in your Steam library named",
-                  code(
-                    `${
-                      typeof plist.CFBundleName === "string"
-                        ? plist.CFBundleName
-                        : basename(gameAppPath)
-                    } (BepInEx)`,
-                  ),
+                  code(parse(shortcutPath).name),
                 ].join(" "),
                 null,
               ]

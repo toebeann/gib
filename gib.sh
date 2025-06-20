@@ -29,7 +29,7 @@
 
     set -euo pipefail # exit on err
 
-    gib_version=v0.7.21
+    gib_version=v0.7.22
     bun_version=1.2.16
     gib_dir=${GIB_INSTALL:-$HOME/.gib}
 
