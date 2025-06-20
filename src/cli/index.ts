@@ -509,7 +509,7 @@ export const run = async () => {
       const insertIndex = output.indexOf("\n", basedirIndex);
       output = `${
         output.slice(0, insertIndex)
-      }\ncd "$BASEDIR # GIB: workaround for some games only working if script is run from game dir"${
+      }\ncd "$BASEDIR" # GIB: workaround for some games only working if script is run from game dir${
         output.slice(insertIndex)
       }`;
     }
