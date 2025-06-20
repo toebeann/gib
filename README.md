@@ -153,13 +153,13 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 1.  Open Terminal from Launchpad or Spotlight (press `Command Space`, type
     `terminal` and press `Enter`).
-
-        <img width="600" alt="Searching for Terminal with macOS Spotlight" src="https://github.com/toebeann/BepInEx.Subnautica/assets/45315526/f374da75-5c74-4b49-99c2-25daa296c504">
+   
+    <img width="600" alt="Searching for Terminal with macOS Spotlight" src="https://github.com/toebeann/BepInEx.Subnautica/assets/45315526/f374da75-5c74-4b49-99c2-25daa296c504">
 
 2.  Copy the command from the [Quick start](#quick-start) section above and paste
     it in your terminal window with `Command V`, then press `Enter` to run it.
-
-        <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd">
+    
+    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd">
 
 3.  Now, simply follow the instructions in the terminal to install BepInEx to
     your game!
