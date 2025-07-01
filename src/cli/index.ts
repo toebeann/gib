@@ -278,7 +278,7 @@ export const run = async () => {
 
   const providePathInstructions = list([
     "Drag it into this window, or",
-    `Select it and press ${copyPath} to copy the path to the script file, then press ${paste} to paste it here.`,
+    `Select it and press ${copyPath} to copy its path, then press ${paste} to paste the path here.`,
   ], false);
 
   const bepinexPath = dirname(
