@@ -1,6 +1,5 @@
 import { access, constants, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { Readable } from "node:stream";
 import { ID } from "@node-steam/id";
 import { readVdf, writeVdf } from "steam-binary-vdf";
 import { match, P } from "ts-pattern";
