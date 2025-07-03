@@ -541,6 +541,26 @@ export const run = async () => {
         .raw`if ! echo "$real_executable_name" | grep "^.*/Contents/MacOS/.*";`,
     );
 
+    // workaround for issue with codesigned apps preventing doorstop injection
+    if (!output.includes("codesign --remove-signature")) {
+      const lines = output.split("\n");
+      const runExecutablePath = lines.findLastIndex((line) =>
+        line.includes("executable_path")
+      );
+      const emptyLineIndex = lines.lastIndexOf("", runExecutablePath);
+      output = lines
+        .toSpliced(
+          emptyLineIndex,
+          0,
+          "",
+          "# gib: workaround to ensure game is not codesigned so that doorstop can inject BepInEx",
+          'app_path="${executable_path%/Contents/MacOS*}"',
+          'if command -v codesign &>/dev/null && codesign -d "$app_path"; then',
+          '    codesign --remove-signature "$app_path"',
+          "fi",
+        ).join("\n");
+    }
+
     // write the changes, if any
     if (output !== bepinexScriptContents) {
       await writeFile(path, output, "utf8");
