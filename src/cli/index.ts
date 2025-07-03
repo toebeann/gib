@@ -692,6 +692,7 @@ export const run = async () => {
       ),
     );
 
+    log();
     log(
       wrap(
         chalk.bold(`gib will now perform the following operations:${EOL}`),
