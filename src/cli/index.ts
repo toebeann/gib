@@ -1277,7 +1277,7 @@ export const run = async () => {
               ? [
                 null,
                 [
-                  "We also added a Steam shortut to launch the vanilla game.",
+                  "We also added a Steam shortcut to launch the vanilla game.",
                   "You can find it in your Steam library named",
                   code(`${steamApp.name} (Vanilla)`),
                 ].join(" "),
