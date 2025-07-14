@@ -478,12 +478,6 @@ export const run = async () => {
         return false;
       }
 
-      if (basename(path) === "Contents") {
-        return extname(dirname(path)) === ".app"
-          ? dirname(path)
-          : join(plist, "..", "MacOS", CFBundleExecutable);
-      }
-
       return basename(path) === "Contents"
         ? extname(dirname(path)) === ".app"
           ? dirname(path)
