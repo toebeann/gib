@@ -16,7 +16,6 @@ const wrap = (
 ) => wrapAnsi(str, columns, options);
 
 export const createLogo = async () => {
-  // const { version } = packageMetadata;
   const outputLines: string[] = [];
 
   outputLines.push(
