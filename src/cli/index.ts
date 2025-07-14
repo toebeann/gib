@@ -574,10 +574,10 @@ export const run = async () => {
     // workaround for issue with codesigned apps preventing doorstop injection
     if (!output.includes("codesign --remove-signature")) {
       const lines = output.split("\n");
-      const runExecutablePath = lines.findLastIndex((line) =>
+      const runExecutablePathIndex = lines.findLastIndex((line) =>
         line.includes("executable_path")
       );
-      const emptyLineIndex = lines.lastIndexOf("", runExecutablePath);
+      const emptyLineIndex = lines.lastIndexOf("", runExecutablePathIndex);
       output = lines
         .toSpliced(
           emptyLineIndex,
