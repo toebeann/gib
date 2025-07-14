@@ -541,6 +541,36 @@ export const run = async () => {
         .raw`if ! echo "$real_executable_name" | grep "^.*/Contents/MacOS/.*";`,
     );
 
+    // workaround to ensure the game's Content folder is packaged in an .app folder
+    if (!output.includes("mkdir -p")) {
+      const lines = output.split("\n");
+      const runExecutablePathIndex = lines.findLastIndex((line) =>
+        line.includes("executable_path")
+      );
+      const codesignIndex = lines.findLastIndex(
+        (line) => line.includes("codesign"),
+        runExecutablePathIndex,
+      );
+      const emptyLineIndex = lines.lastIndexOf(
+        "",
+        codesignIndex !== -1 ? codesignIndex : runExecutablePathIndex,
+      );
+      output = lines.toSpliced(
+        emptyLineIndex,
+        0,
+        "",
+        "# gib: workaround to ensure game content is packaged in an .app folder",
+        'app_path="${executable_path%/Contents/MacOS*}"',
+        'if [[ $(basename "$app_path") != *.app ]]; then',
+        '    real_executable_name=$(basename "$executable_path")',
+        '    executable_path="${app_path}/${real_executable_name}.app/Contents/MacOS/${real_executable_name}"',
+        '    target_path="${app_path}/${real_executable_name}.app/Contents"',
+        '    mkdir -p "$target_path"',
+        '    cp -ca "${app_path}/Contents/" "${target_path}/"',
+        "fi",
+      ).join("\n");
+    }
+
     // workaround for issue with codesigned apps preventing doorstop injection
     if (!output.includes("codesign --remove-signature")) {
       const lines = output.split("\n");
