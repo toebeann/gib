@@ -51,7 +51,7 @@
     "@types/lodash.camelcase": "^4.3.9",
     "@types/lodash.isplainobject": "^4.0.9",
     "@types/lodash.mapkeys": "^4.6.9",
-    "@types/node": "^22.16.0",
+    "@types/node": "^22.16.3",
     "@types/plist": "^3.0.5",
     "@types/readline-sync": "^1.4.8",
     "@types/shell-quote": "^1.7.5",
@@ -69,8 +69,8 @@
     "chalk": "^5.4.1",
     "chokidar": "^4.0.3",
     "cli-width": "^4.1.0",
-    "figlet": "^1.8.1",
-    "find-process": "^1.4.10",
+    "figlet": "^1.8.2",
+    "find-process": "^1.4.11",
     "fs-extra": "^11.3.0",
     "glob": "^11.0.3",
     "gradient-string": "^3.0.0",
@@ -90,6 +90,6 @@
     "ts-pattern": "^5.7.1",
     "unquote": "^1.1.1",
     "wrap-ansi": "^9.0.0",
-    "zod": "^3.25.70"
+    "zod": "^3.25.76"
   }
 }
