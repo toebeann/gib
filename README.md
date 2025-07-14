@@ -6,6 +6,7 @@ gib _(tobey's Guided Installer for BepInEx)_ is a TUI application for automating
 the installation of [BepInEx](https://github.com/BepInEx/BepInEx), the popular
 modding framework for Unity games.
 
+To get started, just run the following command in Terminal:
 ```sh
 curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash
 ```
