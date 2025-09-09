@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "gib",
-  "version": "0.7.26",
+  "version": "0.7.27",
   "description": "A TUI application for automating the installation of BepInEx",
   "license": "ISC",
   "author": "Tobey Blaber",
