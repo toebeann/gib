@@ -88,9 +88,10 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 > [!TIP]\
 > If you run into any unexpected issues while following these instructions or
-> need further assistance, please feel free to send a DM on discord to `toebean`
-> (that's me) explaining the issue and I'll reply when I remember to check my
-> message requests.
+> need further assistance, please feel free to
+> [open an issue](https://github.com/toebeann/gib/issues/new/choose) describing
+> what happened, ideally providing the output from running gib, and I'll help
+> when I can.
 
 > [!NOTE]\
 > These usage instructions were written for macOS Sonoma. The instructions below
@@ -170,9 +171,10 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 > [!TIP]\
 > If you ran into any unexpected issues while following these instructions or
-> need further assistance, please feel free to send a DM on discord to `toebean`
-> (that's me) explaining the issue and I'll reply when I remember to check my
-> message requests.
+> need further assistance, please feel free to
+> [open an issue](https://github.com/toebeann/gib/issues/new/choose) describing
+> what happened, ideally providing the output from running gib, and I'll help
+> when I can.
 
 ## Temporarily disabling mods for a game
 
