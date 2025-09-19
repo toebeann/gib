@@ -94,9 +94,9 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 > when I can.
 
 > [!NOTE]\
-> These usage instructions were written for macOS Sonoma. The instructions below
-> should work for other versions of macOS, but there may be some slight
-> differences.
+> These usage instructions were originally written with macOS Sonoma in mind.
+> The instructions below should work for other versions of macOS, but there
+> may be some slight differences.
 
 #### Prerequisites
 
