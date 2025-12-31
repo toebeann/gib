@@ -30,7 +30,7 @@
     set -euo pipefail # exit on err
 
     gib_version=v0.7.27
-    bun_version=1.2.21
+    bun_version=1.3.5
     gib_dir=${GIB_INSTALL:-$HOME/.gib}
 
     while getopts :v: arg; do
