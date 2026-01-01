@@ -45,6 +45,7 @@ import {
   access,
   chmod,
   copyFile,
+  mkdir,
   readFile,
   stat,
   writeFile,
@@ -66,7 +67,6 @@ import chalk from "chalk";
 import { watch } from "chokidar";
 import cliWidth from "cli-width";
 import findProcess from "find-process";
-import { ensureDir } from "fs-extra";
 import JSZip from "jszip";
 import open from "open";
 import { build as buildPlist } from "plist";
@@ -607,7 +607,7 @@ export const run = async () => {
       if (basename(path) === ".DS_Store") continue;
 
       const destination = join(gamePath, path.split(sep).slice(i).join(sep));
-      await ensureDir(dirname(destination));
+      await mkdir(dirname(destination), { recursive: true });
       await copyFile(path, destination);
 
       if (
@@ -894,11 +894,14 @@ export const run = async () => {
         }),
       shouldAddShortcut
         ? Promise.all([
-          ensureDir(join(
-            shortcutPath,
-            "Contents",
-            "MacOS",
-          ))
+          mkdir(
+            join(
+              shortcutPath,
+              "Contents",
+              "MacOS",
+            ),
+            { recursive: true },
+          )
             .then(() =>
               writeFile(
                 join(
@@ -918,7 +921,9 @@ export const run = async () => {
                 { encoding: "utf8", mode: 0o764 },
               )
             ),
-          ensureDir(join(shortcutPath, "Contents", "Resources"))
+          mkdir(join(shortcutPath, "Contents", "Resources"), {
+            recursive: true,
+          })
             .then(() => {
               const { CFBundleIconFile, CFBundleName } = plist;
               if (CFBundleIconFile) {
@@ -1113,11 +1118,14 @@ export const run = async () => {
           })
         : Promise.resolve(),
       Promise.all([
-        ensureDir(join(
-          shortcutPath,
-          "Contents",
-          "MacOS",
-        ))
+        mkdir(
+          join(
+            shortcutPath,
+            "Contents",
+            "MacOS",
+          ),
+          { recursive: true },
+        )
           .then(() =>
             writeFile(
               join(
@@ -1140,10 +1148,12 @@ export const run = async () => {
               { encoding: "utf8", mode: 0o764 },
             )
           ),
-        ensureDir(join(shortcutPath, "Contents", "Resources"))
+        mkdir(join(shortcutPath, "Contents", "Resources"), { recursive: true })
           .then(async () => {
             if (CFBundleIconFile) {
-              await ensureDir(join(shortcutPath, "Contents", "Resources"));
+              await mkdir(join(shortcutPath, "Contents", "Resources"), {
+                recursive: true,
+              });
               await Promise.all([
                 shouldAddShortcut &&
                 $`sips -s format png ${
