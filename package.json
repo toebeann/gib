@@ -69,7 +69,6 @@
     "cli-width": "^4.1.0",
     "figlet": "^1.9.4",
     "find-process": "^2.0.0",
-    "glob": "^11.1.0",
     "gradient-string": "^3.0.0",
     "jszip": "^3.10.1",
     "lodash.camelcase": "^4.3.0",

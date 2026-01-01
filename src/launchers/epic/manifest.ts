@@ -1,7 +1,10 @@
-import { basename, join } from "node:path";
+import { Glob } from "bun";
+
+import { join } from "node:path";
 import { readFile } from "node:fs/promises";
-import { Glob } from "glob";
+
 import { z } from "zod";
+
 import { toCamelCaseKeys } from "../../utils/zod.ts";
 import { getAppDataPath } from "./path.ts";
 import type { launcherInstalledSchema } from "./launcherInstalled.ts";
@@ -116,12 +119,14 @@ export type AppManifest =
  * computer, parsed from its `${InstallationGuid}.item` manifest files.
  */
 export async function* getManifests() {
-  const glob = new Glob("*.item", {
-    absolute: true,
-    nodir: true,
-    cwd: join(getAppDataPath(), "Manifests"),
-  });
-  for await (const path of glob) {
+  const glob = new Glob("*.item");
+  for await (
+    const path of glob.scan({
+      absolute: true,
+      onlyFiles: true,
+      cwd: join(getAppDataPath(), "Manifests"),
+    })
+  ) {
     yield appManifestSchema.parse(
       JSON.parse(
         await readFile(path, "utf8"),
