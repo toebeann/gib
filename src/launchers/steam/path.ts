@@ -1,4 +1,5 @@
-import { match } from "ts-pattern";
+import { platform } from "node:os" with { type: "macro" };
+
 import {
   getLibraryFoldersPath as getLibraryFoldersPathMac,
   getLoginUsersPath as getLoginUsersPathMac,
@@ -6,19 +7,19 @@ import {
 } from "./macos/path.ts";
 
 /** Retrieves the path to the Steam installation. */
-export const getSteamPath = match(process.platform)
-  .returnType<() => string>()
-  .with("darwin", () => getSteamPathMac)
-  .otherwise(() => () => "");
+export const getSteamPath = () => {
+  if (platform() === "darwin") return getSteamPathMac();
+  return "";
+};
 
 /** Retrieves the path to Steam's `libraryfolders.vdf` file. */
-export const getLibraryFoldersPath = match(process.platform)
-  .returnType<() => string>()
-  .with("darwin", () => getLibraryFoldersPathMac)
-  .otherwise(() => () => "");
+export const getLibraryFoldersPath = () => {
+  if (platform() === "darwin") return getLibraryFoldersPathMac();
+  return "";
+};
 
 /** Retrieves the path to Steam's `loginusers`.vdf` file. */
-export const getLoginUsersPath = match(process.platform)
-  .returnType<() => string>()
-  .with("darwin", () => getLoginUsersPathMac)
-  .otherwise(() => () => "");
+export const getLoginUsersPath = () => {
+  if (platform() === "darwin") return getLoginUsersPathMac();
+  return "";
+};

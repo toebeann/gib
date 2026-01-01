@@ -82,7 +82,6 @@
     "slashes": "^3.0.12",
     "steam-binary-vdf": "^0.1.0",
     "terminal-link": "^5.0.0",
-    "ts-pattern": "^5.9.0",
     "unquote": "^1.1.1",
     "wrap-ansi": "^9.0.2",
     "zod": "^3.25.76"

@@ -5,7 +5,6 @@ import { basename, join, resolve } from "node:path";
 
 import { parse } from "@node-steam/vdf";
 import open, { openApp } from "open";
-import { match, P } from "ts-pattern";
 
 import { booleanRace } from "../../utils/booleanRace.ts";
 import { caseInsensitiveProxy } from "../../utils/proxy.ts";
@@ -194,11 +193,7 @@ export function launch(id: string): Promise<void>;
 export function launch(app: App | string): Promise<void>;
 
 export async function launch(app: App | string) {
-  const id = await match(app)
-    .returnType<string | Promise<string | undefined>>()
-    .with(P.string, (id) => id)
-    .otherwise((app) => app.id);
-
+  const id = typeof app === "string" ? app : app.id;
   if (!id) return;
 
   if (await isOpen()) {

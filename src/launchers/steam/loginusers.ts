@@ -1,8 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+
 import { ID } from "@node-steam/id";
 import { parse } from "@node-steam/vdf";
-import { match, P } from "ts-pattern";
+
 import { caseInsensitiveProxy } from "../../utils/proxy.ts";
 import { getLoginUsersPath, getSteamPath } from "./path.ts";
 
@@ -88,16 +89,14 @@ export function getUserConfigFolderPath(
 ): Promise<string | undefined>;
 
 export async function getUserConfigFolderPath(userId?: ID | string) {
-  const { accountid } = await match(userId)
-    .returnType<Promise<ID | undefined>>()
-    .with(P.instanceOf(ID), (id) => Promise.resolve(id))
-    .with(P.string, (id) => Promise.resolve(new ID(id)))
-    .otherwise(() =>
-      getMostRecentUser()
-        .then((user) => user?.[0] && new ID(user?.[0]) || undefined)
-    )
-    .then((id) => id || { accountid: undefined });
-
+  const { accountid } = userId instanceof ID
+    ? userId
+    : typeof userId === "string"
+    ? new ID(userId)
+    : await getMostRecentUser()
+      .then((user) =>
+        user?.[0] && new ID(user?.[0]) || { accountid: undefined }
+      );
   if (!accountid) return;
 
   return join(

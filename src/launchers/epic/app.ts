@@ -1,6 +1,7 @@
 import { basename } from "node:path";
+
 import open from "open";
-import { match, P } from "ts-pattern";
+
 import type { App as AppBase } from "../app.ts";
 import { getLauncherInstalled } from "./launcherInstalled.ts";
 import {
@@ -66,45 +67,44 @@ export async function* getApps() {
  *
  * @param id The ArtifactId or AppName of the app.
  */
-export const getAppById = async (id: string) =>
-  match(
-    await Promise.all([
-      getLauncherInstalled()
-        .then((apps) =>
-          apps.find((app) => [app.artifactId, app.appName].includes(id))
-        ),
-      getManifestById(id),
-    ]),
-  )
-    .returnType<App | undefined>()
-    .with([P.not(P.nullish), P.not(P.nullish)], ([info, _manifest]) => {
-      const manifest = { ...info, ..._manifest };
-      const {
-        displayName: name,
-        installLocation: path,
-        namespaceId,
-        catalogNamespace,
-        itemId,
-        catalogItemId,
-        artifactId,
-        appName,
-      } = manifest;
-      const id = typeof artifactId === "string" ? artifactId : appName;
-      const launchId = [
-        typeof namespaceId === "string" ? namespaceId : catalogNamespace,
-        typeof itemId === "string" ? itemId : catalogItemId,
-        id,
-      ].filter(Boolean).join(":");
-      return {
-        launcher,
-        manifest,
-        id,
-        name,
-        path,
-        launchId,
-      } satisfies App;
-    })
-    .otherwise(() => undefined);
+export const getAppById = async (id: string) => {
+  const [info, appManifest] = await Promise.all([
+    getLauncherInstalled()
+      .then((apps) =>
+        apps.find((app) => [app.artifactId, app.appName].includes(id))
+      ),
+    getManifestById(id),
+  ]);
+  if (!info || !appManifest) return;
+
+  const manifest = { ...info, ...appManifest };
+  const {
+    displayName: name,
+    installLocation: path,
+    namespaceId,
+    catalogNamespace,
+    itemId,
+    catalogItemId,
+    artifactId,
+    appName,
+  } = manifest;
+
+  const bestId = typeof artifactId === "string" ? artifactId : appName;
+  const launchId = [
+    typeof namespaceId === "string" ? namespaceId : catalogNamespace,
+    typeof itemId === "string" ? itemId : catalogItemId,
+    bestId,
+  ].filter(Boolean).join(":");
+
+  return {
+    launcher,
+    manifest,
+    id: bestId,
+    name,
+    path,
+    launchId,
+  } satisfies App;
+};
 
 /**
  * Gets information about an installed Epic Games Launcher app.
@@ -113,43 +113,42 @@ export const getAppById = async (id: string) =>
  *
  * @param path The InstallLocation of the app.
  */
-export const getAppByPath = async (path: string) =>
-  match(
-    await Promise.all([
-      getLauncherInstalled()
-        .then((apps) => apps.find((app) => app.installLocation === path)),
-      getManifestByPath(path),
-    ]),
-  )
-    .returnType<App | undefined>()
-    .with([P.not(P.nullish), P.not(P.nullish)], ([info, _manifest]) => {
-      const manifest = { ...info, ..._manifest };
-      const {
-        displayName: name,
-        installLocation: path,
-        namespaceId,
-        catalogNamespace,
-        itemId,
-        catalogItemId,
-        artifactId,
-        appName,
-      } = manifest;
-      const id = typeof artifactId === "string" ? artifactId : appName;
-      const launchId = [
-        typeof namespaceId === "string" ? namespaceId : catalogNamespace,
-        typeof itemId === "string" ? itemId : catalogItemId,
-        id,
-      ].filter(Boolean).join(":");
-      return {
-        launcher,
-        manifest,
-        id,
-        name,
-        path,
-        launchId,
-      } satisfies App;
-    })
-    .otherwise(() => undefined);
+export const getAppByPath = async (path: string) => {
+  const [info, appManifest] = await Promise.all([
+    getLauncherInstalled()
+      .then((apps) => apps.find((app) => app.installLocation === path)),
+    getManifestByPath(path),
+  ]);
+  if (!info || !appManifest) return;
+
+  const manifest = { ...info, ...appManifest };
+  const {
+    displayName: name,
+    installLocation,
+    namespaceId,
+    catalogNamespace,
+    itemId,
+    catalogItemId,
+    artifactId,
+    appName,
+  } = manifest;
+
+  const id = typeof artifactId === "string" ? artifactId : appName;
+  const launchId = [
+    typeof namespaceId === "string" ? namespaceId : catalogNamespace,
+    typeof itemId === "string" ? itemId : catalogItemId,
+    id,
+  ].filter(Boolean).join(":");
+
+  return {
+    launcher,
+    manifest,
+    id,
+    name,
+    path: installLocation,
+    launchId,
+  } satisfies App;
+};
 
 /**
  * Launches an Epic Games Launcher app.
@@ -173,16 +172,11 @@ export function launch(app: string): Promise<void>;
 export function launch(app: App | string): Promise<void>;
 
 export async function launch(app: App | string): Promise<void> {
-  const launchId = await match(app)
-    .returnType<string | Promise<string | undefined>>()
-    .with(
-      P.string,
-      (idOrPath) => basename(idOrPath) === idOrPath,
-      async (id) => (await getAppById(id))?.launchId,
-    )
-    .with(P.string, (path) => path)
-    .otherwise((app) => app.launchId);
-
+  const launchId = typeof app !== "string"
+    ? app.launchId
+    : basename(app) === app
+    ? (await getAppById(app))?.launchId
+    : app;
   if (!launchId) return;
 
   await open(

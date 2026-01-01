@@ -1,6 +1,6 @@
 import { ID } from "@node-steam/id";
 import { addSlashes, removeSlashes } from "slashes";
-import { match, P } from "ts-pattern";
+
 import { type App, getAppById } from "./app.ts";
 import { getLocalConfig, setLocalConfig } from "./localconfig.ts";
 import { quit } from "./process.ts";
@@ -117,10 +117,7 @@ export async function getLaunchOptions(
   app: App | string,
   userId?: ID | string,
 ) {
-  const resolved = await match(app)
-    .returnType<App | Promise<App | undefined>>()
-    .with(P.string, (id) => getAppById(id))
-    .otherwise((app) => app);
+  const resolved = typeof app === "string" ? await getAppById(app) : app;
   if (!resolved) return;
 
   const config = await getLocalConfig(userId);
@@ -131,16 +128,12 @@ export async function getLaunchOptions(
   } = config;
   if (!apps) return;
 
-  const launchOptions = match(
-    Object.entries(apps).find(([id]) => resolved.id === id)?.[1]
-      ?.LaunchOptions,
-  )
-    .returnType<string | undefined>()
-    .with(P.number, (n) => n.toString())
-    .with(P.string, (s) => s)
-    .otherwise(() => undefined);
+  const launchOptions = Object.entries(apps).find(([id]) => resolved.id === id)
+    ?.[1]
+    ?.LaunchOptions;
+  if (!launchOptions) return;
 
-  return launchOptions && removeSlashes(launchOptions) || undefined;
+  return removeSlashes(launchOptions.toString());
 }
 
 /**
@@ -250,10 +243,7 @@ export async function setLaunchOptions(
   launchOptions: string,
   userId?: ID | string,
 ) {
-  const resolved = await match(app)
-    .returnType<App | Promise<App | undefined>>()
-    .with(P.string, (id) => getAppById(id))
-    .otherwise((app) => app);
+  const resolved = typeof app === "string" ? await getAppById(app) : app;
   if (!resolved) return false;
 
   const config = await getLocalConfig(userId);

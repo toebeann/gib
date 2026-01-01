@@ -1,8 +1,9 @@
 import { access, constants, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+
 import { ID } from "@node-steam/id";
-import { readVdf, writeVdf } from "steam-binary-vdf";
-import { match, P } from "ts-pattern";
+import { readVdf, writeVdf, type VdfMap } from "steam-binary-vdf";
+
 import { caseInsensitiveProxy } from "../../utils/proxy.ts";
 import { getMostRecentUser } from "./loginusers.ts";
 import { getSteamPath } from "./path.ts";
@@ -63,16 +64,14 @@ export function getPath(
 ): Promise<string | undefined>;
 
 export async function getPath(userId?: ID | string) {
-  const { accountid } = await match(userId)
-    .returnType<Promise<ID | undefined>>()
-    .with(P.instanceOf(ID), (id) => Promise.resolve(id))
-    .with(P.string, (id) => Promise.resolve(new ID(id)))
-    .otherwise(() =>
-      getMostRecentUser()
-        .then((user) => user?.[0] && new ID(user?.[0]) || undefined)
-    )
-    .then((id) => id || { accountid: undefined });
-
+  const { accountid } = userId instanceof ID
+    ? userId
+    : typeof userId === "string"
+    ? new ID(userId)
+    : await getMostRecentUser()
+      .then((user) =>
+        user?.[0] && new ID(user?.[0]) || { accountid: undefined }
+      );
   if (!accountid) return;
 
   return join(
