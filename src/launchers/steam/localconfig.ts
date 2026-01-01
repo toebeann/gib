@@ -1,7 +1,9 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+
 import type { ID } from "@node-steam/id";
 import { parse, stringify } from "@node-steam/vdf";
+
 import { caseInsensitiveProxy } from "../../utils/proxy.ts";
 import { getUserConfigFolderPath } from "./loginusers.ts";
 

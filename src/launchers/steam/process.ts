@@ -1,8 +1,10 @@
 import { isAbsolute, relative } from "node:path";
 import { kill as _kill } from "node:process";
+
 import { waitUntil } from "async-wait-until";
 import findProcess from "find-process";
 import open from "open";
+
 import { getSteamPath } from "./path.ts";
 
 /** Get running Steam processes, if any. */

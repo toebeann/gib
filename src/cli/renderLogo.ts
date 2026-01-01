@@ -1,4 +1,5 @@
 import { env } from "node:process";
+
 import boxen from "boxen";
 import center from "center-align";
 import chalk from "chalk";
@@ -6,6 +7,7 @@ import cliWidth from "cli-width";
 import figlet from "figlet";
 import gradientString from "gradient-string";
 import wrapAnsi from "wrap-ansi";
+
 import { version } from "../../package.json" with { type: "json" };
 
 const width = () => cliWidth({ defaultWidth: 80 });

@@ -1,7 +1,10 @@
 import { readFile } from "node:fs/promises";
-import { toCamelCaseKeys } from "../../utils/zod.ts";
-import { z } from "zod";
+
 import { join } from "node:path";
+
+import { z } from "zod";
+
+import { toCamelCaseKeys } from "../../utils/zod.ts";
 import { getAppDataPath } from "./path.ts";
 
 /**

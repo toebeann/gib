@@ -1,5 +1,7 @@
 import { readFile } from "node:fs/promises";
+
 import { parse } from "@node-steam/vdf";
+
 import { caseInsensitiveProxy } from "../../utils/proxy.ts";
 import { getLibraryFoldersPath } from "./path.ts";
 
