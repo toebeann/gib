@@ -1,4 +1,4 @@
-import { platform } from "node:os" with { type: "macro" };
+import { platform } from "node:process";
 
 import {
   getLibraryFoldersPath as getLibraryFoldersPathMac,
@@ -8,18 +8,18 @@ import {
 
 /** Retrieves the path to the Steam installation. */
 export const getSteamPath = () => {
-  if (platform() === "darwin") return getSteamPathMac();
+  if (platform === "darwin") return getSteamPathMac();
   return "";
 };
 
 /** Retrieves the path to Steam's `libraryfolders.vdf` file. */
 export const getLibraryFoldersPath = () => {
-  if (platform() === "darwin") return getLibraryFoldersPathMac();
+  if (platform === "darwin") return getLibraryFoldersPathMac();
   return "";
 };
 
 /** Retrieves the path to Steam's `loginusers`.vdf` file. */
 export const getLoginUsersPath = () => {
-  if (platform() === "darwin") return getLoginUsersPathMac();
+  if (platform === "darwin") return getLoginUsersPathMac();
   return "";
 };
