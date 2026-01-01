@@ -40,7 +40,7 @@
  *****************************************************************************/
 
 import { $, Glob } from "bun";
-import { writeSync } from "node:fs";
+
 import {
   access,
   chmod,
@@ -62,7 +62,8 @@ import {
   resolve,
   sep,
 } from "node:path";
-import { kill, platform, stdout } from "node:process";
+import { kill, platform } from "node:process";
+
 import chalk from "chalk";
 import { watch } from "chokidar";
 import cliWidth from "cli-width";
@@ -70,16 +71,17 @@ import findProcess from "find-process";
 import JSZip from "jszip";
 import open from "open";
 import { build as buildPlist } from "plist";
-import readlineSync from "readline-sync";
 import { quote } from "shell-quote";
 import terminalLink from "terminal-link";
 import unquote from "unquote";
 import wrapAnsi from "wrap-ansi";
 import { z } from "zod";
-import { renderLogo } from "./renderLogo.ts";
+
 import { exists } from "../fs/exists.ts";
 import { getAppById, getAppsByPath, launch } from "../launchers/steam/app.ts";
 import { isInstalled } from "../launchers/steam/launcher.ts";
+import { setLaunchOptions } from "../launchers/steam/launchOption.ts";
+import { getMostRecentUser } from "../launchers/steam/loginusers.ts";
 import { isOpen, quit } from "../launchers/steam/process.ts";
 import {
   addShortcut,
@@ -87,39 +89,12 @@ import {
   setShortcuts,
   type Shortcut,
 } from "../launchers/steam/shortcut.ts";
-import { hasUnityAppIndicators, search } from "../utils/unity.ts";
 import { getFixedPath } from "../utils/getFixedPath.ts";
-import { setLaunchOptions } from "../launchers/steam/launchOption.ts";
-import { getMostRecentUser } from "../launchers/steam/loginusers.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
+import { hasUnityAppIndicators, search } from "../utils/unity.ts";
+import { renderLogo } from "./renderLogo.ts";
 
 export const run = async () => {
-  function alertShim(message: string) {
-    writeSync(stdout.fd, new TextEncoder().encode(`${message} [Enter] `));
-    readlineSync.question();
-  }
-
-  function confirmShim(message: string) {
-    writeSync(stdout.fd, new TextEncoder().encode(`${message} [y/N] `));
-    const result = readlineSync.question();
-    return result.toLowerCase() === "y";
-  }
-
-  function promptShim(message = "Prompt", defaultValue?: string) {
-    writeSync(
-      stdout.fd,
-      new TextEncoder().encode(
-        `${message}${defaultValue ? ` [${defaultValue}]` : ""} `,
-      ),
-    );
-    const result = readlineSync.question();
-    return result.length > 0
-      ? result
-      : defaultValue !== null && defaultValue !== void 0
-      ? defaultValue
-      : null;
-  }
-
   const pink = chalk.hex("#ae0956");
   const code = chalk.yellowBright.bold;
 
@@ -201,7 +176,7 @@ export const run = async () => {
 
   const pressHeartToContinue = (message = "to continue") => {
     log();
-    alertShim(wrap(chalk.yellowBright(`Press enter ${message}`)));
+    alert(wrap(chalk.yellowBright(`Press enter ${message}`)));
     log();
   };
 
@@ -216,7 +191,7 @@ export const run = async () => {
 
   const err = `${chalk.red("error")}${chalk.gray(":")}`;
 
-  const prompt = async (
+  const promptUntil = async (
     message: string,
     validator:
       | ((value: string) => string | false)
@@ -226,7 +201,9 @@ export const run = async () => {
     let value: string | undefined;
 
     do {
-      value = promptShim(message, defaultValue)?.trim();
+      value = defaultValue
+        ? prompt(message, defaultValue)?.trim()
+        : prompt(message)?.trim();
 
       if (!value) {
         error(
@@ -282,7 +259,7 @@ export const run = async () => {
   ], false);
 
   const bepinexPath = dirname(
-    await prompt(
+    await promptUntil(
       wrap([
         null,
         `In Finder, locate the ${run_bepinex_sh} script file within your downloaded BepInEx pack, then either:`,
@@ -365,7 +342,7 @@ export const run = async () => {
   const pleaseSelectAUnityGameAndTryAgain =
     "Please make sure you are selecting a Unity game app and try again.";
 
-  const gameAppPath = await prompt(
+  const gameAppPath = await promptUntil(
     wrap([
       null,
       `Open a Finder window at the game's location, (e.g. by clicking ${
@@ -725,7 +702,7 @@ export const run = async () => {
       ]),
     );
 
-    shouldAddShortcut = confirmShim(
+    shouldAddShortcut = confirm(
       wrap(
         switchSupported
           ? `Add experimental Steam shortcut to launch ${game} without mods?`
@@ -773,7 +750,7 @@ export const run = async () => {
       null,
     ]));
 
-    if (!confirmShim(wrap(chalk.yellowBright("Proceed?")))) {
+    if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
       throw wrap("User cancelled installation");
     }
 
@@ -1021,7 +998,7 @@ export const run = async () => {
           : user.AccountName,
       );
 
-    shouldAddShortcut = await isInstalled() && confirmShim(wrap([
+    shouldAddShortcut = await isInstalled() && confirm(wrap([
       [
         game,
         "appears to be a non-Steam game. gib can optionally add a Steam",
@@ -1066,7 +1043,7 @@ export const run = async () => {
       null,
     ]));
 
-    if (!confirmShim(wrap(chalk.yellowBright("Proceed?")))) {
+    if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
       throw wrap("User cancelled installation");
     }
 
