@@ -3,10 +3,8 @@ import { Glob } from "bun";
 import { readFile as _readFile } from "node:fs/promises";
 import { basename, dirname, extname, resolve } from "node:path";
 
-import plist, { type PlistValue } from "plist";
+import { parse, type PlistValue } from "plist";
 import { z } from "zod";
-
-import parse = plist.parse;
 
 const plistStrictSchema = z.object({
   /** @type {string | undefined} */
