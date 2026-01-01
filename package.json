@@ -55,8 +55,7 @@
     "@types/readline-sync": "^1.4.8",
     "@types/shell-quote": "^1.7.5",
     "@types/unquote": "^1.1.0",
-    "ix": "^7.0.0",
-    "registry-js": "^1.16.1"
+    "ix": "^7.0.0"
   },
   "dependencies": {
     "@node-steam/id": "^1.2.0",
