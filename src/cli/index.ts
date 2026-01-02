@@ -56,6 +56,7 @@ import {
   sep,
 } from "node:path";
 import { kill, platform, stdout } from "node:process";
+
 import chalk from "chalk";
 import { watch } from "chokidar";
 import cliWidth from "cli-width";
@@ -70,10 +71,12 @@ import terminalLink from "terminal-link";
 import unquote from "unquote";
 import wrapAnsi from "wrap-ansi";
 import { z } from "zod";
-import { renderLogo } from "./renderLogo.ts";
+
 import { exists } from "../fs/exists.ts";
 import { getAppById, getAppsByPath, launch } from "../launchers/steam/app.ts";
 import { isInstalled } from "../launchers/steam/launcher.ts";
+import { setLaunchOptions } from "../launchers/steam/launchOption.ts";
+import { getMostRecentUser } from "../launchers/steam/loginusers.ts";
 import { isOpen, quit } from "../launchers/steam/process.ts";
 import {
   addShortcut,
@@ -81,11 +84,10 @@ import {
   setShortcuts,
   type Shortcut,
 } from "../launchers/steam/shortcut.ts";
-import { hasUnityAppIndicators, search } from "../utils/unity.ts";
 import { getFixedPath } from "../utils/getFixedPath.ts";
-import { setLaunchOptions } from "../launchers/steam/launchOption.ts";
-import { getMostRecentUser } from "../launchers/steam/loginusers.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
+import { hasUnityAppIndicators, search } from "../utils/unity.ts";
+import { renderLogo } from "./renderLogo.ts";
 
 export const run = async () => {
   function alertShim(message: string) {
