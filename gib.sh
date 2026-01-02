@@ -84,7 +84,7 @@
 
         curl -fL --progress-bar --output "$gib.zip" "$gib_uri" ||
         error "Failed to download gib from \"$gib_uri\""
-        
+
         echo -ne "\033[A\033[2K⏳ Preparing to launch gib..."
 
         unzip -oqd "$bin_dir" "$gib.zip" || error "Failed to extract gib"
