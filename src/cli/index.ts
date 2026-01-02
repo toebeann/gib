@@ -62,6 +62,7 @@ import cliWidth from "cli-width";
 import findProcess from "find-process";
 import JSZip from "jszip";
 import open from "open";
+import { pathEqual } from "path-equal";
 import { build as buildPlist } from "plist";
 import { quote } from "shell-quote";
 import terminalLink from "terminal-link";
@@ -565,20 +566,23 @@ export const run = async () => {
     const i = bepinexPath.split(sep).length;
     const glob = new Glob("**/*");
     for await (
-      const path of glob.scan({
+      const origin of glob.scan({
         absolute: true,
         dot: true,
         onlyFiles: true,
         cwd: bepinexPath,
       })
     ) {
-      if (basename(path) === ".DS_Store") continue;
+      if (basename(origin) === ".DS_Store") continue;
 
-      const destination = join(gamePath, path.split(sep).slice(i).join(sep));
-      await write(destination, file(path));
+      const destination = join(gamePath, origin.split(sep).slice(i).join(sep));
+      if (!pathEqual(origin, destination)) {
+        await write(destination, file(origin));
+      }
 
       if (
-        basename(path) === "run_bepinex.sh" && dirname(path) === bepinexPath
+        basename(origin) === "run_bepinex.sh" &&
+        dirname(origin) === bepinexPath
       ) {
         await configureBepInExScript(destination, gameAppPath);
       }
