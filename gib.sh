@@ -1,7 +1,6 @@
 #!/bin/bash
 #
-# This file is a shell script to ensure a user has all of the prerequisite
-# dependencies of gib installed before launching it.
+# This file is a shell script to ensure gib is up-to-date before launching it.
 #
 ###############################################################################
 #
@@ -29,40 +28,75 @@
 
     set -euo pipefail # exit on err
 
-    gib_version=v0.7.30
-    bun_version=1.3.5
     gib_dir=${GIB_INSTALL:-$HOME/.gib}
+    bin_dir=${gib_dir}/bin
+    gib=${bin_dir}/gib
 
-    while getopts :v: arg; do
-        case $arg in
-        v) gib_version=$OPTARG ;;
+    echo -ne "\033[2K⏳ Preparing to launch gib..."
+
+    error() {
+        echo -e "\r\033[2K❌" "$@" >&2
+        exit 1
+    }
+
+    if [[ $# -gt 1 ]]; then
+        error "Too many arguments, only 1 is allowed, which can be a specific tag of gib to install (e.g. \"v0.7.30\")"
+    fi
+
+    # only download gib binary if necessary, e.g. user has specified a tag, or version reported by gib is not latest
+    if [[ ! -x "$gib" ]] ||
+        [[ $# = 1 ]] ||
+        ([[ $# = 0 ]] && ! "$gib" -c); then
+
+        command -v unzip >/dev/null || error "unzip is required to install gib"
+
+        platform=$(uname -ms)
+        case $platform in
+        "Darwin x86_64")
+            target=darwin-x64
+
+            # check AVX2 support
+            if [[ $(sysctl -a | grep machdep.cpu | grep AVX2) == '' ]]; then
+                target="$target-baseline"
+            fi
+            ;;
+        "Darwin arm64")
+            target=darwin-aarch64
+            ;;
+        *)
+            error "Target platform (${platform}) is not supported."
+            ;;
         esac
-    done
 
-    echo -ne "\033[K  ⏳ Preparing to launch gib..."
-
-    bun_dir=${gib_dir}/env/bun
-    bun=${bun_dir}/bin/bun
-
-    # set custom bun install directory for installing and running gib
-    export BUN_INSTALL=$bun_dir
-
-    # ensure bun is installed and version is in sync
-    if ! command -v $bun >/dev/null || [ $($bun -v) != $bun_version ]; then
-        (
-            # prevent bun install script from setting shell environment variables
-            export SHELL=""
-            curl -fsSL https://bun.sh/install | bash -s bun-v$bun_version &>/dev/null
-        )
-
-        # check for bun command and let user know if not found
-        if ! command -v $bun >/dev/null; then
-            echo -e "\r\033[K  ❌ Installing bun failed"
-            exit 1
+        if [[ ! -d $bin_dir ]]; then
+            mkdir -p "$bin_dir" || error "Failed to create install directory \"$bin_dir\""
         fi
+
+        github_repo="https://github.com/toebeann/gib"
+
+        if [[ $# = 0 ]]; then
+            gib_uri=$github_repo/releases/latest/download/gib-$target.zip
+        else
+            gib_uri=$github_repo/releases/download/$1/gib-$target.zip
+        fi
+
+        echo -ne "\r\033[2K";
+
+        curl -fL --progress-bar --output "$gib.zip" "$gib_uri" ||
+        error "Failed to download gib from \"$gib_uri\""
+        
+        echo -ne "\033[A\033[2K⏳ Preparing to launch gib..."
+
+        unzip -oqd "$bin_dir" "$gib.zip" || error "Failed to extract gib"
+
+        mv "$gib-$target" "$gib" || error "Failed to move extracted gib to destination"
+
+        chmod +x "$gib" || error "Failed to set permissions on gib executable"
+
+        rm -r "$gib.zip"
     fi
 
     echo -ne "\r\033[2K"
 
-    exec $bun x --bun github:toebeann/gib#${GIB_VERSION:-$gib_version} -- $@
+    exec "$gib" $@
 } # this ensures the entire script is downloaded #

@@ -32,10 +32,17 @@
   "type": "module",
   "bin": "src/cli/index.ts",
   "scripts": {
-    "start": "bun src/cli/index.ts"
+    "start": "bun src/cli",
+    "build:target": "bun build --compile --target=bun-$TARGET --minify --sourcemap --bytecode src/cli --outfile dist/gib-$TARGET",
+    "build:local": "bun build --compile --sourcemap src/cli --outfile bin/gib",
+    "build": "TARGET=darwin-x64 bun build:target & TARGET=darwin-aarch64 bun build:target & TARGET=darwin-x64-baseline bun build:target && wait",
+    "local": "bun build:local && export GIB_INSTALL=.; cat gib.sh | bash",
+    "zip:target": "zip -Dj9 dist/gib-$TARGET.zip dist/gib-$TARGET",
+    "zip": "TARGET=darwin-x64 bun zip:target & TARGET=darwin-aarch64 bun zip:target & TARGET=darwin-x64-baseline bun zip:target && wait",
+    "dist": "rm -rf ./dist && bun run build && bun zip"
   },
   "engines": {
-    "bun": "^1.3"
+    "bun": "^1.3.5"
   },
   "os": [
     "darwin"

@@ -2,14 +2,14 @@ import { isAbsolute, relative } from "node:path";
 import { kill as _kill } from "node:process";
 
 import { waitUntil } from "async-wait-until";
-import findProcess from "find-process";
 import open from "open";
 
+import { find } from "../../utils/process.ts";
 import { getSteamPath } from "./path.ts";
 
 /** Get running Steam processes, if any. */
-export const getProcess = () =>
-  findProcess("name", "steam")
+export const get = () =>
+  find("name", "steam")
     .then((processes) =>
       processes.filter((process) => {
         const path = getSteamPath();
@@ -25,7 +25,7 @@ export const getProcess = () =>
     );
 
 /** Checks whether Steam appears to be running. */
-export const isOpen = () => getProcess().then((process) => process.length > 0);
+export const isOpen = () => get().then((process) => process.length > 0);
 
 /** Attempts to kill all running Steam processes. */
 export const quit = async () => {
@@ -36,11 +36,11 @@ export const quit = async () => {
       return true;
     } catch {
       console.log("timed out!");
-      const processes = await getProcess();
+      const processes = await get();
       return processes.every((process) => _kill(process.pid, "SIGKILL"));
     }
   } else {
-    const processes = await getProcess();
+    const processes = await get();
     return processes.every((process) => _kill(process.pid, "SIGKILL"));
   }
 };

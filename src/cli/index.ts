@@ -39,7 +39,7 @@
  *
  *****************************************************************************/
 
-import { $, file, Glob, write } from "bun";
+import { $, argv, file, Glob, semver, write } from "bun";
 
 import { writeSync } from "node:fs";
 import { access, chmod, mkdir, stat } from "node:fs/promises";
@@ -56,11 +56,11 @@ import {
   sep,
 } from "node:path";
 import { kill, platform, stdout } from "node:process";
+import { parseArgs } from "node:util";
 
 import chalk from "chalk";
 import { watch } from "chokidar";
 import cliWidth from "cli-width";
-import findProcess from "find-process";
 import JSZip from "jszip";
 import open from "open";
 import { pathEqual } from "path-equal";
@@ -72,6 +72,7 @@ import unquote from "unquote";
 import wrapAnsi from "wrap-ansi";
 import { z } from "zod";
 
+import { version } from "../../package.json" with { type: "json" };
 import { exists } from "../fs/exists.ts";
 import { getAppById, getAppsByPath, launch } from "../launchers/steam/app.ts";
 import { isInstalled } from "../launchers/steam/launcher.ts";
@@ -85,6 +86,7 @@ import {
   type Shortcut,
 } from "../launchers/steam/shortcut.ts";
 import { getFixedPath } from "../utils/getFixedPath.ts";
+import { find } from "../utils/process.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
 import { hasUnityAppIndicators, search } from "../utils/unity.ts";
 import { renderLogo } from "./renderLogo.ts";
@@ -1234,7 +1236,7 @@ export const run = async () => {
       });
       let detectedGame = false, detectedBepInEx = false;
       const getProcesses = () =>
-        findProcess("name", plist.CFBundleExecutable ?? basename(gameAppPath))
+        find("name", plist.CFBundleExecutable ?? basename(gameAppPath))
           .then((processes) =>
             processes.filter(
               (process) => {
@@ -1394,4 +1396,43 @@ export const run = async () => {
   }
 };
 
-if (import.meta.main) await run();
+const prerun = async () => {
+  const { values } = parseArgs({
+    args: argv,
+    options: {
+      version: {
+        type: "boolean",
+        short: "v",
+        default: false,
+      },
+      "check-update": {
+        type: "boolean",
+        short: "c",
+        default: false,
+      },
+    },
+    strict: true,
+    allowPositionals: true,
+  });
+
+  if (values.version) {
+    console.log(version);
+    return;
+  }
+
+  if (values["check-update"]) {
+    const response = await fetch(
+      "https://data.jsdelivr.com/v1/packages/gh/toebeann/gib/resolved",
+    );
+
+    const { version: latest } = z.looseObject({ version: z.string() })
+      .parse(await response.json());
+
+    if (!semver.satisfies(version, `>=${latest}`)) process.exit(1);
+    return;
+  }
+
+  await run();
+};
+
+if (import.meta.main) prerun();

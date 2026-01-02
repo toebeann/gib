@@ -4,11 +4,11 @@ import boxen from "boxen";
 import center from "center-align";
 import chalk from "chalk";
 import cliWidth from "cli-width";
-import figlet from "figlet";
-import gradientString from "gradient-string";
+import gradientString, { retro } from "gradient-string";
 import wrapAnsi from "wrap-ansi";
 
 import { version } from "../../package.json" with { type: "json" };
+import { logo } from "./ascii.ts" with { type: "macro" };
 
 const width = () => cliWidth({ defaultWidth: 80 });
 const wrap = (
@@ -30,21 +30,13 @@ export const createLogo = async () => {
     ),
   );
 
-  const logo = new Promise<string>((resolve, reject) =>
-    figlet(
-      "gib",
-      "Colossal",
-      (err, data) => (err && reject(err)) || resolve(data!),
-    )
-  );
-
   const gradient = env.NO_COLOR === undefined
-    ? gradientString.retro
-    : gradientString("white", "white");
+    ? retro
+    : gradientString(["white", "white"]);
 
   const title = "tobey's Guided Installer for BepInEx";
 
-  const logoLines = (await logo).split("\n");
+  const logoLines = (await logo()).split("\n");
 
   if (width() >= title.length + 4) {
     const boxed = boxen(logoLines.join("\n"), {
