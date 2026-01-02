@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { file } from "bun";
 
 import { parse } from "@node-steam/vdf";
 
@@ -23,7 +23,7 @@ export type LibraryFolders = {
  * from Steam's `libraryfolders.vdf` file.
  */
 export const getLibraryFolders = async (path = getLibraryFoldersPath()) => {
-  const data = await readFile(path, "utf8");
+  const data = await file(path).text();
   return Object.values(
     (new Proxy(parse(data), caseInsensitiveProxy) as LibraryFolders)
       .libraryfolders,

@@ -1,4 +1,5 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { file, write } from "bun";
+
 import { join } from "node:path";
 
 import type { ID } from "@node-steam/id";
@@ -74,7 +75,7 @@ export async function getLocalConfig(userId?: ID | string) {
 
   return new Proxy(
     parse(
-      await readFile(join(configPath, "localconfig.vdf"), "utf8"),
+      await file(join(configPath, "localconfig.vdf")).text(),
     ),
     caseInsensitiveProxy,
   ) as LocalConfig;
@@ -153,9 +154,8 @@ export async function setLocalConfig(
   const configPath = await getUserConfigFolderPath(userId);
   if (!configPath) return;
 
-  await writeFile(
+  await write(
     join(configPath, "localconfig.vdf"),
     stringify(config),
-    "utf8",
   );
 }

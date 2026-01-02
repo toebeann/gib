@@ -1,7 +1,6 @@
-import { Glob } from "bun";
+import { file, Glob } from "bun";
 
 import { join } from "node:path";
-import { readFile } from "node:fs/promises";
 
 import { z } from "zod";
 
@@ -127,11 +126,7 @@ export async function* getManifests() {
       cwd: join(getAppDataPath(), "Manifests"),
     })
   ) {
-    yield appManifestSchema.parse(
-      JSON.parse(
-        await readFile(path, "utf8"),
-      ),
-    );
+    yield appManifestSchema.parse(await file(path).json());
   }
 }
 

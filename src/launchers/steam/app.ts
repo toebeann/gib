@@ -1,6 +1,6 @@
-import { Glob } from "bun";
+import { file, Glob } from "bun";
 
-import { readFile, realpath } from "node:fs/promises";
+import { realpath } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 
 import { parse } from "@node-steam/vdf";
@@ -53,12 +53,11 @@ export const isFullyInstalled = (app: App) =>
 /**
  * Gets a stored Steam app manifest.
  */
-export async function getAppManifest(manifestPath: string) {
-  return new Proxy(
-    parse(await readFile(manifestPath, { encoding: "utf-8" })),
+export const getAppManifest = async (manifestPath: string) =>
+  new Proxy(
+    parse(await file(manifestPath).text()),
     caseInsensitiveProxy,
   ) as AppManifest;
-}
 
 /**
  * Gets information about installed Steam apps.

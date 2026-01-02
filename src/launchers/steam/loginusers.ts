@@ -1,4 +1,5 @@
-import { readFile } from "node:fs/promises";
+import { file } from "bun";
+
 import { join } from "node:path";
 
 import { ID } from "@node-steam/id";
@@ -27,15 +28,12 @@ export type LoginUsers = {
  * Gets inforation about users who have logged in to Steam on this computer,
  * parsed from Steam's `loginusers.vdf` file.
  */
-export const getUsers = () =>
-  readFile(
-    getLoginUsersPath(),
-    "utf8",
-  ).then((text) =>
-    Object.entries(
-      (new Proxy(parse(text), caseInsensitiveProxy) as LoginUsers).users,
-    )
+export const getUsers = async () => {
+  const text = await file(getLoginUsersPath()).text();
+  return Object.entries(
+    (new Proxy(parse(text), caseInsensitiveProxy) as LoginUsers).users,
   );
+};
 
 /**
  * Retrieves information about the most recent user of Steam on this computer,

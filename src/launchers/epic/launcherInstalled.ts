@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { file } from "bun";
 
 import { join } from "node:path";
 
@@ -35,8 +35,8 @@ export const launcherInstalledSchema = toCamelCaseKeys(
  * computer, parsed from its `LauncherInstalled.dat` file.
  */
 export const getLauncherInstalled = async () =>
-  launcherInstalledSchema.parse(JSON.parse(
-    await readFile(
+  launcherInstalledSchema.parse(
+    await file(
       join(
         getAppDataPath(),
         "..",
@@ -44,6 +44,5 @@ export const getLauncherInstalled = async () =>
         "UnrealEngineLauncher",
         "LauncherInstalled.dat",
       ),
-      "utf8",
-    ),
-  )).installationList;
+    ).json(),
+  ).installationList;

@@ -1,6 +1,5 @@
-import { Glob } from "bun";
+import { file, Glob } from "bun";
 
-import { readFile as _readFile } from "node:fs/promises";
 import { basename, dirname, extname, resolve } from "node:path";
 
 import { parse, type PlistValue } from "plist";
@@ -60,9 +59,8 @@ export const search = async function* (path: string) {
  *
  * @param path The path to an `Info.plist` file to parse.
  */
-export const parsePlistFromFile = (path: string) =>
-  _readFile(path, "utf8")
-    .then((text) => plistSchema.parse(parse(text)));
+export const parsePlistFromFile = async (path: string) =>
+  plistSchema.parse(parse(await file(path).text()));
 
 /**
  * Retrieves a value from the plist file at `path` with given `key`.

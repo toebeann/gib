@@ -1,8 +1,10 @@
-import { access, constants, readFile, writeFile } from "node:fs/promises";
+import { file, write } from "bun";
+
+import { access, constants } from "node:fs/promises";
 import { join } from "node:path";
 
 import { ID } from "@node-steam/id";
-import { readVdf, writeVdf, type VdfMap } from "steam-binary-vdf";
+import { readVdf, type VdfMap, writeVdf } from "steam-binary-vdf";
 
 import { caseInsensitiveProxy } from "../../utils/proxy.ts";
 import { getMostRecentUser } from "./loginusers.ts";
@@ -123,7 +125,7 @@ export async function getShortcuts(
   ) return { shortcuts: {} };
 
   return new Proxy(
-    readVdf(await readFile(shortcutsPath)),
+    readVdf(Buffer.from(await file(shortcutsPath).arrayBuffer())),
     caseInsensitiveProxy,
   ) as Shortcuts;
 }
@@ -233,6 +235,6 @@ export async function setShortcuts(shortcuts: Shortcuts, userId?: ID | string) {
   const shortcutsPath = await getPath(userId);
   if (!shortcutsPath) return false;
 
-  await writeFile(shortcutsPath, writeVdf(shortcuts as VdfMap));
+  await write(shortcutsPath, writeVdf(shortcuts as VdfMap));
   return true;
 }

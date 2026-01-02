@@ -1,5 +1,8 @@
-import { readFile, stat } from "node:fs/promises";
+import { file } from "bun";
+
+import { stat } from "node:fs/promises";
 import { basename, dirname, extname, join, normalize, sep } from "node:path";
+
 import { exists } from "../fs/exists.ts";
 import { booleanRace } from "./booleanRace.ts";
 import {
@@ -79,11 +82,12 @@ export const hasCommonUnityFiles = (plist: string) =>
  *
  * @param plist The path to the `Info.plist` of the macOS Application to check.
  */
-export const hasCommonUnityString = async (plist: string) =>
-  readFile(plist, "utf8")
-    .then((text) =>
-      !!text.trim().match(new RegExp("Unity Player|Unity Technologies", "g"))
-    );
+export const hasCommonUnityString = async (plist: string) => {
+  const text = await file(plist).text();
+  return !!text.trim().match(
+    new RegExp("Unity Player|Unity Technologies", "g"),
+  );
+};
 
 /**
  * Determines whether the macOS Application corresponding with the provided
