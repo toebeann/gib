@@ -29,7 +29,7 @@
 
     set -euo pipefail # exit on err
 
-    gib_version=v0.7.28
+    gib_version=v0.7.29
     bun_version=1.3.5
     gib_dir=${GIB_INSTALL:-$HOME/.gib}
 
@@ -64,5 +64,5 @@
 
     echo -ne "\r\033[2K"
 
-    $bun x --bun github:toebeann/gib#${GIB_VERSION:-$gib_version} -- $@
+    exec $bun x --bun github:toebeann/gib#${GIB_VERSION:-$gib_version} -- $@
 } # this ensures the entire script is downloaded #
