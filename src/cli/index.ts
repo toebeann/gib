@@ -39,7 +39,7 @@
  *
  *****************************************************************************/
 
-import { $, argv, file, Glob, semver, write } from "bun";
+import { $, argv, color, file, Glob, semver, write } from "bun";
 
 import { access, chmod, mkdir, stat } from "node:fs/promises";
 import { EOL, homedir } from "node:os";
@@ -54,7 +54,7 @@ import {
   resolve,
   sep,
 } from "node:path";
-import { kill, platform } from "node:process";
+import { exit, kill, platform } from "node:process";
 import { parseArgs } from "node:util";
 
 import chalk from "chalk";
@@ -90,6 +90,14 @@ import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
 import { hasUnityAppIndicators, search } from "../utils/unity.ts";
 import { renderLogo } from "./renderLogo.ts";
 
+const width = () => cliWidth({ defaultWidth: 80 });
+
+const wrap = (
+  str: string | (string | null | undefined)[],
+  columns = width(),
+  options?: Parameters<typeof wrapAnsi>[2],
+) => wrapAnsi(typeof str === "string" ? str : str.join(EOL), columns, options);
+
 export const run = async () => {
   const pink = chalk.hex("#ae0956");
   const code = chalk.yellowBright.bold;
@@ -104,15 +112,6 @@ export const run = async () => {
       fallback: () => `${label} [ ${short} ]`,
       ...options,
     });
-
-  const width = () => cliWidth({ defaultWidth: 80 });
-
-  const wrap = (
-    str: string | (string | null | undefined)[],
-    columns = width(),
-    options?: Parameters<typeof wrapAnsi>[2],
-  ) =>
-    wrapAnsi(typeof str === "string" ? str : str.join(EOL), columns, options);
 
   const list = (items: string[], ordered: boolean) => {
     const padding = ordered ? items.length.toString().length + 2 : 3;
@@ -1369,8 +1368,57 @@ export const run = async () => {
   }
 };
 
-const prerun = async () => {
-  const { values } = parseArgs({
+const confirmUpdate = async (updateVersion: string) => {
+  const { log } = console;
+  const orange = color("orange", "ansi");
+
+  log();
+  log(
+    wrap(
+      `gib ${orange}${chalk.bold.underline(`v${updateVersion}`)}${
+        chalk.reset(" is available.")
+      }`,
+    ),
+  );
+  log(
+    wrap(
+      chalk.dim(
+        `You currently have ${chalk.bold.underline(`v${version}`)} installed.`,
+      ),
+    ),
+  );
+  log();
+
+  if (await confirm(chalk.yellowBright("Would you like to update?"))) {
+    const command =
+      "curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash";
+    await $`echo -n ${command.trim()} | pbcopy`.nothrow().quiet();
+
+    log();
+    log(wrap("Run the following command to update and relaunch gib:"));
+    log(wrap(chalk.dim(command)));
+    log(
+      wrap(
+        `The command has been placed in your clipboard so you can simply paste it.`,
+      ),
+    );
+    log();
+
+    return true;
+  }
+
+  log();
+  return false;
+};
+
+export const prerun = async () => {
+  const {
+    values: {
+      version: wantsVersion,
+      "check-latest": wantsUpdateExitStatus,
+      update: wantsAutoUpdate,
+    },
+  } = parseArgs({
     args: argv,
     options: {
       version: {
@@ -1378,32 +1426,43 @@ const prerun = async () => {
         short: "v",
         default: false,
       },
-      "check-update": {
+      "check-latest": {
         type: "boolean",
         short: "c",
         default: false,
       },
+      update: {
+        type: "boolean",
+        short: "u",
+        default: true,
+      },
     },
     strict: true,
+    allowNegative: true,
     allowPositionals: true,
   });
 
-  if (values.version) {
+  if (wantsVersion) {
     console.log(version);
     return;
   }
 
-  if (values["check-update"]) {
-    const response = await fetch(
-      "https://data.jsdelivr.com/v1/packages/gh/toebeann/gib/resolved",
-    );
+  const latest = wantsAutoUpdate || wantsUpdateExitStatus
+    ? z.looseObject({ version: z.string() })
+      .parse(
+        await (await fetch(
+          "https://data.jsdelivr.com/v1/packages/gh/toebeann/gib/resolved",
+        )).json(),
+      )
+      .version
+    : null;
 
-    const { version: latest } = z.looseObject({ version: z.string() })
-      .parse(await response.json());
+  const updateAvailable = latest !== null &&
+    semver.satisfies(version, `<${latest}`);
 
-    if (!semver.satisfies(version, `>=${latest}`)) process.exit(1);
-    return;
-  }
+  if (wantsUpdateExitStatus) exit(+updateAvailable);
+
+  if (updateAvailable && await confirmUpdate(latest)) return;
 
   await run();
 };
