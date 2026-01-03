@@ -170,13 +170,13 @@ export const run = async () => {
     ),
   );
 
-  const pressHeartToContinue = (message = "to continue") => {
+  const pressHeartToContinue = async (message = "to continue") => {
     log();
-    alert(wrap(chalk.yellowBright(`Press enter ${message}`)));
+    await alert(wrap(chalk.yellowBright(`Press enter ${message}`)));
     log();
   };
 
-  pressHeartToContinue();
+  await pressHeartToContinue();
 
   log(
     wrap(
@@ -197,7 +197,7 @@ export const run = async () => {
     let value: string | undefined;
 
     do {
-      value = prompt(message, defaultValue)?.trim();
+      value = (await prompt(message, defaultValue))?.trim();
 
       if (!value) {
         error(
@@ -696,7 +696,7 @@ export const run = async () => {
       ]),
     );
 
-    shouldAddShortcut = confirm(
+    shouldAddShortcut = await confirm(
       wrap(
         switchSupported
           ? `Add experimental Steam shortcut to launch ${game} without mods?`
@@ -744,7 +744,7 @@ export const run = async () => {
       null,
     ]));
 
-    if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
+    if (!await confirm(wrap(chalk.yellowBright("Proceed?")))) {
       throw wrap("User cancelled installation");
     }
 
@@ -995,7 +995,7 @@ export const run = async () => {
           : user.AccountName,
       );
 
-    shouldAddShortcut = await isInstalled() && confirm(wrap([
+    shouldAddShortcut = await isInstalled() && await confirm(wrap([
       [
         game,
         "appears to be a non-Steam game. gib can optionally add a Steam",
@@ -1040,7 +1040,7 @@ export const run = async () => {
       null,
     ]));
 
-    if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
+    if (!await confirm(wrap(chalk.yellowBright("Proceed?")))) {
       throw wrap("User cancelled installation");
     }
 
@@ -1188,7 +1188,7 @@ export const run = async () => {
     null,
     "Return to this Terminal window once the game has closed.",
   ]));
-  pressHeartToContinue("when you're ready to run the test");
+  await pressHeartToContinue("when you're ready to run the test");
 
   const steamApp = steamApps[0];
 
