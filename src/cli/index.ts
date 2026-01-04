@@ -1380,7 +1380,7 @@ export const prerun = async () => {
       version: wantsVersion,
       status: wantsUpdateExitStatus,
       update: wantsAutoUpdate,
-      "check-path": wantsCheckPath,
+      "path-check": wantsCheckPath,
     },
   } = parseArgs({
     args: argv,
@@ -1399,10 +1399,14 @@ export const prerun = async () => {
         type: "boolean",
         default: true,
       },
-      "check-path": {
-        type: "boolean",
-        default: command === "gib",
-      },
+      ...(command === "gib"
+        ? {
+          "path-check": {
+            type: "boolean",
+            default: true,
+          },
+        }
+        : {}),
     },
     strict: true,
     allowNegative: true,
@@ -1601,9 +1605,7 @@ export const prerun = async () => {
         } catch {}
       }
 
-      if (!done) {
-        promptToManuallyEditConfig("~/.bashrc", commands);
-      }
+      if (!done) promptToManuallyEditConfig("~/.bashrc", commands);
     }
 
     log();
