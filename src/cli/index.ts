@@ -92,6 +92,10 @@ import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
 import { hasUnityAppIndicators, search } from "../utils/unity.ts";
 import { renderLogo } from "./renderLogo.ts";
 
+const code = chalk.yellowBright.bold;
+
+const { error, log } = console;
+
 const width = () => cliWidth({ defaultWidth: 80 });
 
 const wrap = (
@@ -102,7 +106,6 @@ const wrap = (
 
 export const run = async () => {
   const pink = chalk.hex("#ae0956");
-  const code = chalk.yellowBright.bold;
 
   const link = (
     label: string,
@@ -135,8 +138,6 @@ export const run = async () => {
     }
     return output;
   };
-
-  const { error, log } = console;
 
   await renderLogo();
 
@@ -1370,202 +1371,6 @@ export const run = async () => {
   }
 };
 
-const confirmUpdate = async (updateVersion: string) => {
-  const { log } = console;
-  const orange = color("orange", "ansi");
-
-  log();
-  log(
-    wrap(
-      `gib ${orange}${chalk.bold.underline(`v${updateVersion}`)}${
-        chalk.reset(" is available.")
-      }`,
-    ),
-  );
-  log(
-    wrap(
-      chalk.dim(
-        `You currently have ${chalk.bold.underline(`v${version}`)} installed.`,
-      ),
-    ),
-  );
-  log();
-
-  if (await confirm(chalk.yellowBright("Would you like to update?"))) {
-    const command =
-      "curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash";
-    await $`echo -n ${command.trim()} | pbcopy`.nothrow().quiet();
-
-    log();
-    log(wrap("Run the following command to update and relaunch gib:"));
-    log(wrap(chalk.dim(command)));
-    log(
-      wrap(
-        `The command has been placed in your clipboard so you can simply paste it.`,
-      ),
-    );
-    log();
-
-    return true;
-  }
-
-  log();
-  return false;
-};
-
-const attemptAddCommandToPath = async (command: string) => {
-  const { log } = console;
-  const code = chalk.yellowBright.bold;
-  const pathText = chalk.yellowBright.bold("$PATH");
-
-  const { SHELL } = env;
-  const quotedInstallFolder = quote([dirname(dirname(execPath))]);
-  const quotedBinFolder = quote([dirname(execPath)]);
-
-  const promptToManuallyEditConfig = (
-    configPath: string,
-    commands: string[],
-  ) => {
-    log(wrap(`${command} not found in ${pathText}`));
-    log(wrap(`We recommend adding ${command} to ${pathText} for ease of use`));
-    log();
-
-    log(
-      wrap(
-        `To do so, manually add the equivalent commands to ${
-          chalk.yellowBright.bold(configPath)
-        } (or similar):`,
-      ),
-    );
-
-    for (const command of commands) {
-      log(`  ${wrap(code(command), width() - 2)}`);
-    }
-  };
-
-  const configCommandsNeeded = async (
-    configPath: string,
-    commands: string[],
-  ) => {
-    const absoluteConfigPath = untildify(configPath);
-    await access(absoluteConfigPath, W_OK);
-
-    const lines = (await file(absoluteConfigPath).text())
-      .split(EOL)
-      .map((line) => line.trim());
-
-    return commands.filter((command) => !lines.includes(command));
-  };
-
-  const appendCommandsToConfig = async (
-    configPath: string,
-    commands: string[],
-  ) => {
-    const absoluteConfigPath = untildify(configPath);
-
-    await appendFile(
-      absoluteConfigPath,
-      ["", "# gib", ...commands, ""].join(EOL),
-    );
-
-    log(
-      wrap(`${command} has been added to ${pathText} in ${code(configPath)}`),
-    );
-    log();
-    log(wrap("The next time you want to launch gib, you can simply run:"));
-    log(`  ${wrap(code(command), width() - 2)}`);
-    log(
-      wrap(
-        chalk.dim(
-          "You will need to reload your terminal for this command to be available",
-        ),
-      ),
-    );
-  };
-
-  if (!SHELL || !(["fish", "zsh", "bash"] as const).includes(basename(SHELL))) {
-    promptToManuallyEditConfig("~/.bashrc", [
-      `export GIB_INSTALL=${quotedInstallFolder}`,
-      `export PATH=${quotedBinFolder}:$PATH`,
-    ]);
-  } else if (basename(SHELL) === "fish") {
-    const config = join("~", ".config", "fish", "config.fish");
-    const commands = [
-      `set --export GIB_INSTALL ${quotedInstallFolder}`,
-      `set --export PATH ${quotedBinFolder} $PATH`,
-    ];
-
-    try {
-      const commandsToAppend = await configCommandsNeeded(config, commands);
-      if (commandsToAppend.length) {
-        await appendCommandsToConfig(config, commandsToAppend);
-      } else {
-        return;
-      }
-    } catch {
-      promptToManuallyEditConfig(config, commands);
-    }
-  } else if (basename(SHELL) === "zsh") {
-    const config = join("~", ".zshrc");
-    const commands = [
-      `export GIB_INSTALL=${quotedInstallFolder}`,
-      `export PATH=${quotedBinFolder}:$PATH`,
-    ];
-
-    try {
-      const commandsToAppend = await configCommandsNeeded(config, commands);
-      if (commandsToAppend.length) {
-        await appendCommandsToConfig(config, commandsToAppend);
-      } else {
-        return;
-      }
-    } catch {
-      promptToManuallyEditConfig(config, commands);
-    }
-  } else if (basename(SHELL) === "bash") {
-    const { XDG_CONFIG_HOME } = env;
-    const configs = [
-      join("~", ".bash_profile"),
-      join("~", ".bashrc"),
-    ];
-    if (XDG_CONFIG_HOME) {
-      configs.concat(
-        join(XDG_CONFIG_HOME, ".bash_profile"),
-        join(XDG_CONFIG_HOME, ".bashrc"),
-        join(XDG_CONFIG_HOME, "bash_profile"),
-        join(XDG_CONFIG_HOME, "bashrc"),
-      );
-    }
-
-    const commands = [
-      `export GIB_INSTALL=${quotedInstallFolder}`,
-      `export PATH=${quotedBinFolder}:$PATH`,
-    ];
-
-    let done = false;
-    for (const config of configs) {
-      try {
-        const commandsToAppend = await configCommandsNeeded(config, commands);
-        if (commandsToAppend.length) {
-          await appendCommandsToConfig(config, commandsToAppend);
-        } else {
-          return;
-        }
-        done = true;
-        break;
-      } catch {}
-    }
-
-    if (!done) {
-      promptToManuallyEditConfig("~/.bashrc", commands);
-    }
-  }
-
-  log();
-  await alert(wrap(chalk.yellowBright("Press enter to continue")));
-  log();
-};
-
 export const prerun = async () => {
   const command = basename(execPath);
 
@@ -1605,9 +1410,208 @@ export const prerun = async () => {
   });
 
   if (wantsVersion) {
-    console.log(version);
+    log(version);
     return;
   }
+
+  const confirmUpdate = async (updateVersion: string) => {
+    const orange = color("orange", "ansi");
+
+    log();
+    log(
+      wrap(
+        `gib ${orange}${chalk.bold.underline(`v${updateVersion}`)}${
+          chalk.reset(" is available.")
+        }`,
+      ),
+    );
+    log(
+      wrap(
+        chalk.dim(
+          `You currently have ${
+            chalk.bold.underline(`v${version}`)
+          } installed.`,
+        ),
+      ),
+    );
+    log();
+
+    if (await confirm(chalk.yellowBright("Would you like to update?"))) {
+      const command =
+        "curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash";
+      await $`echo -n ${command.trim()} | pbcopy`.nothrow().quiet();
+
+      log();
+      log(wrap("Run the following command to update and relaunch gib:"));
+      log(wrap(chalk.dim(command)));
+      log(
+        wrap(
+          `The command has been placed in your clipboard so you can simply paste it.`,
+        ),
+      );
+      log();
+
+      return true;
+    }
+
+    log();
+    return false;
+  };
+
+  const attemptAddCommandToPath = async (command: string) => {
+    const pathText = chalk.yellowBright.bold("$PATH");
+
+    const { SHELL } = env;
+    const quotedInstallFolder = quote([dirname(dirname(execPath))]);
+    const quotedBinFolder = quote([dirname(execPath)]);
+
+    const promptToManuallyEditConfig = (
+      configPath: string,
+      commands: string[],
+    ) => {
+      log(wrap(`${command} not found in ${pathText}`));
+      log(
+        wrap(`We recommend adding ${command} to ${pathText} for ease of use`),
+      );
+      log();
+
+      log(
+        wrap(
+          `To do so, manually add the equivalent commands to ${
+            chalk.yellowBright.bold(configPath)
+          } (or similar):`,
+        ),
+      );
+
+      for (const command of commands) {
+        log(`  ${wrap(code(command), width() - 2)}`);
+      }
+    };
+
+    const configCommandsNeeded = async (
+      configPath: string,
+      commands: string[],
+    ) => {
+      const absoluteConfigPath = untildify(configPath);
+      await access(absoluteConfigPath, W_OK);
+
+      const lines = (await file(absoluteConfigPath).text())
+        .split(EOL)
+        .map((line) => line.trim());
+
+      return commands.filter((command) => !lines.includes(command));
+    };
+
+    const appendCommandsToConfig = async (
+      configPath: string,
+      commands: string[],
+    ) => {
+      const absoluteConfigPath = untildify(configPath);
+
+      await appendFile(
+        absoluteConfigPath,
+        ["", "# gib", ...commands, ""].join(EOL),
+      );
+
+      log(
+        wrap(`${command} has been added to ${pathText} in ${code(configPath)}`),
+      );
+      log();
+      log(wrap("The next time you want to launch gib, you can simply run:"));
+      log(`  ${wrap(code(command), width() - 2)}`);
+      log(
+        wrap(
+          chalk.dim(
+            "You will need to reload your terminal for this command to be available",
+          ),
+        ),
+      );
+    };
+
+    if (
+      !SHELL || !(["fish", "zsh", "bash"] as const).includes(basename(SHELL))
+    ) {
+      promptToManuallyEditConfig("~/.bashrc", [
+        `export GIB_INSTALL=${quotedInstallFolder}`,
+        `export PATH=${quotedBinFolder}:$PATH`,
+      ]);
+    } else if (basename(SHELL) === "fish") {
+      const config = join("~", ".config", "fish", "config.fish");
+      const commands = [
+        `set --export GIB_INSTALL ${quotedInstallFolder}`,
+        `set --export PATH ${quotedBinFolder} $PATH`,
+      ];
+
+      try {
+        const commandsToAppend = await configCommandsNeeded(config, commands);
+        if (commandsToAppend.length) {
+          await appendCommandsToConfig(config, commandsToAppend);
+        } else {
+          return;
+        }
+      } catch {
+        promptToManuallyEditConfig(config, commands);
+      }
+    } else if (basename(SHELL) === "zsh") {
+      const config = join("~", ".zshrc");
+      const commands = [
+        `export GIB_INSTALL=${quotedInstallFolder}`,
+        `export PATH=${quotedBinFolder}:$PATH`,
+      ];
+
+      try {
+        const commandsToAppend = await configCommandsNeeded(config, commands);
+        if (commandsToAppend.length) {
+          await appendCommandsToConfig(config, commandsToAppend);
+        } else {
+          return;
+        }
+      } catch {
+        promptToManuallyEditConfig(config, commands);
+      }
+    } else if (basename(SHELL) === "bash") {
+      const { XDG_CONFIG_HOME } = env;
+      const configs = [
+        join("~", ".bash_profile"),
+        join("~", ".bashrc"),
+      ];
+      if (XDG_CONFIG_HOME) {
+        configs.concat(
+          join(XDG_CONFIG_HOME, ".bash_profile"),
+          join(XDG_CONFIG_HOME, ".bashrc"),
+          join(XDG_CONFIG_HOME, "bash_profile"),
+          join(XDG_CONFIG_HOME, "bashrc"),
+        );
+      }
+
+      const commands = [
+        `export GIB_INSTALL=${quotedInstallFolder}`,
+        `export PATH=${quotedBinFolder}:$PATH`,
+      ];
+
+      let done = false;
+      for (const config of configs) {
+        try {
+          const commandsToAppend = await configCommandsNeeded(config, commands);
+          if (commandsToAppend.length) {
+            await appendCommandsToConfig(config, commandsToAppend);
+          } else {
+            return;
+          }
+          done = true;
+          break;
+        } catch {}
+      }
+
+      if (!done) {
+        promptToManuallyEditConfig("~/.bashrc", commands);
+      }
+    }
+
+    log();
+    await alert(wrap(chalk.yellowBright("Press enter to continue")));
+    log();
+  };
 
   const latest = wantsAutoUpdate || wantsUpdateExitStatus
     ? z.looseObject({ version: z.string() })
@@ -1631,7 +1635,7 @@ export const prerun = async () => {
     const commandExists = commandResult.exitCode === 0;
 
     if (!commandExists) {
-      if (!updateAvailable) console.log();
+      if (!updateAvailable) log();
       await attemptAddCommandToPath(command);
     }
   }
