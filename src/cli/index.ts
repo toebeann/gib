@@ -1397,7 +1397,6 @@ export const prerun = async () => {
       },
       update: {
         type: "boolean",
-        short: "u",
         default: true,
       },
       "check-path": {
