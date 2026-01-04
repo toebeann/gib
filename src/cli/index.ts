@@ -39,9 +39,10 @@
  *
  *****************************************************************************/
 
-import { $, argv, color, file, Glob, semver, write } from "bun";
+import { $, argv, color, env, file, Glob, semver, write } from "bun";
 
-import { access, chmod, mkdir, stat } from "node:fs/promises";
+import { W_OK } from "node:constants";
+import { access, appendFile, chmod, mkdir, stat } from "node:fs/promises";
 import { EOL, homedir } from "node:os";
 import {
   basename,
@@ -54,7 +55,7 @@ import {
   resolve,
   sep,
 } from "node:path";
-import { exit, kill, platform } from "node:process";
+import { execPath, exit, kill, platform } from "node:process";
 import { parseArgs } from "node:util";
 
 import chalk from "chalk";
@@ -67,6 +68,7 @@ import { build as buildPlist } from "plist";
 import { quote } from "shell-quote";
 import terminalLink from "terminal-link";
 import unquote from "unquote";
+import untildify from "untildify";
 import wrapAnsi from "wrap-ansi";
 import { z } from "zod";
 
@@ -1411,12 +1413,168 @@ const confirmUpdate = async (updateVersion: string) => {
   return false;
 };
 
+const attemptAddCommandToPath = async (command: string) => {
+  const { log } = console;
+  const code = chalk.yellowBright.bold;
+  const pathText = chalk.yellowBright.bold("$PATH");
+
+  const { SHELL } = env;
+  const quotedInstallFolder = quote([dirname(dirname(execPath))]);
+  const quotedBinFolder = quote([dirname(execPath)]);
+
+  const promptToManuallyEditConfig = (
+    configPath: string,
+    commands: string[],
+  ) => {
+    log(wrap(`${command} not found in ${pathText}`));
+    log(wrap(`We recommend adding ${command} to ${pathText} for ease of use`));
+    log();
+
+    log(
+      wrap(
+        `To do so, manually add the equivalent commands to ${
+          chalk.yellowBright.bold(configPath)
+        } (or similar):`,
+      ),
+    );
+
+    for (const command of commands) {
+      log(`  ${wrap(code(command), width() - 2)}`);
+    }
+  };
+
+  const configCommandsNeeded = async (
+    configPath: string,
+    commands: string[],
+  ) => {
+    const absoluteConfigPath = untildify(configPath);
+    await access(absoluteConfigPath, W_OK);
+
+    const lines = (await file(absoluteConfigPath).text())
+      .split(EOL)
+      .map((line) => line.trim());
+
+    return commands.filter((command) => !lines.includes(command));
+  };
+
+  const appendCommandsToConfig = async (
+    configPath: string,
+    commands: string[],
+  ) => {
+    const absoluteConfigPath = untildify(configPath);
+
+    await appendFile(
+      absoluteConfigPath,
+      ["", "# gib", ...commands, ""].join(EOL),
+    );
+
+    log(
+      wrap(`${command} has been added to ${pathText} in ${code(configPath)}`),
+    );
+    log();
+    log(wrap("The next time you want to launch gib, you can simply run:"));
+    log(`  ${wrap(code(command), width() - 2)}`);
+    log(
+      wrap(
+        chalk.dim(
+          "You will need to reload your terminal for this command to be available",
+        ),
+      ),
+    );
+  };
+
+  if (!SHELL || !(["fish", "zsh", "bash"] as const).includes(basename(SHELL))) {
+    promptToManuallyEditConfig("~/.bashrc", [
+      `export GIB_INSTALL=${quotedInstallFolder}`,
+      `export PATH=${quotedBinFolder}:$PATH`,
+    ]);
+  } else if (basename(SHELL) === "fish") {
+    const config = join("~", ".config", "fish", "config.fish");
+    const commands = [
+      `set --export GIB_INSTALL ${quotedInstallFolder}`,
+      `set --export PATH ${quotedBinFolder} $PATH`,
+    ];
+
+    try {
+      const commandsToAppend = await configCommandsNeeded(config, commands);
+      if (commandsToAppend.length) {
+        await appendCommandsToConfig(config, commandsToAppend);
+      } else {
+        return;
+      }
+    } catch {
+      promptToManuallyEditConfig(config, commands);
+    }
+  } else if (basename(SHELL) === "zsh") {
+    const config = join("~", ".zshrc");
+    const commands = [
+      `export GIB_INSTALL=${quotedInstallFolder}`,
+      `export PATH=${quotedBinFolder}:$PATH`,
+    ];
+
+    try {
+      const commandsToAppend = await configCommandsNeeded(config, commands);
+      if (commandsToAppend.length) {
+        await appendCommandsToConfig(config, commandsToAppend);
+      } else {
+        return;
+      }
+    } catch {
+      promptToManuallyEditConfig(config, commands);
+    }
+  } else if (basename(SHELL) === "bash") {
+    const { XDG_CONFIG_HOME } = env;
+    const configs = [
+      join("~", ".bash_profile"),
+      join("~", ".bashrc"),
+    ];
+    if (XDG_CONFIG_HOME) {
+      configs.concat(
+        join(XDG_CONFIG_HOME, ".bash_profile"),
+        join(XDG_CONFIG_HOME, ".bashrc"),
+        join(XDG_CONFIG_HOME, "bash_profile"),
+        join(XDG_CONFIG_HOME, "bashrc"),
+      );
+    }
+
+    const commands = [
+      `export GIB_INSTALL=${quotedInstallFolder}`,
+      `export PATH=${quotedBinFolder}:$PATH`,
+    ];
+
+    let done = false;
+    for (const config of configs) {
+      try {
+        const commandsToAppend = await configCommandsNeeded(config, commands);
+        if (commandsToAppend.length) {
+          await appendCommandsToConfig(config, commandsToAppend);
+        } else {
+          return;
+        }
+        done = true;
+        break;
+      } catch {}
+    }
+
+    if (!done) {
+      promptToManuallyEditConfig("~/.bashrc", commands);
+    }
+  }
+
+  log();
+  await alert(wrap(chalk.yellowBright("Press enter to continue")));
+  log();
+};
+
 export const prerun = async () => {
+  const command = basename(execPath);
+
   const {
     values: {
       version: wantsVersion,
       "check-latest": wantsUpdateExitStatus,
       update: wantsAutoUpdate,
+      "check-path": wantsCheckPath,
     },
   } = parseArgs({
     args: argv,
@@ -1435,6 +1593,10 @@ export const prerun = async () => {
         type: "boolean",
         short: "u",
         default: true,
+      },
+      "check-path": {
+        type: "boolean",
+        default: command === "gib",
       },
     },
     strict: true,
@@ -1463,6 +1625,16 @@ export const prerun = async () => {
   if (wantsUpdateExitStatus) exit(+updateAvailable);
 
   if (updateAvailable && await confirmUpdate(latest)) return;
+
+  if (wantsCheckPath) {
+    const commandResult = await $`command -v ${command}`.nothrow().quiet();
+    const commandExists = commandResult.exitCode === 0;
+
+    if (!commandExists) {
+      if (!updateAvailable) console.log();
+      await attemptAddCommandToPath(command);
+    }
+  }
 
   await run();
 };

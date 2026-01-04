@@ -88,6 +88,7 @@
     "steam-binary-vdf": "^0.1.0",
     "terminal-link": "^5.0.0",
     "unquote": "^1.1.1",
+    "untildify": "^6.0.0",
     "wrap-ansi": "^9.0.2",
     "zod": "^4.3.4"
   }
