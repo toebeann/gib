@@ -54,6 +54,7 @@ Apple Silicon processors are supported, provided you are running on macOS 13
 - Takes care of all the annoying stuff like making the run script executable and
   giving permission to run BepInEx which is where most people give up when
   installing manually!
+- Implements workarounds for common macOS-specific issues when using BepInEx
 - After installing BepInEx, runs an automated test to check that BepInEx is
   actually loading when you run the game, so you know that everything is working
   as it's supposed to!
