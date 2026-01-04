@@ -36,7 +36,7 @@
     "build:target": "bun build --compile --target=bun-$TARGET --minify --sourcemap --bytecode src/cli --outfile dist/gib-$TARGET",
     "build:local": "bun build --compile --minify --sourcemap --bytecode src/cli --outfile bin/gib",
     "build": "TARGET=darwin-x64 bun build:target & TARGET=darwin-aarch64 bun build:target & TARGET=darwin-x64-baseline bun build:target && wait",
-    "local": "bun build:local && export GIB_INSTALL=.; cat gib.sh | bash",
+    "local": "bun build:local && (export GIB_INSTALL=.; cat gib.sh | bash)",
     "zip:target": "zip -Dj9 dist/gib-$TARGET.zip dist/gib-$TARGET",
     "zip": "TARGET=darwin-x64 bun zip:target & TARGET=darwin-aarch64 bun zip:target & TARGET=darwin-x64-baseline bun zip:target && wait",
     "dist": "rm -rf ./dist && bun run build && bun zip"
