@@ -1415,14 +1415,12 @@ export const prerun = async () => {
   }
 
   const confirmUpdate = async (updateVersion: string) => {
-    const orange = color("orange", "ansi");
+    const orange = chalk.hex(color("orange", "hex")!);
 
     log();
     log(
       wrap(
-        `gib ${orange}${chalk.bold.underline(`v${updateVersion}`)}${
-          chalk.reset(" is available.")
-        }`,
+        `gib ${orange.bold.underline(`v${updateVersion}`)} is available.`,
       ),
     );
     log(
@@ -1469,9 +1467,9 @@ export const prerun = async () => {
       configPath: string,
       commands: string[],
     ) => {
-      log(wrap(`${command} not found in ${pathText}`));
+      log(wrap(`${command} not found in ${pathText}.`));
       log(
-        wrap(`We recommend adding ${command} to ${pathText} for ease of use`),
+        wrap(`We recommend adding ${command} to ${pathText} for ease of use.`),
       );
       log();
 
@@ -1514,7 +1512,9 @@ export const prerun = async () => {
       );
 
       log(
-        wrap(`${command} has been added to ${pathText} in ${code(configPath)}`),
+        wrap(
+          `${command} has been added to ${pathText} in ${code(configPath)}.`,
+        ),
       );
       log();
       log(wrap("The next time you want to launch gib, you can simply run:"));
@@ -1522,7 +1522,7 @@ export const prerun = async () => {
       log(
         wrap(
           chalk.dim(
-            "You will need to reload your terminal for this command to be available",
+            "You will need to reload your terminal for this command to be available.",
           ),
         ),
       );
