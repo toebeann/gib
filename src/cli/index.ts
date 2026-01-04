@@ -42,7 +42,14 @@
 import { $, argv, color, env, file, Glob, semver, write } from "bun";
 
 import { W_OK } from "node:constants";
-import { access, appendFile, chmod, mkdir, stat } from "node:fs/promises";
+import {
+  access,
+  appendFile,
+  chmod,
+  mkdir,
+  realpath,
+  stat,
+} from "node:fs/promises";
 import { EOL, homedir } from "node:os";
 import {
   basename,
@@ -320,7 +327,11 @@ export const run = async () => {
           return false;
         }
 
-        return path;
+        try {
+          return await realpath(path);
+        } catch {
+          return resolve(path);
+        }
       },
     ),
   );
@@ -450,11 +461,17 @@ export const run = async () => {
         return false;
       }
 
-      return basename(path) === "Contents"
+      const bestPath = basename(path) === "Contents"
         ? extname(dirname(path)) === ".app"
           ? dirname(path)
           : join(plist, "..", "MacOS", CFBundleExecutable)
         : path;
+
+      try {
+        return await realpath(bestPath);
+      } catch {
+        return resolve(bestPath);
+      }
     },
   );
   const gamePath = extname(gameAppPath) === ".app"
