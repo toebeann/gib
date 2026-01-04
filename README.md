@@ -7,6 +7,7 @@ the installation of [BepInEx](https://github.com/BepInEx/BepInEx), the popular
 modding framework for Unity games.
 
 To get started, just run the following command in Terminal:
+
 ```sh
 curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash
 ```
@@ -46,24 +47,24 @@ Apple Silicon processors are supported, provided you are running on macOS 13
 
 ## Features
 
--   Completely automates the process of installing BepInEx 5 for native unix
-    builds of Unity games on macOS - no more falling asleep or pulling your hair
-    out with frustration while trying to
-    [install it manually](https://github.com/toebeann/BepInEx.Subnautica/wiki/Idiot's-guide-to-macOS-installation#manual-installation)!
--   Takes care of all the annoying stuff like making the run script executable and
-    giving permission to run BepInEx which is where most people give up when
-    installing manually!
--   After installing BepInEx, runs an automated test to check that BepInEx is
-    actually loading when you run the game, so you know that everything is working
-    as it's supposed to!
--   Nifty Steam integrations:
+- Completely automates the process of installing BepInEx 5 for native unix
+  builds of Unity games on macOS - no more falling asleep or pulling your hair
+  out with frustration while trying to
+  [install it manually](https://github.com/toebeann/BepInEx.Subnautica/wiki/Idiot's-guide-to-macOS-installation#manual-installation)!
+- Takes care of all the annoying stuff like making the run script executable and
+  giving permission to run BepInEx which is where most people give up when
+  installing manually!
+- After installing BepInEx, runs an automated test to check that BepInEx is
+  actually loading when you run the game, so you know that everything is working
+  as it's supposed to!
+- Nifty Steam integrations:
 
-    -   Automatically configures the launch options to run Steam games with BepInEx!
-    -   Optionally adds Steam shortcuts to run Steam games vanilla (without mods) or
-        non-Steam games with mods!
+  - Automatically configures the launch options to run Steam games with BepInEx!
+  - Optionally adds Steam shortcuts to run Steam games vanilla (without mods) or
+    non-Steam games with mods!
 
-        _**Note:** The Steam shortcuts feature is experimental, please see
-        [Caveats](#caveats) below for details._
+    _**Note:** The Steam shortcuts feature is experimental, please see
+    [Caveats](#caveats) below for details._
 
 ## Usage
 
@@ -75,8 +76,10 @@ Just run the following command in Terminal:
 curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash
 ```
 
-This command will make sure that [bun](https://bun.sh/) (a speedy JavaScript
-runtime) is installed, then install and run the latest version of gib with it.
+This command will install and launch gib. After the first run, you can simply
+run the command `gib` in Terminal if you want to use it again instead (**note:**
+you will need to restart the Terminal first).
+
 If you're curious how it all works or want to verify the source code is safe,
 check [`gib.sh`](https://github.com/toebeann/gib/blob/main/gib.sh) and
 [`index.ts`](https://github.com/toebeann/gib/blob/main/src/cli/index.ts) for
@@ -95,56 +98,56 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 > [!NOTE]\
 > These usage instructions were originally written with macOS Sonoma in mind.
-> The instructions below should work for other versions of macOS, but there
-> may be some slight differences.
+> The instructions below should work for other versions of macOS, but there may
+> be some slight differences.
 
 #### Prerequisites
 
--   You'll want a Finder window open at the folder where the game is installed.
+- You'll want a Finder window open at the folder where the game is installed.
 
-    -   If you own the game on Steam, find the game in your library, then
-        right-click it and select `Manage` -> `Browse local files`.
+  - If you own the game on Steam, find the game in your library, then
+    right-click it and select `Manage` -> `Browse local files`.
 
-    -   For the Epic Games Launcher, find the game in your library, then right-click
-        it and select `Manage`. In the window that opens, look for the folder icon
-        and click it.
+  - For the Epic Games Launcher, find the game in your library, then right-click
+    it and select `Manage`. In the window that opens, look for the folder icon
+    and click it.
 
-    -   For games you typically launch with Spotlight, search for the game as usual
-        in Spotlight, and when the game is highlighted in the drop-down, hold
-        `Command` until the icon changes to Finder. With `Command` still held down,
-        press `Enter`.
+  - For games you typically launch with Spotlight, search for the game as usual
+    in Spotlight, and when the game is highlighted in the drop-down, hold
+    `Command` until the icon changes to Finder. With `Command` still held down,
+    press `Enter`.
 
--   You'll want a copy of BepInEx downloaded and unzipped in your Downloads
-    folder.
+- You'll want a copy of BepInEx downloaded and unzipped in your Downloads
+  folder.
 
-    If you're unsure where to get BepInEx from, try a Google search for
-    `[game name] bepinex pack`, e.g. for Subnautica, I would search for:
+  If you're unsure where to get BepInEx from, try a Google search for
+  `[game name] bepinex pack`, e.g. for Subnautica, I would search for:
 
-    ```
-    Subnautica BepInEx pack
-    ```
+  ```
+  Subnautica BepInEx pack
+  ```
 
-    Where available, it is always advised to use a popular pack of BepInEx which
-    has been tailored to the specific game you're trying to mod.
+  Where available, it is always advised to use a popular pack of BepInEx which
+  has been tailored to the specific game you're trying to mod.
 
-    If you can't find a BepInEx pack for the game, then the latest stable version
-    of BepInEx from their official GitHub repo will do.
-    [You can find it here](https://github.com/BepInEx/BepInEx/releases/latest) -
-    scroll down to the `Assets` section, then download the file with "unix" or
-    "macos_x64" in the name, e.g. `BepInEx_unix_5.4.22.0.zip`,
-    `BepInEx_macos_x64_5.4.23.2.zip`
+  If you can't find a BepInEx pack for the game, then the latest stable version
+  of BepInEx from their official GitHub repo will do.
+  [You can find it here](https://github.com/BepInEx/BepInEx/releases/latest) -
+  scroll down to the `Assets` section, then download the file with "unix" or
+  "macos_x64" in the name, e.g. `BepInEx_unix_5.4.22.0.zip`,
+  `BepInEx_macos_x64_5.4.23.2.zip`
 
-    Make sure it is unzipped in your Downloads folder after downloading it, as
-    presently gib requires this. By default, Safari will have unzipped it for you.
-    If you use other browsers, simply open the .zip and macOS should unzip it for
-    you.
+  Make sure it is unzipped in your Downloads folder after downloading it, as
+  presently gib requires this. By default, Safari will have unzipped it for you.
+  If you use other browsers, simply open the .zip and macOS should unzip it for
+  you.
 
-    Go ahead and open a Finder window in the unzipped BepInEx folder, so that you
-    can see the file `run_bepinex.sh`.
+  Go ahead and open a Finder window in the unzipped BepInEx folder, so that you
+  can see the file `run_bepinex.sh`.
 
-    Leave this Finder window open - you'll want to come back to it later.
+  Leave this Finder window open - you'll want to come back to it later.
 
-    <img width="920" alt="A screenshot of Finder window open at the location of BepInEx's run_bepinex.sh " src="https://github.com/toebeann/gib/assets/45315526/8b961265-2fd2-4017-85fb-2c91369a825f">
+  <img width="920" alt="A screenshot of Finder window open at the location of BepInEx's run_bepinex.sh " src="https://github.com/toebeann/gib/assets/45315526/8b961265-2fd2-4017-85fb-2c91369a825f">
 
 > [!TIP]\
 > In some cases the shell script to load BepInEx may be named something else,
@@ -153,18 +156,18 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 #### Running gib
 
-1.  Open Terminal from Launchpad or Spotlight (press `Command Space`, type
-    `terminal` and press `Enter`).
-   
-    <img width="600" alt="Searching for Terminal with macOS Spotlight" src="https://github.com/toebeann/BepInEx.Subnautica/assets/45315526/f374da75-5c74-4b49-99c2-25daa296c504">
+1. Open Terminal from Launchpad or Spotlight (press `Command Space`, type
+   `terminal` and press `Enter`).
 
-2.  Copy the command from the [Quick start](#quick-start) section above and paste
-    it in your terminal window with `Command V`, then press `Enter` to run it.
-    
-    <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd">
+   <img width="600" alt="Searching for Terminal with macOS Spotlight" src="https://github.com/toebeann/BepInEx.Subnautica/assets/45315526/f374da75-5c74-4b49-99c2-25daa296c504">
 
-3.  Now, simply follow the instructions in the terminal to install BepInEx to
-    your game!
+2. Copy the command from the [Quick start](#quick-start) section above and paste
+   it in your terminal window with `Command V`, then press `Enter` to run it.
+
+   <img width="585" alt="Running gib in the Terminal" src="https://github.com/toebeann/gib/assets/45315526/1325c6cf-b057-4491-8826-37a54a05affd">
+
+3. Now, simply follow the instructions in the terminal to install BepInEx to
+   your game!
 
 > [!TIP]\
 > You can press `Control C` at any time in the terminal to abort.
@@ -197,9 +200,9 @@ In either case, you can temporarily disable mods by following these steps:
 2. In the `General` tab of the window which opens, there should be a text input
    for launch options. Add the following text to the _beginning_ of the text
    field, so that it comes before _any_ other text:
-    ```sh
-    %command% #
-    ```
+   ```sh
+   %command% #
+   ```
 3. Close the window.
 
 Now, when you run the game with Steam, it should run without any mods. If you
@@ -222,9 +225,9 @@ need to undo the changes you made to the launch options:
 2. In the `General` tab of the window which opens, there should be a text input
    for launch options. **Delete** the following text, which should be at the
    start of the line:
-    ```sh
-    %command% #
-    ```
+   ```sh
+   %command% #
+   ```
 3. Close the window.
 
 The game should now run with mods once more when launched through Steam. If you
@@ -242,13 +245,13 @@ At present, uninstalling BepInEx is an entirely manual process which gib cannot
 automate, but it is fairly straightforward:
 
 1. Undo any changes gib made to your Steam library:
-    - **Steam games:**
-      [clear the launch options](#clearing-steam-launch-options), and
-      [remove the vanilla shortcut added during instalation](#removing-steam-shortcuts),
-      if applicable.
-    - **Non-Steam games:**
-      [remove the Steam shortcut to launch the game with BepInEx](<(#removing-steam-shortcuts)>),
-      if applicable.
+   - **Steam games:**
+     [clear the launch options](#clearing-steam-launch-options), and
+     [remove the vanilla shortcut added during instalation](#removing-steam-shortcuts),
+     if applicable.
+   - **Non-Steam games:**
+     [remove the Steam shortcut to launch the game with BepInEx]((#removing-steam-shortcuts)),
+     if applicable.
 2. You should also
    [remove the shortcuts added to your Applications folder by gib for the game](#removing-shortcuts-from-applications).
 3. Optionally, you can reclaim the disk space used by BepInEx and your mods by
@@ -321,14 +324,14 @@ mods from the game folder:
    installing BepInEx. If you can't remember how to find it, check the
    [Prerequisites](#prerequisites) section for instructions.
 2. Delete the following files if present:
-    - `changelog.txt`
-    - `doorstop_config.ini`
-    - `libdoorstop.dylib`
-    - `run_bepinex.sh`
-    - `winhttp.dll`
+   - `changelog.txt`
+   - `doorstop_config.ini`
+   - `libdoorstop.dylib`
+   - `run_bepinex.sh`
+   - `winhttp.dll`
 3. Delete the following folders if present:
-    - `doorstop_libs`
-    - `corlibs`
+   - `doorstop_libs`
+   - `corlibs`
 4. Finally, delete the `BepInEx` folder itself. Be aware that deleting this
    folder will delete not only BepInEx but also all mods you had installed, and
    any stored configuration of those mods.
@@ -340,9 +343,8 @@ mods from the game folder:
 > nor any mods you have installed for any games. For that, see
 > [Uninstalling BepInEx](#uninstalling-bepinex).
 
-As of gib v0.2, gib is installed and executed with [bun](https://bun.sh/). gib
-and its dependencies (besides bun) take up ~32 MB of space, and bun takes up
-~64 MB, making for a total less than ~100 MB, which is pretty negligible.
+As of gib v0.8, gib is a single-file executable created with
+[bun](https://bun.sh/) which takes up a negligible ~76 MB of space.
 
 If you do want to uninstall gib for the miniscule space saving, simply execute
 the following command in Terminal:
@@ -353,60 +355,61 @@ rm -rf ~/.gib
 
 ## Caveats
 
--   Steam shortcuts are an experimental feature and may not work with all games -
-    particularly the shortcuts to launch the game vanilla (without mods). For
-    non-Steam games this isn't an issue - you can simply launch the game
-    "normally" (_without_ Steam) and as such we don't offer to create a vanilla
-    shortcut. For Steam games however this can be irksome if we want to
-    occasionally run the game without mods.
+- Steam shortcuts are an experimental feature and may not work with all games -
+  particularly the shortcuts to launch the game vanilla (without mods). For
+  non-Steam games this isn't an issue - you can simply launch the game
+  "normally" (_without_ Steam) and as such we don't offer to create a vanilla
+  shortcut. For Steam games however this can be irksome if we want to
+  occasionally run the game without mods.
 
-    If the vanilla shortcut does not work for one of your Steam games, you are
-    encouraged to [remove the vanilla shortcut](#removing-steam-shortcuts) and
-    follow the guide to
-    [temporarily disable mods for the game](#temporarily-disabling-mods-for-a-game).
+  If the vanilla shortcut does not work for one of your Steam games, you are
+  encouraged to [remove the vanilla shortcut](#removing-steam-shortcuts) and
+  follow the guide to
+  [temporarily disable mods for the game](#temporarily-disabling-mods-for-a-game).
 
--   Only native macOS applications are currently supported.
+- Only native macOS applications are currently supported.
 
-    -   Support for Windows apps on macOS (e.g. via Wine-based solutions like
-        CrossOver) is being considered.
+  - Support for Windows apps on macOS (e.g. via Wine-based solutions like
+    CrossOver) is being considered.
 
-    -   Support for other operating systems is being considered.
+  - Support for other operating systems is being considered.
 
--   Only BepInEx 5 is currently supported. Support for BepInEx 6 is being
-    considered.
+- Only BepInEx 5 is currently supported. Support for BepInEx 6 is being
+  considered.
 
--   Users on Apple Silicon sometimes report that their game performance seems to
-    diminish with only BepInEx installed. This is due to the fact that BepInEx is
-    built for Intel-based chips, and therefore your Apple Silicon chip needs to
-    run it through Rosetta. Unfortunately, there is nothing gib can do to resolve
-    this, since BepInEx does not currently support Apple Silicon. You could try
-    running the Windows version of the game (and likewise installing the Windows
-    build of BepInEx) to see if that helps things at all. My recommendation would
-    be to prefer a Wine-based solution such as CrossOver over VMs like Parallels
-    Desktop, as VM-based solutions will introduce more performance bottlenecks,
-    though they are typically more convenient to get running. With a Wine-based
-    approach, make sure you additionally configure Wine to inject BepInEx when
-    the game launches by setting `winhttp` as a DLL override from the `Libraries`
-    tab of the game's Wine Configuration, otherwise the game will run without
-    BepInEx and thus without mods. Google how to access the Wine Configuration
-    via whatever Wine-based solution you're using if you're unsure how, e.g.
-    "access Wine Configuration via CrossOver". You also probably will need to
-    Google "how to install Windows versions of Steam games on mac with CrossOver"
-    or similar to get started.
+- Users on Apple Silicon sometimes report that their game performance seems to
+  diminish with only BepInEx installed. This is due to the fact that BepInEx is
+  built for Intel-based chips, and therefore your Apple Silicon chip needs to
+  run it through Rosetta. Unfortunately, there is nothing gib can do to resolve
+  this, since BepInEx does not currently support Apple Silicon. You could try
+  running the Windows version of the game (and likewise installing the Windows
+  build of BepInEx) to see if that helps things at all. My recommendation would
+  be to prefer a Wine-based solution such as CrossOver over VMs like Parallels
+  Desktop, as VM-based solutions will introduce more performance bottlenecks,
+  though they are typically more convenient to get running. With a Wine-based
+  approach, make sure you additionally configure Wine to inject BepInEx when the
+  game launches by setting `winhttp` as a DLL override from the `Libraries` tab
+  of the game's Wine Configuration, otherwise the game will run without BepInEx
+  and thus without mods. Google how to access the Wine Configuration via
+  whatever Wine-based solution you're using if you're unsure how, e.g. "access
+  Wine Configuration via CrossOver". You also probably will need to Google "how
+  to install Windows versions of Steam games on mac with CrossOver" or similar
+  to get started.
 
 ## Known issues
 
--   If the shell script to launch BepInEx is named something other than
-    `run_bepinex.sh` (e.g. `start_game_bepinex.sh`), gib will not recognise it. I
-    plan to fix this in an update. In the meantime, you can workaround this by
-    renaming the shell script to `run_bepinex.sh` as needed.
+- If the shell script to launch BepInEx is named something other than
+  `run_bepinex.sh` (e.g. `start_game_bepinex.sh`), gib will not recognise it. I
+  plan to fix this in an update. In the meantime, you can workaround this by
+  renaming the shell script to `run_bepinex.sh` as needed.
 
--   Relative paths are currently not supported and providing them will lead to
-    strange issues. If you encounter an issue after having provided a relative
-    path, please run the script again, this time providing absolute paths. You can
-    provide absolute paths easily by simply highlighting the file in Finder,
-    pressing `Option Command C`, then `Command V` in terminal to paste.
+- Relative paths are currently not supported and providing them will lead to
+  strange issues. If you encounter an issue after having provided a relative
+  path, please run the script again, this time providing absolute paths. You can
+  provide absolute paths easily by simply highlighting the file in Finder,
+  pressing `Option Command C`, then `Command V` in terminal to paste.
 
 ## License
 
-gib is licensed under the [ISC License](https://github.com/toebeann/gib?tab=ISC-1-ov-file#readme).
+gib is licensed under the
+[ISC License](https://github.com/toebeann/gib?tab=ISC-1-ov-file#readme).
