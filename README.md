@@ -76,9 +76,9 @@ Just run the following command in Terminal:
 curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash
 ```
 
-This command will install and launch gib. After the first run, you can simply
-run the command `gib` in Terminal if you want to use it again instead (**note:**
-you will need to restart the Terminal first).
+This command will install and launch gib. After this command has completed, to
+run gib in future you can simply run the command `gib` in Terminal instead.
+**Note:** You will need to reload the Terminal for this change to take effect.
 
 If you're curious how it all works or want to verify the source code is safe,
 check [`gib.sh`](https://github.com/toebeann/gib/blob/main/gib.sh) and
