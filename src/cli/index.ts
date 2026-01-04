@@ -87,9 +87,9 @@ import {
 } from "../launchers/steam/shortcut.ts";
 import { getFixedPath } from "../utils/getFixedPath.ts";
 import { find } from "../utils/process.ts";
-import { alert, confirm, prompt } from "../utils/prompt.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
 import { hasUnityAppIndicators, search } from "../utils/unity.ts";
+import { alert, confirm, prompt } from "./prompt.ts";
 import { renderLogo } from "./renderLogo.ts";
 
 const code = chalk.yellowBright.bold;
