@@ -93,6 +93,7 @@ import { hasUnityAppIndicators, search } from "../utils/unity.ts";
 import { renderLogo } from "./renderLogo.ts";
 
 const code = chalk.yellowBright.bold;
+const orange = chalk.hex(color("orange", "hex")!);
 
 const { error, log } = console;
 
@@ -1377,7 +1378,7 @@ export const prerun = async () => {
   const {
     values: {
       version: wantsVersion,
-      "check-latest": wantsUpdateExitStatus,
+      status: wantsUpdateExitStatus,
       update: wantsAutoUpdate,
       "check-path": wantsCheckPath,
     },
@@ -1389,9 +1390,9 @@ export const prerun = async () => {
         short: "v",
         default: false,
       },
-      "check-latest": {
+      status: {
         type: "boolean",
-        short: "c",
+        short: "s",
         default: false,
       },
       update: {
@@ -1415,8 +1416,6 @@ export const prerun = async () => {
   }
 
   const confirmUpdate = async (updateVersion: string) => {
-    const orange = chalk.hex(color("orange", "hex")!);
-
     log();
     log(
       wrap(
@@ -1441,7 +1440,7 @@ export const prerun = async () => {
 
       log();
       log(wrap("Run the following command to update and relaunch gib:"));
-      log(wrap(chalk.dim(command)));
+      log(`  ${wrap(chalk.dim(command))}`);
       log(
         wrap(
           `The command has been placed in your clipboard so you can simply paste it.`,
@@ -1626,7 +1625,26 @@ export const prerun = async () => {
   const updateAvailable = latest !== null &&
     semver.satisfies(version, `<${latest}`);
 
-  if (wantsUpdateExitStatus) exit(+updateAvailable);
+  if (wantsUpdateExitStatus) {
+    if (updateAvailable) {
+      const command =
+        "curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash";
+      await $`echo -n ${command.trim()} | pbcopy`.nothrow().quiet();
+
+      error(wrap(`gib ${chalk.bold.underline(`v${latest}`)} is available.`));
+      log(wrap("Run the following command to update and relaunch gib:"));
+      log(`  ${wrap(chalk.dim(command))}`);
+      log(
+        wrap(
+          `The command has been placed in your clipboard so you can simply paste it.`,
+        ),
+      );
+      exit(1);
+    } else {
+      log(wrap("gib is up-to-date."));
+      exit(0);
+    }
+  }
 
   if (updateAvailable && await confirmUpdate(latest)) return;
 

@@ -46,7 +46,7 @@
     # only download gib binary if necessary, e.g. user has specified a tag, or version reported by gib is not latest
     if [[ ! -x "$gib" ]] ||
         [[ $# = 1 ]] ||
-        ([[ $# = 0 ]] && ! "$gib" -c); then
+        ([[ $# = 0 ]] && ! "$gib" -s &>/dev/null); then
 
         command -v unzip >/dev/null || error "unzip is required to install gib"
 
