@@ -94,6 +94,7 @@ import { renderLogo } from "./renderLogo.ts";
 
 const code = chalk.yellowBright.bold;
 const orange = chalk.hex(color("orange", "hex")!);
+const pink = chalk.hex("#ae0956");
 
 const { error, log } = console;
 
@@ -106,8 +107,6 @@ const wrap = (
 ) => wrapAnsi(typeof str === "string" ? str : str.join(EOL), columns, options);
 
 export const run = async () => {
-  const pink = chalk.hex("#ae0956");
-
   const link = (
     label: string,
     url: string = label,
@@ -1377,6 +1376,7 @@ export const prerun = async () => {
 
   const {
     values: {
+      help: wantsHelp,
       version: wantsVersion,
       status: wantsUpdateExitStatus,
       update: wantsAutoUpdate,
@@ -1385,6 +1385,11 @@ export const prerun = async () => {
   } = parseArgs({
     args: argv,
     options: {
+      help: {
+        type: "boolean",
+        short: "h",
+        default: false,
+      },
       version: {
         type: "boolean",
         short: "v",
@@ -1412,6 +1417,83 @@ export const prerun = async () => {
     allowNegative: true,
     allowPositionals: true,
   });
+
+  const printHelp = () => {
+    log(
+      wrap(
+        `${
+          pink("gib")
+        } is a TUI app for automating the installation of BepInEx on macOS. ${
+          chalk.dim(`(${version})`)
+        }`,
+      ),
+    );
+    log();
+    log(wrap(chalk.bold(`Usage: gib ${chalk.cyan("[...flags]")}`)));
+    log();
+    log(wrap(chalk.bold("Flags:")));
+    log(
+      `  ${
+        wrap(
+          `${chalk.cyan("-v")}, ${
+            chalk.cyan("--version")
+          }          Print version and exit`,
+          width() - 2,
+        )
+      }`,
+    );
+    log(
+      `  ${
+        wrap(
+          `${chalk.cyan("-s")}, ${
+            chalk.cyan("--status")
+          }           Print update status and exit`,
+          width() - 2,
+        )
+      }`,
+    );
+    log(
+      `      ${
+        wrap(
+          `${chalk.cyan("--no-update")}        Disable update check`,
+          width() - 6,
+        )
+      }`,
+    );
+    if (command === "gib") {
+      log(
+        `      ${
+          wrap(
+            `${chalk.cyan("--no-path-check")}    Disable $PATH check`,
+            width() - 6,
+          )
+        }`,
+      );
+    }
+    log(
+      `  ${
+        wrap(
+          `${chalk.cyan("-h")}, ${
+            chalk.cyan("--help")
+          }             Display usage information and exit`,
+          width() - 2,
+        )
+      }`,
+    );
+    log();
+    log(
+      wrap(
+        `Learn more about gib:    ${
+          pink("https://github.com/toebeann/gib#readme")
+        }`,
+      ),
+    );
+  };
+
+  if (wantsHelp) {
+    printHelp();
+    return;
+  }
 
   if (wantsVersion) {
     log(version);
