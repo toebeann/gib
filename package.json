@@ -37,9 +37,10 @@
     "build:local": "bun build --compile --minify --sourcemap --bytecode src/cli --outfile bin/gib",
     "build": "TARGET=darwin-x64 bun build:target & TARGET=darwin-aarch64 bun build:target && wait",
     "local": "bun build:local && (export GIB_INSTALL=.; cat gib.sh | bash)",
+    "lipo": "lipo -create -output ./dist/gib-darwin-universal ./dist/gib-darwin-x64 ./dist/gib-darwin-aarch64",
     "zip:target": "zip -Dj9 dist/gib-$TARGET.zip dist/gib-$TARGET",
-    "zip": "TARGET=darwin-x64 bun zip:target & TARGET=darwin-aarch64 bun zip:target && wait",
-    "dist": "rm -rf ./dist && bun run build && bun zip"
+    "zip": "TARGET=darwin-universal bun zip:target",
+    "dist": "rm -rf ./dist && bun run build && bun lipo && bun zip"
   },
   "engines": {
     "bun": "^1.3.5"

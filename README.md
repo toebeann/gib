@@ -344,11 +344,11 @@ mods from the game folder:
 > nor any mods you have installed for any games. For that, see
 > [Uninstalling BepInEx](#uninstalling-bepinex).
 
-As of gib v0.8, gib is a single-file executable created with
-[bun](https://bun.sh/) which takes up a negligible ~70 MB of space.
+As of gib v0.8, gib is a single-file executable built with
+[bun](https://bun.sh/), and takes up ~150 MB of space.
 
-If you do want to uninstall gib for the miniscule space saving, simply execute
-the following command in Terminal:
+If you do want to uninstall gib, simply execute the following command in
+Terminal to delete all gib-related files:
 
 ```sh
 rm -rf ~/.gib
