@@ -52,11 +52,8 @@
 
         platform=$(uname -ms)
         case $platform in
-        "Darwin x86_64")
-            target=darwin-x64
-            ;;
-        "Darwin arm64")
-            target=darwin-aarch64
+        "Darwin x86_64"|"Darwin arm64")
+            target=darwin-universal
             ;;
         *)
             error "Target platform (${platform}) is not supported."
