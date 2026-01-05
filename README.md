@@ -143,16 +143,11 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
   you.
 
   Go ahead and open a Finder window in the unzipped BepInEx folder, so that you
-  can see the file `run_bepinex.sh`.
+  can see the file `run_bepinex.sh` (or similar).
 
   Leave this Finder window open - you'll want to come back to it later.
 
   <img width="920" alt="A screenshot of Finder window open at the location of BepInEx's run_bepinex.sh " src="https://github.com/toebeann/gib/assets/45315526/8b961265-2fd2-4017-85fb-2c91369a825f">
-
-> [!TIP]\
-> In some cases the shell script to load BepInEx may be named something else,
-> e.g. `start_game_bepinex.sh` - in this case you will need to rename it to
-> `run_bepinex.sh` for gib to recognise it.
 
 #### Running gib
 
@@ -327,7 +322,7 @@ mods from the game folder:
    - `changelog.txt`
    - `doorstop_config.ini`
    - `libdoorstop.dylib`
-   - `run_bepinex.sh`
+   - `run_bepinex.sh` (or similar)
    - `winhttp.dll`
 3. Delete the following folders if present:
    - `doorstop_libs`
