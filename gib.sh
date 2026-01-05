@@ -54,11 +54,6 @@
         case $platform in
         "Darwin x86_64")
             target=darwin-x64
-
-            # check AVX2 support
-            if [[ $(sysctl -a | grep machdep.cpu | grep AVX2) == '' ]]; then
-                target="$target-baseline"
-            fi
             ;;
         "Darwin arm64")
             target=darwin-aarch64
