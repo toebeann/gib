@@ -266,48 +266,30 @@ export const run = async () => {
     `Select it and press ${copyPath} to copy its path, then press ${paste} to paste the path here.`,
   ], false);
 
-  const bepinexPath = dirname(
-    await promptUntilValid(
-      wrap([
-        null,
-        `In Finder, locate the ${run_bepinex_sh} (or similar) script file within your downloaded BepInEx pack, then either:`,
-        null,
-        providePathInstructions,
-        null,
-        `Path to ${run_bepinex_sh} (or similar):`,
-      ]),
-      async (value) => {
-        const input = unquote(value);
-        const path = await getFixedPath(input);
+  const bepinexScriptPath = await promptUntilValid(
+    wrap([
+      null,
+      `In Finder, locate the ${run_bepinex_sh} (or similar) script file within your downloaded BepInEx pack, then either:`,
+      null,
+      providePathInstructions,
+      null,
+      `Path to ${run_bepinex_sh} (or similar):`,
+    ]),
+    async (value) => {
+      const input = unquote(value);
+      const path = await getFixedPath(input);
 
-        if (!path) {
-          error(getInvalidPathError(input));
-          return false;
-        }
+      if (!path) {
+        error(getInvalidPathError(input));
+        return false;
+      }
 
-        try {
-          if (!(await stat(path)).isFile()) {
-            error(
-              wrap([
-                null,
-                `${err} Path is not a file:`,
-                chalk.yellow(path),
-                null,
-                `Please make sure you are selecting the ${run_bepinex_sh} (or similar) script file and try again.`,
-              ]),
-            );
-            return false;
-          }
-        } catch {
-          error(getUnknownErrorCheckingPath(path));
-          return false;
-        }
-
-        if (!await isDoorstopScript(path) || !await hasBepInExCore(path)) {
+      try {
+        if (!(await stat(path)).isFile()) {
           error(
             wrap([
               null,
-              `${err} File does not appear to be a valid BepInEx run script:`,
+              `${err} Path is not a file:`,
               chalk.yellow(path),
               null,
               `Please make sure you are selecting the ${run_bepinex_sh} (or similar) script file and try again.`,
@@ -315,49 +297,67 @@ export const run = async () => {
           );
           return false;
         }
+      } catch {
+        error(getUnknownErrorCheckingPath(path));
+        return false;
+      }
 
-        if (!await hasMacOsSupport(path)) {
-          error(
-            wrap([
-              null,
-              `${err} BepInEx run script does not appear to support macOS:`,
-              chalk.yellow(path),
-              null,
-              "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
-            ]),
-          );
-          return false;
-        }
+      if (!await isDoorstopScript(path) || !await hasBepInExCore(path)) {
+        error(
+          wrap([
+            null,
+            `${err} File does not appear to be a valid BepInEx run script:`,
+            chalk.yellow(path),
+            null,
+            `Please make sure you are selecting the ${run_bepinex_sh} (or similar) script file and try again.`,
+          ]),
+        );
+        return false;
+      }
 
-        const libdoorstop = join(path, "..", "libdoorstop.dylib");
-        const oldDoorstop = join(path, "..", "doorstop_libs");
+      if (!await hasMacOsSupport(path)) {
+        error(
+          wrap([
+            null,
+            `${err} BepInEx run script does not appear to support macOS:`,
+            chalk.yellow(path),
+            null,
+            "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
+          ]),
+        );
+        return false;
+      }
 
-        if (
-          !await access(libdoorstop).then(() =>
-            stat(libdoorstop).then((stats) => stats.isFile())
-          ).catch(() => false) &&
-          !await access(oldDoorstop).then(() =>
-            stat(oldDoorstop).then((stats) => stats.isDirectory())
-          ).catch(() => false)
-        ) {
-          error(getInvalidBepInExPackError());
-          return false;
-        }
+      const libdoorstop = join(path, "..", "libdoorstop.dylib");
+      const oldDoorstop = join(path, "..", "doorstop_libs");
 
-        try {
-          return await realpath(path);
-        } catch {
-          return resolve(path);
-        }
-      },
-    ),
+      if (
+        !await access(libdoorstop).then(() =>
+          stat(libdoorstop).then((stats) => stats.isFile())
+        ).catch(() => false) &&
+        !await access(oldDoorstop).then(() =>
+          stat(oldDoorstop).then((stats) => stats.isDirectory())
+        ).catch(() => false)
+      ) {
+        error(getInvalidBepInExPackError());
+        return false;
+      }
+
+      try {
+        return await realpath(path);
+      } catch {
+        return resolve(path);
+      }
+    },
   );
+  let bepinexScriptName = basename(bepinexScriptPath);
+  const bepinexFolderPath = dirname(bepinexScriptPath);
 
   log(
     wrap([
       null,
       "macOS BepInEx pack successfully detected at:",
-      chalk.green.bold(bepinexPath),
+      chalk.green.bold(bepinexFolderPath),
       null,
       "Next, we need to know the location of the Unity game.",
     ]),
@@ -600,14 +600,14 @@ export const run = async () => {
   };
 
   const installBepInEx = async () => {
-    const i = bepinexPath.split(sep).length;
+    const i = bepinexFolderPath.split(sep).length;
     const glob = new Glob("**/*");
     for await (
       const origin of glob.scan({
         absolute: true,
         dot: true,
         onlyFiles: true,
-        cwd: bepinexPath,
+        cwd: bepinexFolderPath,
       })
     ) {
       if (basename(origin) === ".DS_Store") continue;
@@ -617,10 +617,7 @@ export const run = async () => {
         await write(destination, file(origin));
       }
 
-      if (
-        basename(origin) === "run_bepinex.sh" &&
-        dirname(origin) === bepinexPath
-      ) {
+      if (pathEqual(origin, bepinexScriptPath)) {
         await configureBepInExScript(destination, gameAppPath);
       }
     }
@@ -639,13 +636,13 @@ export const run = async () => {
     ),
     (async () => {
       if (
-        !await access(join(bepinexPath, "libdoorstop.dylib"))
+        !await access(join(bepinexFolderPath, "libdoorstop.dylib"))
           .then(() => true)
           .catch(() => false)
       ) return false;
 
       try {
-        return (await file(join(bepinexPath, "run_bepinex.sh")).text())
+        return (await file(bepinexScriptPath).text())
           .includes("--doorstop_enabled)");
       } catch {
         return false;
@@ -835,17 +832,23 @@ export const run = async () => {
             installing,
           ]);
 
+          bepinexScriptName = "run_bepinex.sh";
           const filenames = Object.keys(archive.files);
-          if (!filenames.includes("run_bepinex.sh")) {
+          if (!filenames.includes(bepinexScriptName)) {
             throw "Downloded BepInEx pack appears invalid";
           }
+
+          if (basename(bepinexScriptPath) !== bepinexScriptName) {
+            await file(resolve(gamePath, basename(bepinexScriptPath))).delete();
+          }
+
           await Promise.all(filenames
             .map((filename) =>
               archive.file(filename)!
                 .async("arraybuffer")
                 .then((data) => write(resolve(gamePath, filename), data))
                 .then(() =>
-                  filename === "run_bepinex.sh" &&
+                  filename === bepinexScriptName &&
                     configureBepInExScript(
                       resolve(gamePath, filename),
                       gameAppPath,
@@ -871,7 +874,7 @@ export const run = async () => {
                 "/usr/bin/arch",
                 "-x86_64",
                 "/bin/bash",
-                resolve(gamePath, "run_bepinex.sh"),
+                resolve(gamePath, bepinexScriptName),
                 "%command%",
               ]),
               userId,
@@ -1146,7 +1149,7 @@ export const run = async () => {
                   "/usr/bin/arch",
                   "-x86_64",
                   "/bin/bash",
-                  join(gamePath, "run_bepinex.sh"),
+                  join(gamePath, bepinexScriptName),
                   gameAppPath,
                 ]),
               ].join(EOL),
@@ -1407,7 +1410,6 @@ export const run = async () => {
 
 export const prerun = async () => {
   const command = basename(execPath);
-
   const {
     values: {
       help: wantsHelp,
