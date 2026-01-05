@@ -101,6 +101,7 @@ import { getFixedPath } from "../utils/getFixedPath.ts";
 import { find } from "../utils/process.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
 import { hasUnityAppIndicators, search } from "../utils/unity.ts";
+import { config } from "./config.ts";
 import { alert, confirm, prompt } from "./prompt.ts";
 import { renderLogo } from "./renderLogo.ts";
 
@@ -1408,30 +1409,15 @@ export const run = async () => {
   }
 };
 
-export const prerun = async () => {
+export const setup = async () => {
   const command = basename(execPath);
   const {
-    values: {
-      help: wantsHelp,
-      version: wantsVersion,
-      status: wantsUpdateExitStatus,
-      update: wantsAutoUpdate,
-      "path-check": wantsCheckPath,
-    },
-  } = parseArgs({
-    allowNegative: true,
-    allowPositionals: true,
-    strict: true,
-    options: {
-      help: { type: "boolean", short: "h", default: false },
-      version: { type: "boolean", short: "v", default: false },
-      status: { type: "boolean", short: "s", default: false },
-      update: { type: "boolean", default: true },
-      ...(command === "gib"
-        ? { "path-check": { type: "boolean", default: true } }
-        : {}),
-    },
-  });
+    wantsHelp,
+    wantsVersion,
+    wantsAutoUpdate,
+    wantsUpdateExitStatus,
+    wantsCheckPath,
+  } = config();
 
   const printHelp = () => {
     log(
@@ -1771,4 +1757,4 @@ export const prerun = async () => {
   await run();
 };
 
-if (import.meta.main) prerun();
+if (import.meta.main) setup();
