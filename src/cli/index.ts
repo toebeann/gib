@@ -1515,11 +1515,11 @@ export const prerun = async () => {
     return;
   }
 
-  const confirmUpdate = async (updateVersion: string) => {
+  const confirmUpdate = async () => {
     log();
     log(
       wrap(
-        `gib ${orange.bold.underline(`v${updateVersion}`)} is available.`,
+        `gib ${orange.bold.underline(`v${latest}`)} is available.`,
       ),
     );
     log(
@@ -1534,9 +1534,7 @@ export const prerun = async () => {
     log();
 
     if (await confirm(chalk.yellowBright("Would you like to update?"))) {
-      const command =
-        "curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash";
-      await $`echo -n ${command.trim()} | pbcopy`.nothrow().quiet();
+      await $`echo -n ${updateCommand.trim()} | pbcopy`.nothrow().quiet();
 
       log();
       log(wrap("Run the following command to update and relaunch gib:"));
@@ -1723,11 +1721,12 @@ export const prerun = async () => {
   const updateAvailable = latest !== null &&
     semver.satisfies(version, `<${latest}`);
 
+  const updateCommand =
+    `curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib@v${latest}/gib.sh | bash -s v${latest}`;
+
   if (wantsUpdateExitStatus) {
     if (updateAvailable) {
-      const command =
-        "curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib/gib.sh | bash";
-      await $`echo -n ${command.trim()} | pbcopy`.nothrow().quiet();
+      await $`echo -n ${updateCommand.trim()} | pbcopy`.nothrow().quiet();
 
       error(wrap(`gib ${chalk.bold.underline(`v${latest}`)} is available.`));
       log(wrap("Run the following command to update and relaunch gib:"));
@@ -1744,7 +1743,7 @@ export const prerun = async () => {
     }
   }
 
-  if (updateAvailable && await confirmUpdate(latest)) return;
+  if (updateAvailable && await confirmUpdate()) return;
 
   if (wantsCheckPath) {
     const commandResult = await $`command -v ${command}`.nothrow().quiet();
