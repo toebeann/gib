@@ -39,7 +39,7 @@
  *
  *****************************************************************************/
 
-import { $, argv, color, env, file, Glob, semver, write } from "bun";
+import { $, color, env, file, Glob, semver, write } from "bun";
 
 import { W_OK } from "node:constants";
 import {
@@ -1400,7 +1400,6 @@ export const prerun = async () => {
       "path-check": wantsCheckPath,
     },
   } = parseArgs({
-    args: argv,
     allowNegative: true,
     allowPositionals: true,
     strict: true,
