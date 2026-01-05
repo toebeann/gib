@@ -92,6 +92,11 @@ import {
   setShortcuts,
   type Shortcut,
 } from "../launchers/steam/shortcut.ts";
+import {
+  hasBepInExCore,
+  hasMacOsSupport,
+  isDoorstopScript,
+} from "../utils/doorstop.ts";
 import { getFixedPath } from "../utils/getFixedPath.ts";
 import { find } from "../utils/process.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
@@ -265,11 +270,11 @@ export const run = async () => {
     await promptUntilValid(
       wrap([
         null,
-        `In Finder, locate the ${run_bepinex_sh} script file within your downloaded BepInEx pack, then either:`,
+        `In Finder, locate the ${run_bepinex_sh} (or similar) script file within your downloaded BepInEx pack, then either:`,
         null,
         providePathInstructions,
         null,
-        `Path to ${run_bepinex_sh}:`,
+        `Path to ${run_bepinex_sh} (or similar):`,
       ]),
       async (value) => {
         const input = unquote(value);
@@ -288,7 +293,7 @@ export const run = async () => {
                 `${err} Path is not a file:`,
                 chalk.yellow(path),
                 null,
-                `Please make sure you are selecting the ${run_bepinex_sh} script and try again.`,
+                `Please make sure you are selecting the ${run_bepinex_sh} (or similar) script file and try again.`,
               ]),
             );
             return false;
@@ -298,15 +303,27 @@ export const run = async () => {
           return false;
         }
 
-        const filename = basename(path);
-        if (filename.toLowerCase() !== "run_bepinex.sh") {
+        if (!await isDoorstopScript(path) || !await hasBepInExCore(path)) {
           error(
             wrap([
               null,
-              `${err} Unexpected filename:`,
-              chalk.yellow(filename),
+              `${err} File does not appear to be a valid BepInEx run script:`,
+              chalk.yellow(path),
               null,
-              `If you are absolutely sure this is a valid ${run_bepinex_sh} script, rename it to ${run_bepinex_sh} and try again.`,
+              `Please make sure you are selecting the ${run_bepinex_sh} (or similar) script file and try again.`,
+            ]),
+          );
+          return false;
+        }
+
+        if (!await hasMacOsSupport(path)) {
+          error(
+            wrap([
+              null,
+              `${err} BepInEx run script does not appear to support macOS:`,
+              chalk.yellow(path),
+              null,
+              "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
             ]),
           );
           return false;

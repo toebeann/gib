@@ -62,7 +62,8 @@
     "@types/readline-sync": "^1.4.8",
     "@types/shell-quote": "^1.7.5",
     "@types/unquote": "^1.1.0",
-    "ix": "^7.0.0"
+    "ix": "^7.0.0",
+    "mitata": "^1.0.34"
   },
   "dependencies": {
     "@node-steam/id": "^1.2.0",

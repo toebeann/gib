@@ -42,7 +42,6 @@ Apple Silicon processors are supported, provided you are running on macOS 13
       - [Removing BepInEx from the game folder](#removing-bepinex-from-the-game-folder)
     - [Uninstalling gib](#uninstalling-gib)
   - [Caveats](#caveats)
-  - [Known issues](#known-issues)
   - [License](#license)
 
 ## Features
@@ -396,13 +395,6 @@ rm -rf ~/.gib
   Wine Configuration via CrossOver". You also probably will need to Google "how
   to install Windows versions of Steam games on mac with CrossOver" or similar
   to get started.
-
-## Known issues
-
-- If the shell script to launch BepInEx is named something other than
-  `run_bepinex.sh` (e.g. `start_game_bepinex.sh`), gib will not recognise it. I
-  plan to fix this in an update. In the meantime, you can workaround this by
-  renaming the shell script to `run_bepinex.sh` as needed.
 
 ## License
 
