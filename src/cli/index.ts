@@ -63,7 +63,6 @@ import {
   sep,
 } from "node:path";
 import { execPath, exit, kill, platform } from "node:process";
-import { parseArgs } from "node:util";
 
 import chalk from "chalk";
 import { watch } from "chokidar";
