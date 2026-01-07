@@ -42,14 +42,7 @@
 import { $, color, env, file, Glob, semver, write } from "bun";
 
 import { W_OK } from "node:constants";
-import {
-  access,
-  appendFile,
-  chmod,
-  mkdir,
-  realpath,
-  stat,
-} from "node:fs/promises";
+import { access, appendFile, chmod, mkdir, realpath } from "node:fs/promises";
 import { EOL, homedir } from "node:os";
 import {
   basename,
@@ -286,7 +279,10 @@ export const run = async () => {
       }
 
       try {
-        if (!(await stat(path)).isFile()) {
+        if (
+          !await file(path).stat()
+            .then((stats) => stats.isFile()).catch(() => false)
+        ) {
           error(
             wrap([
               null,
@@ -333,12 +329,10 @@ export const run = async () => {
       const oldDoorstop = join(path, "..", "doorstop_libs");
 
       if (
-        !await access(libdoorstop).then(() =>
-          stat(libdoorstop).then((stats) => stats.isFile())
-        ).catch(() => false) &&
-        !await access(oldDoorstop).then(() =>
-          stat(oldDoorstop).then((stats) => stats.isDirectory())
-        ).catch(() => false)
+        !await file(libdoorstop).stat()
+          .then((stats) => stats.isFile()).catch(() => false) &&
+        !await file(oldDoorstop).stat()
+          .then((stats) => stats.isDirectory()).catch(() => false)
       ) {
         error(getInvalidBepInExPackError());
         return false;
@@ -405,17 +399,15 @@ export const run = async () => {
         return false;
       }
 
-      try {
-        if (!(await stat(path)).isDirectory()) {
-          error(
-            `${getNotAFolderError(path)}${EOL}${EOL}${
-              wrap(pleaseSelectAUnityGameAndTryAgain)
-            }`,
-          );
-          return false;
-        }
-      } catch {
-        error(getUnknownErrorCheckingPath(path));
+      if (
+        !await file(path).stat()
+          .then((stats) => stats.isDirectory()).catch(() => false)
+      ) {
+        error(
+          `${getNotAFolderError(path)}${EOL}${EOL}${
+            wrap(pleaseSelectAUnityGameAndTryAgain)
+          }`,
+        );
         return false;
       }
 

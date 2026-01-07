@@ -1,6 +1,5 @@
 import { file } from "bun";
 
-import { stat } from "node:fs/promises";
 import { basename, dirname, extname, join, normalize, sep } from "node:path";
 
 import { exists } from "../fs/exists.ts";
@@ -25,7 +24,10 @@ export const search = async function* (
   const index = parts.lastIndexOf("Contents");
   const pathExists = exists(path);
   const isDir = pathExists
-    .then((exists) => exists && stat(path).then((stats) => stats.isDirectory()))
+    .then((exists) =>
+      exists &&
+      file(path).stat().then((stats) => stats.isDirectory())
+    )
     .catch(() => false);
   const searchDir =
     (extname(path) === ".app" || basename(path) === "Contents") && await isDir
@@ -64,12 +66,12 @@ export const search = async function* (
  */
 export const hasCommonUnityFiles = (plist: string) =>
   booleanRace([
-    stat(join(plist, "..", "Data", "boot.config")),
-    stat(join(plist, "..", "Resources", "Data", "boot.config")),
-    stat(join(plist, "..", "Data", "globalgamemanagers")),
-    stat(join(plist, "..", "Resources", "Data", "globalgamemanagers")),
-    stat(join(plist, "..", "Data", "resources.assets")),
-    stat(join(plist, "..", "Resources", "Data", "resources.assets")),
+    file(join(plist, "..", "Data", "boot.config")).stat(),
+    file(join(plist, "..", "Resources", "Data", "boot.config")).stat(),
+    file(join(plist, "..", "Data", "globalgamemanagers")).stat(),
+    file(join(plist, "..", "Resources", "Data", "globalgamemanagers")).stat(),
+    file(join(plist, "..", "Data", "resources.assets")).stat(),
+    file(join(plist, "..", "Resources", "Data", "resources.assets")).stat(),
   ].map((promise) =>
     promise
       .then((stats) => stats.isFile())
@@ -126,6 +128,6 @@ export const hasUnityBuildNumber = async (plist: string) =>
  * @param plist The path to the `Info.plist` of the macOS Application to check.
  */
 export const hasUnityPlayerDylib = (plist: string) =>
-  stat(join(plist, "..", "Frameworks", "UnityPlayer.dylib"))
+  file(join(plist, "..", "Frameworks", "UnityPlayer.dylib")).stat()
     .then((stats) => stats.isFile())
     .catch(() => false);
