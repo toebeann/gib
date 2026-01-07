@@ -91,6 +91,7 @@ import {
   getShortcuts,
   setShortcuts,
   type Shortcut,
+  updateShortcut,
 } from "../launchers/steam/shortcut.ts";
 import {
   hasBepInExCore,
@@ -883,21 +884,50 @@ export const run = async () => {
               if (!success) throw wrap("Failed to set launch options");
             }),
             shouldAddShortcut && getShortcuts(userId)
-              .then((shortcuts) =>
-                shortcuts && setShortcuts(
-                  addShortcut({
-                    AppName: `${name} (Vanilla)`,
-                    Exe: quote([shortcutPath]),
-                    icon: join(
-                      shortcutPath,
-                      "Contents",
-                      "Resources",
-                      "PlayerIcon.png",
-                    ),
-                  } as Shortcut, shortcuts),
+              .then(async (shortcuts) => {
+                const shortcut = {
+                  AppName: `${name} (Vanilla)`,
+                  Exe: quote([shortcutPath]),
+                  LaunchOptions: `# gib v${version}`,
+                  icon: join(
+                    shortcutPath,
+                    "Contents",
+                    "Resources",
+                    "PlayerIcon.png",
+                  ),
+                } satisfies Shortcut;
+
+                if (shortcuts) {
+                  const key = Object.keys(shortcuts.shortcuts).find((key) => {
+                    const { AppName, LaunchOptions, Exe } =
+                      shortcuts.shortcuts[key] ?? {};
+
+                    if (
+                      AppName?.localeCompare(
+                        shortcut.AppName,
+                        undefined,
+                        { sensitivity: "accent" },
+                      ) !== 0
+                    ) return false;
+
+                    return (LaunchOptions &&
+                      /#\s*gib v.*/.test(LaunchOptions)) ||
+                      (Exe && pathEqual(Exe.trim(), shortcut.Exe.trim()));
+                  });
+
+                  return await setShortcuts(
+                    key
+                      ? updateShortcut(key, shortcut, shortcuts)
+                      : addShortcut(shortcut, shortcuts),
+                    userId,
+                  );
+                }
+
+                return await setShortcuts(
+                  { shortcuts: { 0: shortcut } },
                   userId,
-                )
-              )
+                );
+              })
               .then((success) => {
                 if (!success) throw wrap("Failed to add shortcut");
               }),
@@ -1109,23 +1139,45 @@ export const run = async () => {
                 ),
               ]);
             }
-            const shortcuts = await getShortcuts(userId);
-            return shortcuts && await setShortcuts(
-              addShortcut(
-                {
-                  AppName: `${gameName} (BepInEx)`,
-                  Exe: quote([shortcutPath]),
-                  icon: join(
-                    shortcutPath,
-                    "Contents",
-                    "Resources",
-                    "PlayerIcon.png",
-                  ),
-                } satisfies Shortcut,
-                shortcuts,
+            const shortcut = {
+              AppName: `${gameName} (BepInEx)`,
+              Exe: quote([shortcutPath]),
+              LaunchOptions: `# gib v${version}`,
+              icon: join(
+                shortcutPath,
+                "Contents",
+                "Resources",
+                "PlayerIcon.png",
               ),
-              userId,
-            );
+            } satisfies Shortcut;
+            const shortcuts = await getShortcuts(userId);
+            if (shortcuts) {
+              const key = Object.keys(shortcuts.shortcuts).find((key) => {
+                const { AppName, LaunchOptions, Exe } =
+                  shortcuts.shortcuts[key] ?? {};
+
+                if (
+                  AppName?.localeCompare(
+                    shortcut.AppName,
+                    undefined,
+                    { sensitivity: "accent" },
+                  ) !== 0
+                ) return false;
+
+                return (LaunchOptions &&
+                  /#\s*gib v.*/.test(LaunchOptions)) ||
+                  (Exe && pathEqual(Exe.trim(), shortcut.Exe.trim()));
+              });
+
+              return await setShortcuts(
+                key
+                  ? updateShortcut(key, shortcut, shortcuts)
+                  : addShortcut(shortcut, shortcuts),
+                userId,
+              );
+            }
+
+            return await setShortcuts({ shortcuts: { 0: shortcut } }, userId);
           })
           .then((success) => {
             if (!success) throw wrap("Failed to add shortcut");

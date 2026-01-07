@@ -151,6 +151,27 @@ export const addShortcut = (
 };
 
 /**
+ * Update shortcut by key `key`. To save changes, call `setShortcuts` on the
+ * result.
+ *
+ * @param key
+ * @param shortcut
+ * @param shortcuts
+ * @returns
+ */
+export const updateShortcut = (
+  key: string,
+  shortcut: Shortcut,
+  shortcuts: Shortcuts,
+): Shortcuts => {
+  shortcuts.shortcuts[key] = {
+    ...(shortcuts.shortcuts[key] || {}),
+    ...shortcut,
+  };
+  return shortcuts;
+};
+
+/**
  * Add all shortcuts in `arr` to `shortcuts`. To save the changes, call
  * `setShortcuts` on the result.
  *
