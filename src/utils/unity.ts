@@ -46,9 +46,13 @@ export const search = async function* (
     if (await hasUnityAppIndicators(path, indicators)) {
       const plist = await readPlist(path);
       const { CFBundleName, CFBundleExecutable } = plist;
+      const bundle = extname(dirname(dirname(path))) === ".app"
+        ? dirname(dirname(path))
+        : dirname(path);
+        
       yield {
         name: CFBundleName,
-        bundle: dirname(dirname(path)),
+        bundle,
         executable: CFBundleExecutable &&
           join(path, "..", "MacOS", CFBundleExecutable),
         plist,
