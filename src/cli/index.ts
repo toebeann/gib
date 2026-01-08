@@ -260,90 +260,124 @@ export const run = async () => {
     `Select it and press ${copyPath} to copy its path, then press ${paste} to paste the path here.`,
   ], false);
 
+  const bepinexScriptPathValidator = async (
+    value: string,
+  ): Promise<string | false> => {
+    const input = unquote(value);
+    const path = await getFixedPath(input);
+
+    if (!path) {
+      error(getInvalidPathError(input));
+      return false;
+    }
+
+    try {
+      if (
+        await file(path).stat()
+          .then((stats) => stats.isDirectory()).catch(() => false)
+      ) {
+        const glob = new Glob("**/*");
+        for await (
+          const filePath of glob.scan({
+            absolute: true,
+            cwd: path,
+            dot: true,
+            followSymlinks: true,
+            onlyFiles: true,
+          })
+        ) {
+          try {
+            if (
+              await isDoorstopScript(filePath) &&
+              await hasBepInExCore(filePath) &&
+              await hasMacOsSupport(filePath) &&
+              (await file(join(filePath, "..", "libdoorstop.dylib")).stat()
+                .then((stats) => stats.isFile()).catch(() => false) ||
+                await file(join(filePath, "..", "doorstop_libs")).stat()
+                  .then((stats) => stats.isDirectory()).catch(() => false))
+            ) {
+              try {
+                return await realpath(filePath);
+              } catch {
+                return resolve(filePath);
+              }
+            }
+          } catch {}
+        }
+
+        error(
+          wrap([
+            null,
+            `${err} Path does not appear to contain a valid BepInEx pack:`,
+            chalk.yellow(path),
+          ]),
+        );
+        return false;
+      }
+    } catch {
+      error(getUnknownErrorCheckingPath(path));
+      return false;
+    }
+
+    if (!await isDoorstopScript(path) || !await hasBepInExCore(path)) {
+      const tryFolder = await bepinexScriptPathValidator(dirname(path));
+      if (tryFolder) return tryFolder;
+
+      error(
+        wrap([
+          null,
+          `${err} File does not appear to be a valid BepInEx run script:`,
+          chalk.yellow(path),
+          null,
+          `Please make sure you are selecting the ${run_bepinex_sh} (or similar) script file and try again.`,
+        ]),
+      );
+      return false;
+    }
+
+    if (!await hasMacOsSupport(path)) {
+      error(
+        wrap([
+          null,
+          `${err} BepInEx run script does not appear to support macOS:`,
+          chalk.yellow(path),
+          null,
+          "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
+        ]),
+      );
+      return false;
+    }
+
+    const libdoorstop = join(path, "..", "libdoorstop.dylib");
+    const oldDoorstop = join(path, "..", "doorstop_libs");
+
+    if (
+      !await file(libdoorstop).stat()
+        .then((stats) => stats.isFile()).catch(() => false) &&
+      !await file(oldDoorstop).stat()
+        .then((stats) => stats.isDirectory()).catch(() => false)
+    ) {
+      error(getInvalidBepInExPackError());
+      return false;
+    }
+
+    try {
+      return await realpath(path);
+    } catch {
+      return resolve(path);
+    }
+  };
+
   const bepinexScriptPath = await promptUntilValid(
     wrap([
       null,
-      `In Finder, locate the ${run_bepinex_sh} (or similar) script file within your downloaded BepInEx pack, then either:`,
+      `In Finder, locate the folder containing the ${run_bepinex_sh} (or similar) script file within your downloaded BepInEx pack, then either:`,
       null,
       providePathInstructions,
       null,
       `Path to ${run_bepinex_sh} (or similar):`,
     ]),
-    async (value) => {
-      const input = unquote(value);
-      const path = await getFixedPath(input);
-
-      if (!path) {
-        error(getInvalidPathError(input));
-        return false;
-      }
-
-      try {
-        if (
-          !await file(path).stat()
-            .then((stats) => stats.isFile()).catch(() => false)
-        ) {
-          error(
-            wrap([
-              null,
-              `${err} Path is not a file:`,
-              chalk.yellow(path),
-              null,
-              `Please make sure you are selecting the ${run_bepinex_sh} (or similar) script file and try again.`,
-            ]),
-          );
-          return false;
-        }
-      } catch {
-        error(getUnknownErrorCheckingPath(path));
-        return false;
-      }
-
-      if (!await isDoorstopScript(path) || !await hasBepInExCore(path)) {
-        error(
-          wrap([
-            null,
-            `${err} File does not appear to be a valid BepInEx run script:`,
-            chalk.yellow(path),
-            null,
-            `Please make sure you are selecting the ${run_bepinex_sh} (or similar) script file and try again.`,
-          ]),
-        );
-        return false;
-      }
-
-      if (!await hasMacOsSupport(path)) {
-        error(
-          wrap([
-            null,
-            `${err} BepInEx run script does not appear to support macOS:`,
-            chalk.yellow(path),
-            null,
-            "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
-          ]),
-        );
-        return false;
-      }
-
-      const libdoorstop = join(path, "..", "libdoorstop.dylib");
-      const oldDoorstop = join(path, "..", "doorstop_libs");
-
-      if (
-        !await file(libdoorstop).stat()
-          .then((stats) => stats.isFile()).catch(() => false) &&
-        !await file(oldDoorstop).stat()
-          .then((stats) => stats.isDirectory()).catch(() => false)
-      ) {
-        error(getInvalidBepInExPackError());
-        return false;
-      }
-
-      try {
-        return await realpath(path);
-      } catch {
-        return resolve(path);
-      }
-    },
+    bepinexScriptPathValidator,
   );
   let bepinexScriptName = basename(bepinexScriptPath);
   const bepinexFolderPath = dirname(bepinexScriptPath);
@@ -384,19 +418,46 @@ export const run = async () => {
       }
 
       if (
-        extname(path).toLowerCase() !== ".app" &&
+        extname(path) !== ".app" &&
         basename(path) !== "Contents"
       ) {
-        error(
-          wrap([
-            null,
-            `${err} Invalid app path:`,
-            chalk.yellow(basename(path)),
-            null,
-            pleaseSelectAUnityGameAndTryAgain,
-          ]),
-        );
-        return false;
+        const dir = await file(path).stat()
+            .then((stats) => stats.isDirectory()).catch(() => false)
+          ? path
+          : dirname(path);
+
+        const unityApps = await Array.fromAsync(search(dir));
+        if (!unityApps.length) {
+          error(
+            wrap([
+              null,
+              `${err} Invalid app path:`,
+              chalk.yellow(basename(path)),
+              null,
+              pleaseSelectAUnityGameAndTryAgain,
+            ]),
+          );
+          return false;
+        } else if (unityApps.length === 1) {
+          const [{ bundle, executable }] = unityApps;
+          const path = extname(bundle) === ".app" ? bundle : executable;
+          try {
+            return await realpath(path);
+          } catch {
+            return resolve(path);
+          }
+        } else {
+          error(
+            wrap([
+              null,
+              `${err} Multiple Unity apps found:`,
+              list(unityApps.map(({ bundle }) => chalk.yellow(bundle)), false),
+              null,
+              "Please specify which particular Unity app you would like to target.",
+            ]),
+          );
+          return false;
+        }
       }
 
       if (
@@ -429,7 +490,12 @@ export const run = async () => {
       }
 
       const { CFBundleExecutable } = await parsePlistFromFile(plist);
-      if (CFBundleExecutable && extname(CFBundleExecutable) === ".sh") {
+      if (
+        CFBundleExecutable &&
+        (file(join(plist, "..", "MacOS", CFBundleExecutable)).type
+              .toLowerCase() === "application/x-sh" ||
+          extname(CFBundleExecutable) === ".sh")
+      ) {
         const text = await file(join(plist, "..", "MacOS", CFBundleExecutable))
           .text();
 
@@ -439,9 +505,9 @@ export const run = async () => {
           .filter((line) => !line.startsWith("#") && Boolean(line));
 
         if (lines.length === 1 && lines[0].startsWith("open steam://")) {
-          const [command, ...args] = lines[0].split("open steam://")[1]?.split(
-            "/",
-          );
+          const [command, ...args] = lines[0]
+            .split("open steam://")[1]
+            ?.split("/");
           if (
             ["launch", "run", "rungameid"].includes(command.toLowerCase()) &&
             !!+args[0]
@@ -450,8 +516,27 @@ export const run = async () => {
             if (steamApp) {
               const unityApps = await Array.fromAsync(search(steamApp.path));
               if (unityApps.length === 1) {
-                const [app] = unityApps;
-                return app.bundle;
+                const [{ bundle, executable }] = unityApps;
+                const path = extname(bundle) === ".app" ? bundle : executable;
+                try {
+                  return await realpath(path);
+                } catch {
+                  return resolve(path);
+                }
+              } else if (unityApps.length > 1) {
+                error(
+                  wrap([
+                    null,
+                    `${err} Multiple Unity apps found:`,
+                    list(
+                      unityApps.map(({ bundle }) => chalk.yellow(bundle)),
+                      false,
+                    ),
+                    null,
+                    "Please specify which particular Unity app you would like to target.",
+                  ]),
+                );
+                return false;
               }
             }
           }
