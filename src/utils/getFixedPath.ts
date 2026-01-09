@@ -1,3 +1,5 @@
+import untildify from "untildify";
+
 import { exists } from "../fs/exists.ts";
 
 /**
@@ -7,6 +9,7 @@ import { exists } from "../fs/exists.ts";
  * @returns A valid, existing path, or `undefined` if could not resolve.
  */
 export const getFixedPath = async (path: string) => {
+  path = untildify(path);
   if (await exists(path)) return path;
   else if (process.platform !== "win32") {
     const unescaped = path
