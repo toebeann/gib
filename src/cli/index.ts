@@ -42,7 +42,7 @@
 import { $, color, env, file, Glob, semver, write } from "bun";
 
 import { W_OK } from "node:constants";
-import { access, appendFile, chmod, mkdir, realpath } from "node:fs/promises";
+import { access, appendFile, chmod, mkdir } from "node:fs/promises";
 import { EOL, homedir } from "node:os";
 import {
   basename,
@@ -66,14 +66,18 @@ import { pathEqual } from "path-equal";
 import { build as buildPlist } from "plist";
 import { quote } from "shell-quote";
 import terminalLink from "terminal-link";
-import unquote from "unquote";
 import untildify from "untildify";
 import wrapAnsi from "wrap-ansi";
 import { z } from "zod";
 
 import { version } from "../../package.json" with { type: "json" };
-import { exists } from "../fs/exists.ts";
-import { getAppById, getAppsByPath, launch } from "../launchers/steam/app.ts";
+import {
+  DoorstopScriptMissingPlatformSupport,
+  InvalidBepInExPack,
+} from "../bepinex/errors.ts";
+import { getBepInExScriptPath } from "../bepinex/script.ts";
+import { PathNotAFolderError, PathNotFoundError } from "../fs/errors.ts";
+import { getAppsByPath, launch } from "../launchers/steam/app.ts";
 import { isInstalled } from "../launchers/steam/launcher.ts";
 import { setLaunchOptions } from "../launchers/steam/launchOption.ts";
 import { getMostRecentUser } from "../launchers/steam/loginusers.ts";
@@ -85,15 +89,16 @@ import {
   type Shortcut,
   updateShortcut,
 } from "../launchers/steam/shortcut.ts";
+import { getUnityAppPath } from "../unity/app.ts";
 import {
-  hasBepInExCore,
-  hasMacOsSupport,
-  isDoorstopScript,
-} from "../utils/doorstop.ts";
+  InvalidUnityApp,
+  MultipleUnityAppsFoundError,
+  NotAUnityAppError,
+} from "../unity/errors.ts";
+import { booleanRace } from "../utils/booleanRace.ts";
 import { getFixedPath } from "../utils/getFixedPath.ts";
 import { find } from "../utils/process.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
-import { hasUnityAppIndicators, search } from "../utils/unity.ts";
 import { config } from "./config.ts";
 import { alert, confirm, prompt } from "./prompt.ts";
 import { renderLogo } from "./renderLogo.ts";
@@ -227,146 +232,10 @@ export const run = async () => {
   const copyPath = code("Option Command C");
   const paste = code("Command V");
 
-  const getInvalidPathError = (path: string) =>
-    wrap([
-      null,
-      `${err} Could not find path:`,
-      chalk.yellow(path),
-      null,
-      `Please try using ${copyPath} to copy the path from Finder, then ${paste} to paste it here.`,
-    ]);
-
-  const getUnknownErrorCheckingPath = (path: string) =>
-    wrap([
-      null,
-      `${err} Unknown error checking path:`,
-      chalk.yellow(path),
-    ]);
-
-  const getInvalidBepInExPackError = () =>
-    wrap(
-      `${EOL}${err} ${run_bepinex_sh} script does not appear to be located within a valid BepInEx pack.`,
-    );
-
-  const getNotAFolderError = (path: string) =>
-    wrap([
-      null,
-      `${err} Path is not a folder:`,
-      chalk.yellow(path),
-    ]);
-
   const providePathInstructions = list([
     "Drag it into this window, or",
     `Select it and press ${copyPath} to copy its path, then press ${paste} to paste the path here.`,
   ], false);
-
-  const bepinexScriptPathValidator = async (
-    value: string,
-  ): Promise<string | false> => {
-    const input = unquote(value);
-    const path = await getFixedPath(input);
-
-    if (!path) {
-      error(getInvalidPathError(input));
-      return false;
-    }
-
-    try {
-      if (
-        await file(path).stat()
-          .then((stats) => stats.isDirectory()).catch(() => false)
-      ) {
-        const glob = new Glob("**/*");
-        for await (
-          const filePath of glob.scan({
-            absolute: true,
-            cwd: path,
-            dot: true,
-            followSymlinks: true,
-            onlyFiles: true,
-          })
-        ) {
-          try {
-            if (
-              await isDoorstopScript(filePath) &&
-              await hasBepInExCore(filePath) &&
-              await hasMacOsSupport(filePath) &&
-              (await file(join(filePath, "..", "libdoorstop.dylib")).stat()
-                .then((stats) => stats.isFile()).catch(() => false) ||
-                await file(join(filePath, "..", "doorstop_libs")).stat()
-                  .then((stats) => stats.isDirectory()).catch(() => false))
-            ) {
-              try {
-                return await realpath(filePath);
-              } catch {
-                return resolve(filePath);
-              }
-            }
-          } catch {}
-        }
-
-        error(
-          wrap([
-            null,
-            `${err} Path does not appear to contain a valid BepInEx pack:`,
-            chalk.yellow(path),
-          ]),
-        );
-        return false;
-      }
-    } catch {
-      error(getUnknownErrorCheckingPath(path));
-      return false;
-    }
-
-    if (!await isDoorstopScript(path) || !await hasBepInExCore(path)) {
-      const tryFolder = await bepinexScriptPathValidator(dirname(path));
-      if (tryFolder) return tryFolder;
-
-      error(
-        wrap([
-          null,
-          `${err} File does not appear to be a valid BepInEx run script:`,
-          chalk.yellow(path),
-          null,
-          `Please make sure you are selecting the ${run_bepinex_sh} (or similar) script file and try again.`,
-        ]),
-      );
-      return false;
-    }
-
-    if (!await hasMacOsSupport(path)) {
-      error(
-        wrap([
-          null,
-          `${err} BepInEx run script does not appear to support macOS:`,
-          chalk.yellow(path),
-          null,
-          "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
-        ]),
-      );
-      return false;
-    }
-
-    const libdoorstop = join(path, "..", "libdoorstop.dylib");
-    const oldDoorstop = join(path, "..", "doorstop_libs");
-
-    if (
-      !await file(libdoorstop).stat()
-        .then((stats) => stats.isFile()).catch(() => false) &&
-      !await file(oldDoorstop).stat()
-        .then((stats) => stats.isDirectory()).catch(() => false)
-    ) {
-      error(getInvalidBepInExPackError());
-      return false;
-    }
-
-    try {
-      return await realpath(path);
-    } catch {
-      return resolve(path);
-    }
-  };
 
   const bepinexScriptPath = await promptUntilValid(
     wrap([
@@ -377,7 +246,55 @@ export const run = async () => {
       null,
       `Path to ${run_bepinex_sh} (or similar):`,
     ]),
-    bepinexScriptPathValidator,
+    async (value) => {
+      try {
+        return await getBepInExScriptPath(value);
+      } catch (e) {
+        error(
+          wrap([
+            null,
+            `${err} ${
+              e instanceof Error
+                ? e.message
+                : "An unknown error was encountered processing input"
+            }:`,
+            chalk.yellowBright(
+              e instanceof Error && "path" in e && typeof e.path === "string"
+                ? e.path
+                : value,
+            ),
+
+            ...e instanceof Error && e.cause instanceof Error
+              ? [null, chalk.dim(`${e.cause.name}: ${e.cause.message}`)]
+              : e instanceof Error && e.cause
+              ? [null, chalk.dim(`${e.cause}`)]
+              : [],
+
+            ...e instanceof PathNotFoundError
+              ? [
+                chalk.bold(
+                  `Please try using ${copyPath} to copy the ${run_bepinex_sh} path from Finder, then ${paste} to paste it here.`,
+                ),
+              ]
+              : e instanceof DoorstopScriptMissingPlatformSupport
+              ? [
+                chalk.bold(
+                  "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
+                ),
+              ]
+              : e instanceof InvalidBepInExPack
+              ? [
+                chalk.bold(
+                  `Please make sure you are selecting the ${run_bepinex_sh} script and try again.`,
+                ),
+              ]
+              : [],
+          ]),
+        );
+
+        return false;
+      }
+    },
   );
   let bepinexScriptName = basename(bepinexScriptPath);
   const bepinexFolderPath = dirname(bepinexScriptPath);
@@ -391,9 +308,6 @@ export const run = async () => {
       "Next, we need to know the location of the Unity game.",
     ]),
   );
-
-  const pleaseSelectAUnityGameAndTryAgain =
-    "Please make sure you are selecting a Unity game app and try again.";
 
   const gameAppPath = await promptUntilValid(
     wrap([
@@ -409,163 +323,60 @@ export const run = async () => {
       "Path to Unity game app:",
     ]),
     async (value) => {
-      const input = unquote(value);
-      const path = await getFixedPath(input);
-
-      if (!path) {
-        error(getInvalidPathError(input));
-        return false;
-      }
-
-      if (
-        extname(path) !== ".app" &&
-        basename(path) !== "Contents"
-      ) {
-        const dir = await file(path).stat()
-            .then((stats) => stats.isDirectory()).catch(() => false)
-          ? path
-          : dirname(path);
-
-        const unityApps = await Array.fromAsync(search(dir));
-        if (!unityApps.length) {
-          error(
-            wrap([
-              null,
-              `${err} Invalid app path:`,
-              chalk.yellow(basename(path)),
-              null,
-              pleaseSelectAUnityGameAndTryAgain,
-            ]),
-          );
-          return false;
-        } else if (unityApps.length === 1) {
-          const [{ bundle, executable }] = unityApps;
-          const path = extname(bundle) === ".app" ? bundle : executable;
-          try {
-            return await realpath(path);
-          } catch {
-            return resolve(path);
-          }
-        } else {
-          error(
-            wrap([
-              null,
-              `${err} Multiple Unity apps found:`,
-              list(unityApps.map(({ bundle }) => chalk.yellow(bundle)), false),
-              null,
-              "Please specify which particular Unity app you would like to target.",
-            ]),
-          );
-          return false;
-        }
-      }
-
-      if (
-        !await file(path).stat()
-          .then((stats) => stats.isDirectory()).catch(() => false)
-      ) {
-        error(
-          `${getNotAFolderError(path)}${EOL}${EOL}${
-            wrap(pleaseSelectAUnityGameAndTryAgain)
-          }`,
-        );
-        return false;
-      }
-
-      const plist = basename(path) === "Contents"
-        ? join(path, "Info.plist")
-        : join(path, "Contents", "Info.plist");
-
-      if (!await exists(plist)) {
-        error(
-          wrap([
-            null,
-            `${err} Could not find app plist for app:`,
-            chalk.yellow(path),
-            null,
-            pleaseSelectAUnityGameAndTryAgain,
-          ]),
-        );
-        return false;
-      }
-
-      const { CFBundleExecutable } = await parsePlistFromFile(plist);
-      if (
-        CFBundleExecutable &&
-        (file(join(plist, "..", "MacOS", CFBundleExecutable)).type
-              .toLowerCase() === "application/x-sh" ||
-          extname(CFBundleExecutable) === ".sh")
-      ) {
-        const text = await file(join(plist, "..", "MacOS", CFBundleExecutable))
-          .text();
-
-        const lines = text
-          .split("\n")
-          .map((line) => line.trim())
-          .filter((line) => !line.startsWith("#") && Boolean(line));
-
-        if (lines.length === 1 && lines[0].startsWith("open steam://")) {
-          const [command, ...args] = lines[0]
-            .split("open steam://")[1]
-            ?.split("/");
-          if (
-            ["launch", "run", "rungameid"].includes(command.toLowerCase()) &&
-            !!+args[0]
-          ) {
-            const steamApp = await getAppById(args[0]);
-            if (steamApp) {
-              const unityApps = await Array.fromAsync(search(steamApp.path));
-              if (unityApps.length === 1) {
-                const [{ bundle, executable }] = unityApps;
-                const path = extname(bundle) === ".app" ? bundle : executable;
-                try {
-                  return await realpath(path);
-                } catch {
-                  return resolve(path);
-                }
-              } else if (unityApps.length > 1) {
-                error(
-                  wrap([
-                    null,
-                    `${err} Multiple Unity apps found:`,
-                    list(
-                      unityApps.map(({ bundle }) => chalk.yellow(bundle)),
-                      false,
-                    ),
-                    null,
-                    "Please specify which particular Unity app you would like to target.",
-                  ]),
-                );
-                return false;
-              }
-            }
-          }
-        }
-      }
-
-      if (!await hasUnityAppIndicators(plist)) {
-        error(
-          wrap([
-            null,
-            `${err} App does not appear to be a Unity game:`,
-            chalk.yellow(path),
-            null,
-            `BepInEx only works for Unity games. ${pleaseSelectAUnityGameAndTryAgain}`,
-          ]),
-        );
-        return false;
-      }
-
-      const bestPath = basename(path) === "Contents"
-        ? extname(dirname(path)) === ".app"
-          ? dirname(path)
-          : join(plist, "..", "MacOS", CFBundleExecutable)
-        : path;
-
       try {
-        return await realpath(bestPath);
-      } catch {
-        return resolve(bestPath);
+        return await getUnityAppPath(value);
+      } catch (e) {
+        error(
+          wrap([
+            null,
+            `${err} ${
+              e instanceof Error
+                ? e.message
+                : "An unknown error was encountered processing input"
+            }:`,
+            e instanceof MultipleUnityAppsFoundError
+              ? list(e.apps.map((app) => chalk.yellowBright(app)), false)
+              : chalk.yellowBright(
+                e instanceof Error && "path" in e && typeof e.path === "string"
+                  ? e.path
+                  : value,
+              ),
+
+            ...e instanceof Error && e.cause instanceof Error
+              ? [null, chalk.dim(`${e.cause.name}: ${e.cause.message}`)]
+              : e instanceof Error && e.cause
+              ? [null, chalk.dim(`${e.cause}`)]
+              : [],
+
+            ...e instanceof PathNotFoundError
+              ? [
+                chalk.bold(
+                  `Please try using ${copyPath} to copy the ${run_bepinex_sh} path from Finder, then ${paste} to paste it here.`,
+                ),
+              ]
+              : e instanceof InvalidUnityApp || e instanceof PathNotAFolderError
+              ? [
+                chalk.bold(
+                  "Please make sure you are selecting a Unity app and try again.",
+                ),
+              ]
+              : e instanceof MultipleUnityAppsFoundError
+              ? [
+                chalk.bold(
+                  "Please specify which Unity app you would like to target by providing its path.",
+                ),
+              ]
+              : e instanceof NotAUnityAppError
+              ? [
+                chalk.bold(
+                  "BepInEx only works for Unity games. Please make sure you are selecting a Unity app and try again.",
+                ),
+              ]
+              : [],
+          ]),
+        );
+
+        return false;
       }
     },
   );

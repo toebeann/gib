@@ -1,65 +1,9 @@
 import { file } from "bun";
 
-import { basename, dirname, extname, join, normalize, sep } from "node:path";
+import { join } from "node:path";
 
-import { exists } from "../fs/exists.ts";
-import { booleanRace } from "./booleanRace.ts";
-import {
-  getValue,
-  parsePlistFromFile as readPlist,
-  search as searchPlists,
-} from "./plist.ts";
-
-/**
- * Searches the given `path` for native macOS Unity apps.
- *
- * @param path
- * @param indicators
- */
-export const search = async function* (
-  path: string,
-  indicators?: number,
-) {
-  const parts = normalize(path).split(sep);
-  const index = parts.lastIndexOf("Contents");
-  const pathExists = exists(path);
-  const isDir = pathExists
-    .then((exists) =>
-      exists &&
-      file(path).stat().then((stats) => stats.isDirectory())
-    )
-    .catch(() => false);
-  const searchDir =
-    (extname(path) === ".app" || basename(path) === "Contents") && await isDir
-      ? path
-      : index >= 0
-      ? parts.slice(0, index + 1).join(sep)
-      : !await pathExists
-      ? undefined
-      : await isDir
-      ? path
-      : dirname(path);
-
-  if (!searchDir) return;
-
-  for await (const path of searchPlists(searchDir)) {
-    if (await hasUnityAppIndicators(path, indicators)) {
-      const plist = await readPlist(path);
-      const { CFBundleName, CFBundleExecutable } = plist;
-      const bundle = extname(dirname(dirname(path))) === ".app"
-        ? dirname(dirname(path))
-        : dirname(path);
-        
-      yield {
-        name: CFBundleName,
-        bundle,
-        executable: CFBundleExecutable &&
-          join(path, "..", "MacOS", CFBundleExecutable),
-        plist,
-      };
-    }
-  }
-};
+import { booleanRace } from "../utils/booleanRace";
+import { getValue } from "../utils/plist";
 
 /**
  * Determines whether the macOS Application corresponding with the provided
