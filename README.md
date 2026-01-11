@@ -242,7 +242,7 @@ automate, but it is fairly straightforward:
 1. Undo any changes gib made to your Steam library:
    - **Steam games:**
      [clear the launch options](#clearing-steam-launch-options), and
-     [remove the vanilla shortcut added during instalation](#removing-steam-shortcuts),
+     [remove the Steam shortcut added during instalation](#removing-steam-shortcuts),
      if applicable.
    - **Non-Steam games:**
      [remove the Steam shortcut to launch the game with BepInEx]((#removing-steam-shortcuts)),
