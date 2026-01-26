@@ -1440,17 +1440,23 @@ export const setup = async () => {
     return;
   }
 
-  const latest = wantsAutoUpdate || wantsUpdateExitStatus
-    ? z.looseObject({ version: z.string() })
-      .parse(
-        await (await fetch(
-          "https://data.jsdelivr.com/v1/packages/gh/toebeann/gib/resolved",
-        )).json(),
-      )
-      .version
-    : null;
+  let latest: string | undefined;
+  if (wantsAutoUpdate || wantsUpdateExitStatus) {
+    try {
+      const resolvedPackageMetadata = await fetch(
+        "https://data.jsdelivr.com/v1/packages/gh/toebeann/gib/resolved",
+      );
+      const parsed = z
+        .looseObject({ version: z.string() })
+        .safeParse(await resolvedPackageMetadata.json());
 
-  const updateAvailable = latest !== null &&
+      if (parsed.success) {
+        latest = parsed.data.version;
+      }
+    } catch {}
+  }
+
+  const updateAvailable = latest !== undefined &&
     semver.satisfies(version, `<${latest}`);
 
   const updateCommand =
