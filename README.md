@@ -370,7 +370,9 @@ rm -rf ~/.gib
   - Support for other operating systems is being considered.
 
 - Only BepInEx 5 is currently supported. Support for BepInEx 6 is being
-  considered.
+  considered, but is unlikely to happen soon. It's worth noting  that the
+  primary use of BepInEx 6 is for IL2CPP games, and modding IL2CPP games on
+  macOS is almost impossible with current tech.
 
 - Users on Apple Silicon sometimes report that their game performance seems to
   diminish with only BepInEx installed. This is due to the fact that BepInEx is
