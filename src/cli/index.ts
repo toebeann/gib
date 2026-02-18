@@ -94,8 +94,6 @@ import {
   MultipleUnityAppsFoundError,
   NotAUnityAppError,
 } from "../unity/errors.ts";
-import { booleanRace } from "../utils/booleanRace.ts";
-import { getFixedPath } from "../utils/getFixedPath.ts";
 import { find } from "../utils/process.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
 import { config } from "./config.ts";
