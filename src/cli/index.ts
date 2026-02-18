@@ -39,7 +39,7 @@
  *
  *****************************************************************************/
 
-import { $, color, env, file, Glob, semver, write } from "bun";
+import { $, color, env, file, Glob, semver, wrapAnsi, write } from "bun";
 
 import { W_OK } from "node:constants";
 import { access, appendFile, chmod, mkdir } from "node:fs/promises";
@@ -67,7 +67,6 @@ import { build as buildPlist } from "plist";
 import { quote } from "shell-quote";
 import terminalLink from "terminal-link";
 import untildify from "untildify";
-import wrapAnsi from "wrap-ansi";
 import { z } from "zod";
 
 import { version } from "../../package.json" with { type: "json" };
