@@ -33,9 +33,10 @@
   "bin": "src/cli/index.ts",
   "scripts": {
     "start": "bun src/cli",
-    "build:target": "bun build --compile --target=bun-$TARGET --minify --sourcemap --bytecode src/cli --outfile dist/gib-$TARGET",
     "build:local": "bun build --compile --minify --sourcemap --bytecode src/cli --outfile bin/gib",
-    "build": "TARGET=darwin-x64 bun build:target & TARGET=darwin-aarch64 bun build:target && wait",
+    "build:darwin-x64": "bun build:local --target=bun-darwin-x64 --outfile dist/gib-darwin-x64",
+    "build:darwin-aarch64": "bun build:local --target=bun-darwin-aarch64 --outfile dist/gib-darwin-aarch64",
+    "build": "bun --parallel build:darwin-x64 build:darwin-aarch64",
     "local": "bun build:local && (export GIB_INSTALL=.; cat gib.sh | bash)",
     "lipo": "lipo -create -output ./dist/gib-darwin-universal ./dist/gib-darwin-x64 ./dist/gib-darwin-aarch64",
     "zip:target": "zip -Dj9 dist/gib-$TARGET.zip dist/gib-$TARGET",
