@@ -5,7 +5,7 @@ import { waitUntil } from "async-wait-until";
 import open from "open";
 
 import { find } from "../../utils/process.ts";
-import { getDataFolderPath } from "./path.ts";
+import { getDataFolderPath, getExecutablePath } from "./path.ts";
 
 /** Get running Steam processes, if any. */
 export const get = async () => {
@@ -31,7 +31,9 @@ export const isOpen = async () => (await get()).length > 0;
 /** Attempts to kill all running Steam processes. */
 export const quit = async () => {
   if (await isOpen()) {
-    await open("steam://exit");
+    const name = await getExecutablePath();
+    await open("steam://exit", name ? { app: { name } } : undefined);
+
     try {
       await waitUntil(async () => !await isOpen(), { timeout: 10_000 });
       return true;
