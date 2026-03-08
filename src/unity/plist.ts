@@ -14,17 +14,13 @@ import { getValue } from "../utils/plist";
  */
 export const hasCommonUnityFiles = (plist: string) =>
   booleanRace([
-    file(join(plist, "..", "Data", "boot.config")).stat(),
-    file(join(plist, "..", "Resources", "Data", "boot.config")).stat(),
-    file(join(plist, "..", "Data", "globalgamemanagers")).stat(),
-    file(join(plist, "..", "Resources", "Data", "globalgamemanagers")).stat(),
-    file(join(plist, "..", "Data", "resources.assets")).stat(),
-    file(join(plist, "..", "Resources", "Data", "resources.assets")).stat(),
-  ].map((promise) =>
-    promise
-      .then((stats) => stats.isFile())
-      .catch(() => false)
-  ));
+    file(join(plist, "..", "Data", "boot.config")).exists(),
+    file(join(plist, "..", "Resources", "Data", "boot.config")).exists(),
+    file(join(plist, "..", "Data", "globalgamemanagers")).exists(),
+    file(join(plist, "..", "Resources", "Data", "globalgamemanagers")).exists(),
+    file(join(plist, "..", "Data", "resources.assets")).exists(),
+    file(join(plist, "..", "Resources", "Data", "resources.assets")).exists(),
+  ]);
 
 /**
  * Determines whether the provided `Info.plist` file contains at least one of
@@ -76,6 +72,4 @@ export const hasUnityBuildNumber = async (plist: string) =>
  * @param plist The path to the `Info.plist` of the macOS Application to check.
  */
 export const hasUnityPlayerDylib = (plist: string) =>
-  file(join(plist, "..", "Frameworks", "UnityPlayer.dylib")).stat()
-    .then((stats) => stats.isFile())
-    .catch(() => false);
+  file(join(plist, "..", "Frameworks", "UnityPlayer.dylib")).exists();

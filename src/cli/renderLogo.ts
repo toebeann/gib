@@ -74,4 +74,4 @@ export const createLogo = async () => {
   return `${outputLines.join("\n")}${chalk.reset("")}`;
 };
 
-export const renderLogo = () => createLogo().then(console.log);
+export const renderLogo = async () => console.log(await createLogo());

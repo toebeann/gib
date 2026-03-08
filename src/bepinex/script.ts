@@ -62,8 +62,7 @@ export const getBepInExScriptPath = async (value: string): Promise<string> => {
             await isDoorstopScript(filePath) &&
             await hasBepInExCore(filePath) &&
             await hasMacOsSupport(filePath) &&
-            (await file(join(filePath, "..", "libdoorstop.dylib")).stat()
-              .then((stats) => stats.isFile()).catch(() => false) ||
+            (await file(join(filePath, "..", "libdoorstop.dylib")).exists() ||
               await file(join(filePath, "..", "doorstop_libs")).stat()
                 .then((stats) => stats.isDirectory()).catch(() => false))
           ) {
@@ -95,7 +94,7 @@ export const getBepInExScriptPath = async (value: string): Promise<string> => {
   }
 
   if (!await hasMacOsSupport(path)) {
-    throw new DoorstopScriptMissingPlatformSupport(path, 'macOS');
+    throw new DoorstopScriptMissingPlatformSupport(path, "macOS");
   }
 
   const libdoorstop = join(path, "..", "libdoorstop.dylib");
