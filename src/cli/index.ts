@@ -1459,7 +1459,7 @@ export const setup = async () => {
 
       error(wrap(`gib ${chalk.bold.underline(`v${latest}`)} is available.`));
       log(wrap("Run the following command to update and relaunch gib:"));
-      log(`  ${wrap(chalk.dim(command))}`);
+      log(`  ${wrap(chalk.dim(updateCommand))}`);
       log(
         wrap(
           `The command has been placed in your clipboard so you can simply paste it.`,
@@ -1495,7 +1495,7 @@ export const setup = async () => {
 
       log();
       log(wrap("Run the following command to update and relaunch gib:"));
-      log(`  ${wrap(chalk.dim(command))}`);
+      log(`  ${wrap(chalk.dim(updateCommand))}`);
       log(
         wrap(
           `The command has been placed in your clipboard so you can simply paste it.`,
