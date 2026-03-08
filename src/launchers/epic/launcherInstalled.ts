@@ -12,9 +12,9 @@ import { getAppDataPath } from "./path.ts";
  * `LauncherInstalled.dat` file.
  */
 export const launcherInstalledSchema = toCamelCaseKeys(
-  z.object({
+  z.looseObject({
     installationList: toCamelCaseKeys(
-      z.object({
+      z.looseObject({
         installLocation: z.string(),
         /** @type {string | undefined} */
         namespaceId: z.unknown().optional(),
@@ -25,9 +25,9 @@ export const launcherInstalledSchema = toCamelCaseKeys(
         /** @type {string | undefined} */
         appVersion: z.unknown().optional(),
         appName: z.string(),
-      }).passthrough(),
+      }),
     ).array(),
-  }).passthrough(),
+  }),
 );
 
 /**

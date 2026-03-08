@@ -10,7 +10,7 @@ import type { launcherInstalledSchema } from "./launcherInstalled.ts";
 
 /** Zod schema for working with Epic Games Launcher app manifest files. */
 export const appManifestSchema = toCamelCaseKeys(
-  z.object({
+  z.looseObject({
     formatVersion: z.number(),
     /** @type {boolean | undefined} */
     bIsIncompleteInstall: z.unknown().optional(),
@@ -105,7 +105,7 @@ export const appManifestSchema = toCamelCaseKeys(
     mainGameAppName: z.unknown().optional(),
     /** @type {unknown[] | undefined} */
     allowedUriEnvVars: z.unknown().optional(),
-  }).passthrough(),
+  }),
 );
 
 /** A parsed Epic Games Launcher app manifest. */
