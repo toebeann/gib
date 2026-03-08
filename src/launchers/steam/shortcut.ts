@@ -1,6 +1,5 @@
 import { file, write } from "bun";
 
-import { access, constants } from "node:fs/promises";
 import { join } from "node:path";
 
 import { ID } from "@node-steam/id";
@@ -65,11 +64,7 @@ export async function getShortcuts(
   if (!configPath) return;
   const shortcutsPath = join(configPath, "shortcuts.vdf");
 
-  if (
-    !await access(shortcutsPath, constants.R_OK)
-      .then(() => true)
-      .catch(() => false)
-  ) return { shortcuts: {} };
+  if (!await file(shortcutsPath).exists()) return { shortcuts: {} };
 
   return new Proxy(
     readVdf(Buffer.from(await file(shortcutsPath).arrayBuffer())),

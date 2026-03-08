@@ -504,11 +504,9 @@ export const run = async () => {
       ),
     ),
     (async () => {
-      if (
-        !await access(join(bepinexFolderPath, "libdoorstop.dylib"))
-          .then(() => true)
-          .catch(() => false)
-      ) return false;
+      if (!await file(join(bepinexFolderPath, "libdoorstop.dylib")).exists()) {
+        return false;
+      }
 
       try {
         return (await file(bepinexScriptPath).text())
