@@ -64,7 +64,6 @@ import JSZip from "jszip";
 import open from "open";
 import { pathEqual } from "path-equal";
 import { build as buildPlist } from "plist";
-import { quote } from "shell-quote";
 import terminalLink from "terminal-link";
 import untildify from "untildify";
 import { z } from "zod";
@@ -113,6 +112,8 @@ const wrap = (
   columns = width(),
   options?: Parameters<typeof wrapAnsi>[2],
 ) => wrapAnsi(typeof str === "string" ? str : str.join(EOL), columns, options);
+
+const quote = (args: string[]) => args.map($.escape).join(" ");
 
 export const run = async () => {
   const link = (
