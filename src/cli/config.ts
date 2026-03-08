@@ -11,14 +11,18 @@ export const config = () => {
             status: wantsUpdateExitStatus,
             update: wantsAutoUpdate,
             "path-check": wantsCheckPath,
+            launch,
         },
+        positionals,
     } = parseArgs({
         allowNegative: true,
+        allowPositionals: true,
         options: {
             help: { type: "boolean", short: "h", default: false },
             version: { type: "boolean", short: "v", default: false },
             status: { type: "boolean", short: "s", default: false },
             update: { type: "boolean", default: true },
+            launch: { type: "string" },
             ...(command === "gib"
                 ? { "path-check": { type: "boolean", default: true } }
                 : {}),
@@ -26,6 +30,8 @@ export const config = () => {
     });
 
     return {
+        launch,
+        positionals,
         wantsHelp,
         wantsVersion,
         wantsUpdateExitStatus,

@@ -1353,6 +1353,8 @@ export const setup = async () => {
     wantsAutoUpdate,
     wantsUpdateExitStatus,
     wantsCheckPath,
+    launch: launchId,
+    positionals,
   } = config();
 
   const printHelp = () => {
@@ -1386,6 +1388,16 @@ export const setup = async () => {
             chalk.cyan("--status")
           }           Print update status and exit`,
           width() - 2,
+        )
+      }`,
+    );
+    log(
+      `      ${
+        wrap(
+          `${
+            chalk.cyan(`--launch${chalk.dim("=<id>")}`)
+          }      Immediately launch Steam app with the specified id and exit`,
+          width() - 6,
         )
       }`,
     );
@@ -1426,6 +1438,18 @@ export const setup = async () => {
       ),
     );
   };
+
+  if (launchId) {
+    const parts = launchId.split(":");
+    const id = parts[1] ?? parts[0];
+    const launcher = parts[0].toLowerCase();
+
+    switch (launcher) {
+      case "steam":
+      default:
+        return await launch(id, positionals);
+    }
+  }
 
   if (wantsHelp) {
     printHelp();
