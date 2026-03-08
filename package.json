@@ -88,6 +88,7 @@
     "readline-sync": "^1.4.10",
     "slashes": "^3.0.12",
     "steam-binary-vdf": "^0.1.0",
+    "string-argv": "^0.3.2",
     "terminal-link": "^5.0.0",
     "unquote": "^1.1.1",
     "untildify": "^6.0.0",

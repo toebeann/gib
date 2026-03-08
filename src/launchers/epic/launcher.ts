@@ -1,4 +1,4 @@
-import { isProtocolHandlerRegistered } from "../../utils/isProtocolHandlerRegistered.ts";
+import { isProtocolHandlerRegistered } from "../../utils/protocolHandler.ts";
 
 /**
  * Determines whether Steam appears to be installed by checking for a

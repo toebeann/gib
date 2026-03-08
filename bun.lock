@@ -26,6 +26,7 @@
         "readline-sync": "^1.4.10",
         "slashes": "^3.0.12",
         "steam-binary-vdf": "^0.1.0",
+        "string-argv": "^0.3.2",
         "terminal-link": "^5.0.0",
         "unquote": "^1.1.1",
         "untildify": "^6.0.0",
@@ -225,6 +226,8 @@
     "slashes": ["slashes@3.0.12", "", {}, "sha512-Q9VME8WyGkc7pJf6QEkj3wE+2CnvZMI+XJhwdTPR8Z/kWQRXi7boAWLDibRPyHRTUTPx5FaU7MsyrjI3yLB4HA=="],
 
     "steam-binary-vdf": ["steam-binary-vdf@0.1.0", "", { "dependencies": { "@types/buffer-reader": "^0.1.0", "@types/node-int64": "^0.4.29", "buffer-reader": "^0.1.0", "hex2dec": "^1.1.2", "node-int64": "^0.4.0", "polycrc": "^0.1.0" } }, "sha512-oFdrlgG3gKHDURVwdE3TVmquClZkLCx+wBeem4ml66pECFgFu9VqPJP0EpaiZFRqA9yFEOCkkyNCkKpCxSWuOA=="],
+
+    "string-argv": ["string-argv@0.3.2", "", {}, "sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q=="],
 
     "string-width": ["string-width@7.2.0", "", { "dependencies": { "emoji-regex": "^10.3.0", "get-east-asian-width": "^1.0.0", "strip-ansi": "^7.1.0" } }, "sha512-tsaTIkKW9b4N+AEj+SVA+WhJzV7/zMhcSu78mLKWSk7cXMOSHsBKFWUs0fWwq8QyK3MgJBQRX6Gbi4kYbdvGkQ=="],
 
