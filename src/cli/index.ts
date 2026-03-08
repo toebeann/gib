@@ -1458,6 +1458,11 @@ export const setup = async () => {
       await $`echo -n ${updateCommand.trim()} | pbcopy`.nothrow().quiet();
 
       error(wrap(`gib ${chalk.bold.underline(`v${latest}`)} is available.`));
+      log(
+        wrap(
+          `Changelog: https://github.com/toebeann/gib/releases/tag/v${latest}`,
+        ),
+      );
       log(wrap("Run the following command to update and relaunch gib:"));
       log(`  ${wrap(chalk.dim(updateCommand))}`);
       log(
@@ -1474,9 +1479,10 @@ export const setup = async () => {
 
   if (updateAvailable) {
     log();
+    log(wrap(`gib ${orange.bold.underline(`v${latest}`)} is available.`));
     log(
       wrap(
-        `gib ${orange.bold.underline(`v${latest}`)} is available.`,
+        `Changelog: https://github.com/toebeann/gib/releases/tag/v${latest}`,
       ),
     );
     log(
