@@ -23,7 +23,7 @@ export type LibraryFolders = {
  * from Steam's `libraryfolders.vdf` file.
  */
 export const getLibraryFolders = async (path = getLibraryFoldersPath()) => {
-  const data = await file(path).text();
+  const data = await file(await path).text();
   return Object.values(
     (new Proxy(parse(data), caseInsensitiveProxy) as LibraryFolders)
       .libraryfolders,

@@ -1,11 +1,9 @@
 import { file, Glob } from "bun";
 
-import { join } from "node:path";
-
 import { z } from "zod";
 
 import { toCamelCaseKeys } from "../../utils/zod.ts";
-import { getAppDataPath } from "./path.ts";
+import { getManifestsPath } from "./path.ts";
 import type { launcherInstalledSchema } from "./launcherInstalled.ts";
 
 /** Zod schema for working with Epic Games Launcher app manifest files. */
@@ -123,7 +121,7 @@ export async function* getManifests() {
     const path of glob.scan({
       absolute: true,
       onlyFiles: true,
-      cwd: join(getAppDataPath(), "Manifests"),
+      cwd: getManifestsPath(),
     })
   ) {
     yield appManifestSchema.parse(await file(path).json());

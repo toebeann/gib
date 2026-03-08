@@ -1,11 +1,9 @@
 import { file } from "bun";
 
-import { join } from "node:path";
-
 import { z } from "zod";
 
 import { toCamelCaseKeys } from "../../utils/zod.ts";
-import { getAppDataPath } from "./path.ts";
+import { getLauncherInstalledPath } from "./path.ts";
 
 /**
  * Zod schema for working with the Epic Games Launcher's
@@ -35,14 +33,5 @@ export const launcherInstalledSchema = toCamelCaseKeys(
  * computer, parsed from its `LauncherInstalled.dat` file.
  */
 export const getLauncherInstalled = async () =>
-  launcherInstalledSchema.parse(
-    await file(
-      join(
-        getAppDataPath(),
-        "..",
-        "..",
-        "UnrealEngineLauncher",
-        "LauncherInstalled.dat",
-      ),
-    ).json(),
-  ).installationList;
+  launcherInstalledSchema.parse(await file(getLauncherInstalledPath()).json())
+    .installationList;

@@ -7,8 +7,7 @@ import { ID } from "@node-steam/id";
 import { readVdf, type VdfMap, writeVdf } from "steam-binary-vdf";
 
 import { caseInsensitiveProxy } from "../../utils/proxy.ts";
-import { getMostRecentUser } from "./loginusers.ts";
-import { getSteamPath } from "./path.ts";
+import { getUserConfigFolderPath } from "./path.ts";
 
 type numericBoolean = 0 | 1;
 
@@ -31,59 +30,6 @@ export type Shortcuts = {
 
 /** A Shortcut entry for Steam's binary `shortcuts.vdf` files.s */
 export type Shortcut = Shortcuts["shortcuts"][string];
-
-/**
- * Determines the path to the `shortcuts.vdf` file for the most recent user of
- * Steam on this computer.
- */
-export function getPath(): Promise<string | undefined>;
-
-/**
- * Determines the path to the `shortcuts.vdf` file for the user matching
- * `userId`.
- *
- * @param userId
- */
-export function getPath(userId: ID): Promise<string>;
-
-/**
- * Determines the path to the `shortcuts.vdf` file for the user matching
- * `userId`.
- *
- * @param userId
- */
-export function getPath(userId: string): Promise<string>;
-
-/**
- * Determines the path to the `shortcuts.vdf` file for the user matching
- * `userId`, or the most recent user of Steam on this computer if not
- * specified.
- *
- * @param userId
- */
-export function getPath(
-  userId?: ID | string,
-): Promise<string | undefined>;
-
-export async function getPath(userId?: ID | string) {
-  const { accountid } = userId instanceof ID
-    ? userId
-    : typeof userId === "string"
-    ? new ID(userId)
-    : await getMostRecentUser()
-      .then((user) =>
-        user?.[0] && new ID(user?.[0]) || { accountid: undefined }
-      );
-  if (!accountid) return;
-
-  return join(
-    getSteamPath(),
-    "userdata",
-    accountid.toString(),
-    "config",
-    "shortcuts.vdf",
-  );
-}
 
 /** Gets the shortcuts for the most recent user of Steam on this computer. */
 export function getShortcuts(): Promise<Shortcuts | undefined>;
@@ -115,8 +61,9 @@ export function getShortcuts(
 export async function getShortcuts(
   userId?: ID | string,
 ): Promise<Shortcuts | undefined> {
-  const shortcutsPath = await getPath(userId);
-  if (!shortcutsPath) return;
+  const configPath = await getUserConfigFolderPath(userId);
+  if (!configPath) return;
+  const shortcutsPath = join(configPath, "shortcuts.vdf");
 
   if (
     !await access(shortcutsPath, constants.R_OK)
@@ -253,8 +200,9 @@ export function setShortcuts(
 ): Promise<boolean>;
 
 export async function setShortcuts(shortcuts: Shortcuts, userId?: ID | string) {
-  const shortcutsPath = await getPath(userId);
-  if (!shortcutsPath) return false;
+  const configPath = await getUserConfigFolderPath(userId);
+  if (!configPath) return false;
+  const shortcutsPath = join(configPath, "shortcuts.vdf");
 
   await write(shortcutsPath, writeVdf(shortcuts as VdfMap));
   return true;

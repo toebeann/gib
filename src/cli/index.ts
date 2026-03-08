@@ -55,7 +55,7 @@ import {
   resolve,
   sep,
 } from "node:path";
-import { execPath, exit, kill, platform } from "node:process";
+import { execPath, exit, kill } from "node:process";
 
 import chalk from "chalk";
 import { watch } from "chokidar";
@@ -149,23 +149,6 @@ export const run = async () => {
   };
 
   await renderLogo();
-
-  if (platform !== "darwin") {
-    throw wrap([
-      `detected platform ${chalk.yellow(platform)}`,
-      chalk.reset([
-        `Currently only ${chalk.yellow("darwin")} (macOS) is supported.`,
-        null,
-        `For all other platforms, please see ${
-          link(
-            "the BepInEx documentation",
-            "https://docs.bepinex.dev/articles/user_guide/installation/index.html",
-            "https://tinyurl.com/yzp3evma",
-          )
-        } for manual installation instructions.`,
-      ].join(EOL)),
-    ]);
-  }
 
   const run_bepinex_sh = code("run_bepinex.sh");
   log(wrap(chalk.bold("gib will:")));

@@ -6,7 +6,7 @@ import type { ID } from "@node-steam/id";
 import { parse, stringify } from "@node-steam/vdf";
 
 import { caseInsensitiveProxy } from "../../utils/proxy.ts";
-import { getUserConfigFolderPath } from "./loginusers.ts";
+import { getUserConfigFolderPath } from "./path.ts";
 
 /** One of Steam's `localconfig.vdf` files, parsed. */
 export type LocalConfig = {
