@@ -1,17 +1,18 @@
-import { file, Glob } from "bun";
+import { $, file, Glob } from "bun";
 
 import { realpath } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 
 import { parse } from "@node-steam/vdf";
-import open, { openApp } from "open";
+import open from "open";
 
 import { booleanRace } from "../../utils/booleanRace.ts";
 import { caseInsensitiveProxy } from "../../utils/proxy.ts";
+import { quote } from "../../utils/quote.ts";
 import type { App as AppBase } from "../app.ts";
 import { getLibraryFolders } from "./libraryfolders.ts";
 import type { AppManifest } from "./manifest.ts";
-import { isOpen } from "./process.ts";
+import { getExecutablePath } from "./path.ts";
 
 const launcher = "steam";
 
@@ -189,21 +190,18 @@ export function launch(id: string): Promise<void>;
  *
  * @param app The app or app id of the app to launch.
  */
-export function launch(app: App | string): Promise<void>;
+export function launch(app: App | string, args?: string[]): Promise<void>;
 
-export async function launch(app: App | string) {
+export async function launch(app: App | string, args: string[] = []) {
   const id = typeof app === "string" ? app : app.id;
   if (!id) return;
 
-  if (await isOpen()) {
-    await open(`steam://rungameid/${id}`, {
-      background: true,
-    });
-    return;
-  }
+  const name = await getExecutablePath();
+  if (!name) return;
 
-  await openApp("Steam", {
-    arguments: ["--args", "-silent", "-applaunch", id],
+  await open(`steam://run/${id}//${quote(args)}`, {
+    app: { name },
     background: true,
+    newInstance: true,
   });
 }

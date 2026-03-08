@@ -95,6 +95,7 @@ import {
 } from "../unity/errors.ts";
 import { find } from "../utils/process.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
+import { quote } from "../utils/quote.ts";
 import { config } from "./config.ts";
 import { alert, confirm, prompt } from "./prompt.ts";
 import { renderLogo } from "./renderLogo.ts";
@@ -112,8 +113,6 @@ const wrap = (
   columns = width(),
   options?: Parameters<typeof wrapAnsi>[2],
 ) => wrapAnsi(typeof str === "string" ? str : str.join(EOL), columns, options);
-
-const quote = (args: string[]) => args.map($.escape).join(" ");
 
 export const run = async () => {
   const link = (
