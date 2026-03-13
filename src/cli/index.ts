@@ -1462,10 +1462,10 @@ export const setup = async () => {
           `The command has been placed in your clipboard so you can simply paste it.`,
         ),
       );
-      exit(1);
+      return exit(1);
     } else {
       printline(wrap("gib is up-to-date."));
-      exit(0);
+      return exit(0);
     }
   }
 
