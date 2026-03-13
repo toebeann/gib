@@ -37,7 +37,7 @@
     "build:darwin-x64": "bun build:local --target=bun-darwin-x64 --outfile dist/gib-darwin-x64",
     "build:darwin-aarch64": "bun build:local --target=bun-darwin-aarch64 --outfile dist/gib-darwin-aarch64",
     "build": "bun --parallel build:darwin-x64 build:darwin-aarch64",
-    "local": "bun build:local && bin/gib",
+    "local": "bun build:local && bin/gib --no-path-check",
     "local:sh": "bun build:local && (export GIB_INSTALL=.; cat gib.sh | bash)",
     "lipo": "lipo -create -output ./dist/gib-darwin-universal ./dist/gib-darwin-x64 ./dist/gib-darwin-aarch64",
     "zip:target": "zip -Dj9 dist/gib-$TARGET.zip dist/gib-$TARGET",
