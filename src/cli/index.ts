@@ -417,9 +417,10 @@ export const run = async () => {
         (line) => line.includes("codesign"),
         runExecutablePathIndex,
       );
-      const emptyLineIndex = lines.lastIndexOf(
-        "",
-        codesignIndex !== -1 ? codesignIndex : runExecutablePathIndex,
+      const emptyLineIndex = lines.findLastIndex((line, i, lines) =>
+        i > 0 &&
+        i < (codesignIndex > -1 ? codesignIndex : runExecutablePathIndex) &&
+        !/\S/.test(line) && !/^\s/.test(lines[i - 1])
       );
       output = lines.toSpliced(
         emptyLineIndex,
@@ -443,7 +444,11 @@ export const run = async () => {
       const runExecutablePathIndex = lines.findLastIndex((line) =>
         line.includes("executable_path")
       );
-      const emptyLineIndex = lines.lastIndexOf("", runExecutablePathIndex);
+      const emptyLineIndex = lines.findLastIndex((line, i, lines) =>
+        i > 0 &&
+        i < runExecutablePathIndex &&
+        !/\S/.test(line) && !/^\s/.test(lines[i - 1])
+      );
       output = lines
         .toSpliced(
           emptyLineIndex,
@@ -687,7 +692,7 @@ export const run = async () => {
             response = fetch(browser_download_url);
           } catch {
             response = fetch(
-              "https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.4/BepInEx_macos_x64_5.4.23.4.zip",
+              "https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.5/BepInEx_macos_universal_5.4.23.5.zip",
             );
           }
 
