@@ -9,6 +9,7 @@ import wrapAnsi from "wrap-ansi";
 
 import { version } from "../../package.json" with { type: "json" };
 import { logo } from "./ascii.ts" with { type: "macro" };
+import { printline } from "./print.ts";
 
 const width = () => cliWidth({ defaultWidth: 80 });
 const wrap = (
@@ -74,4 +75,4 @@ export const createLogo = async () => {
   return `${outputLines.join("\n")}${chalk.reset("")}`;
 };
 
-export const renderLogo = async () => console.log(await createLogo());
+export const renderLogo = async () => printline(await createLogo());

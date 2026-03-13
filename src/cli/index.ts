@@ -97,14 +97,13 @@ import { find } from "../utils/process.ts";
 import { parsePlistFromFile, type Plist } from "../utils/plist.ts";
 import { quote } from "../utils/quote.ts";
 import { config } from "./config.ts";
+import { errorline, printline } from "./print.ts";
 import { alert, confirm, prompt } from "./prompt.ts";
 import { renderLogo } from "./renderLogo.ts";
 
 const code = chalk.yellowBright.bold;
 const orange = chalk.hex(color("orange", "hex")!);
 const pink = chalk.hex("#ae0956");
-
-const { error, log } = console;
 
 const width = () => cliWidth({ defaultWidth: 80 });
 
@@ -150,9 +149,9 @@ export const run = async () => {
   await renderLogo();
 
   const run_bepinex_sh = code("run_bepinex.sh");
-  log(wrap(chalk.bold("gib will:")));
-  if (width() < 40) log();
-  log(
+  printline(wrap(chalk.bold("gib will:")));
+  if (width() < 40) printline();
+  printline(
     list(
       [
         "install and configure BepInEx for a compatible game",
@@ -163,18 +162,16 @@ export const run = async () => {
     ),
   );
 
-  const pressHeartToContinue = async (message = "to continue") => {
-    log();
-    await alert(wrap(chalk.yellowBright(`Press enter ${message}`)));
-    log();
+  const pressHeartToContinue = (message = "to continue") => {
+    alert(wrap([null, chalk.yellowBright(`Press enter ${message}`)]));
+    printline();
   };
 
-  await pressHeartToContinue();
+  pressHeartToContinue();
 
-  log(
+  printline(
     wrap(
-      "If you haven't already, go ahead and download (and unzip) the relevant " +
-        "BepInEx pack for the game.",
+      "If you haven't already, go ahead and download (and unzip) the relevant BepInEx pack for the game.",
     ),
   );
 
@@ -190,10 +187,10 @@ export const run = async () => {
     let value: string | undefined;
 
     do {
-      value = (await prompt(message, defaultValue))?.trim();
+      value = (prompt(message, defaultValue))?.trim();
 
       if (!value) {
-        error(
+        errorline(
           wrap(
             `${EOL}${err} No input detected. If you would like to exit gib, press ${
               code("Control C")
@@ -230,7 +227,7 @@ export const run = async () => {
       try {
         return await getBepInExScriptPath(value);
       } catch (e) {
-        error(
+        errorline(
           wrap([
             null,
             `${err} ${
@@ -279,7 +276,7 @@ export const run = async () => {
   let bepinexScriptName = basename(bepinexScriptPath);
   const bepinexFolderPath = dirname(bepinexScriptPath);
 
-  log(
+  printline(
     wrap([
       null,
       "macOS BepInEx pack successfully detected at:",
@@ -306,7 +303,7 @@ export const run = async () => {
       try {
         return await getUnityAppPath(value);
       } catch (e) {
-        error(
+        errorline(
           wrap([
             null,
             `${err} ${
@@ -364,7 +361,7 @@ export const run = async () => {
     ? dirname(gameAppPath)
     : join(gameAppPath, "..", "..", "..");
 
-  log(
+  printline(
     wrap([
       null,
       "Unity app successfully detected at:",
@@ -553,7 +550,7 @@ export const run = async () => {
     const [userId, { PersonaName, AccountName }] = await getMostRecentUser();
     const username = code(PersonaName ?? AccountName);
 
-    log(
+    printline(
       wrap([
         [
           game,
@@ -596,7 +593,7 @@ export const run = async () => {
       ]),
     );
 
-    shouldAddShortcut = await confirm(
+    shouldAddShortcut = confirm(
       wrap(
         switchSupported
           ? `Add experimental Steam shortcut to launch ${game} without mods?`
@@ -607,13 +604,13 @@ export const run = async () => {
       ),
     );
 
-    log();
-    log(
-      wrap(
+    printline(
+      wrap([
+        null,
         chalk.bold(`gib will now perform the following operations:${EOL}`),
-      ),
+      ]),
     );
-    log(
+    printline(
       list(
         [
           "install and configure BepInEx for the selected Unity app",
@@ -634,21 +631,23 @@ export const run = async () => {
       ),
     );
 
-    log(wrap([
-      null,
-      chalk.bold.yellowBright(
-        "This will potentially overwrite files in the process.",
-      ),
-      null,
-      "You may be required to grant permission to the Terminal.",
-      null,
-    ]));
+    printline(
+      wrap([
+        null,
+        chalk.bold.yellowBright(
+          "This will potentially overwrite files in the process.",
+        ),
+        null,
+        "You may be required to grant permission to the Terminal.",
+        null,
+      ]),
+    );
 
-    if (!await confirm(wrap(chalk.yellowBright("Proceed?")))) {
+    if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
       throw wrap("User cancelled installation");
     }
 
-    log();
+    printline();
 
     operations.push(
       (async () => {
@@ -923,7 +922,7 @@ export const run = async () => {
           : user.AccountName,
       );
 
-    shouldAddShortcut = await isInstalled() && await confirm(wrap([
+    shouldAddShortcut = await isInstalled() && confirm(wrap([
       [
         game,
         "appears to be a non-Steam game. gib can optionally add a Steam",
@@ -934,14 +933,14 @@ export const run = async () => {
       `Add experimental Steam shortcut to launch ${game} with BepInEx?`,
     ]));
 
-    log(
+    printline(
       wrap(
         chalk.bold(
           `${EOL}gib will now perform the following operations:${EOL}`,
         ),
       ),
     );
-    log(
+    printline(
       list(
         [
           "install and configure BepInEx for the selected Unity app",
@@ -958,21 +957,23 @@ export const run = async () => {
       ),
     );
 
-    log(wrap([
-      null,
-      chalk.bold.yellowBright(
-        "This will potentially overwrite files in the process.",
-      ),
-      null,
-      "You may be required to grant permission to the Terminal.",
-      null,
-    ]));
+    printline(
+      wrap([
+        null,
+        chalk.bold.yellowBright(
+          "This will potentially overwrite files in the process.",
+        ),
+        null,
+        "You may be required to grant permission to the Terminal.",
+        null,
+      ]),
+    );
 
-    if (!await confirm(wrap(chalk.yellowBright("Proceed?")))) {
+    if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
       throw wrap("User cancelled installation");
     }
 
-    log();
+    printline();
 
     const shortcutPath = join(
       homedir(),
@@ -1119,23 +1120,22 @@ export const run = async () => {
 
   await Promise.all(operations);
 
-  log(wrap([
-    "Finally, let's test that everything is working.",
-    null,
-    [
-      "To perform the test, gib will automatically launch the game, wait up to",
-      "30 seconds for signs of BepInEx activity, and then force quit the game.",
-    ].join(" "),
-    null,
-    "Return to this Terminal window once the game has closed.",
-  ]));
-  await pressHeartToContinue("when you're ready to run the test");
+  printline(
+    wrap([
+      "Finally, let's test that everything is working.",
+      null,
+      "To perform the test, gib will automatically launch the game, wait up to 30 seconds for signs of BepInEx activity, and then force quit the game.",
+      null,
+      "Return to this Terminal window once the game has closed.",
+    ]),
+  );
+  pressHeartToContinue("when you're ready to run the test");
 
   const steamApp = steamApps[0];
 
   if (steamApp) {
     await launch(steamApp);
-    log(wrap([`Launching ${code(steamApp.name)} with Steam...`, null]));
+    printline(wrap([`Launching ${code(steamApp.name)} with Steam...`, null]));
   } else {
     await open(shortcutPath);
   }
@@ -1186,9 +1186,9 @@ export const run = async () => {
           clearTimeout(timeout);
           detectedGame = true;
           timeout = setTimeout(finish, 30_000);
-          log(`${code(basename(gameAppPath))}`, "running...");
+          printline(`${code(basename(gameAppPath))} running...`);
         } else if (detectedGame && !processes.length) {
-          log(code(basename(gameAppPath)), "closed.");
+          printline(`${code(basename(gameAppPath))} closed.`);
           await finish();
         }
       }, 200);
@@ -1205,7 +1205,7 @@ export const run = async () => {
     },
   );
 
-  log();
+  printline();
 
   if (!detectedGame && !detectedBepInEx) {
     throw wrap(
@@ -1231,7 +1231,7 @@ export const run = async () => {
       background: true,
     });
 
-    log(
+    printline(
       wrap([
         chalk.green.bold("Successfully detected BepInEx running!"),
         null,
@@ -1290,10 +1290,10 @@ export const run = async () => {
           ],
         null,
         "If you found gib helpful, please consider donating:",
+        null,
       ]),
     );
-    log();
-    log(
+    printline(
       list([
         link(
           chalk.hex("#00457C")("PayPal"),
@@ -1309,9 +1309,7 @@ export const run = async () => {
         ),
       ], false),
     );
-    log();
-    log(pink("- tobey ♥"));
-    log();
+    printline(wrap([null, pink("- tobey ♥"), null]));
   }
 };
 
@@ -1328,84 +1326,76 @@ export const setup = async () => {
   } = config();
 
   const printHelp = () => {
-    log(
+    printline(
       wrap(
-        `${
-          pink("gib")
-        } is a TUI app for automating the installation of BepInEx on macOS. ${
-          chalk.dim(`(${version})`)
-        }`,
+        [
+          `${
+            pink("gib")
+          } is a TUI app for automating the installation of BepInEx on macOS. ${
+            chalk.dim(`(${version})`)
+          }`,
+          null,
+          chalk.bold(`Usage: gib ${chalk.cyan("[...flags]")}`),
+          null,
+          chalk.bold("Flags:"),
+        ],
       ),
     );
-    log();
-    log(wrap(chalk.bold(`Usage: gib ${chalk.cyan("[...flags]")}`)));
-    log();
-    log(wrap(chalk.bold("Flags:")));
-    log(
-      `  ${
-        wrap(
-          `${chalk.cyan("-v")}, ${
-            chalk.cyan("--version")
-          }          Print version and exit`,
-          width() - 2,
-        )
-      }`,
-    );
-    log(
-      `  ${
-        wrap(
-          `${chalk.cyan("-s")}, ${
-            chalk.cyan("--status")
-          }           Print update status and exit`,
-          width() - 2,
-        )
-      }`,
-    );
-    log(
-      `      ${
-        wrap(
-          `${
-            chalk.cyan(`--launch${chalk.dim("=<id>")}`)
-          }      Immediately launch Steam app with the specified id and exit`,
-          width() - 6,
-        )
-      }`,
-    );
-    log(
-      `      ${
-        wrap(
-          `${chalk.cyan("--no-update")}        Disable update check`,
-          width() - 6,
-        )
-      }`,
-    );
-    if (command === "gib") {
-      log(
+    printline(
+      [
+        `  ${
+          wrap(
+            `${chalk.cyan("-v")}, ${
+              chalk.cyan("--version")
+            }          Print version and exit`,
+            width() - 2,
+          )
+        }`,
+        `  ${
+          wrap(
+            `${chalk.cyan("-s")}, ${
+              chalk.cyan("--status")
+            }           Print update status and exit`,
+            width() - 2,
+          )
+        }`,
         `      ${
+          wrap(
+            `${
+              chalk.cyan(`--launch${chalk.dim("=<id>")}`)
+            }      Immediately launch Steam app with the specified id and exit`,
+            width() - 6,
+          )
+        }`,
+        `      ${
+          wrap(
+            `${chalk.cyan("--no-update")}        Disable update check`,
+            width() - 6,
+          )
+        }`,
+        command === "gib" && `      ${
           wrap(
             `${chalk.cyan("--no-path-check")}    Disable $PATH check`,
             width() - 6,
           )
         }`,
-      );
-    }
-    log(
-      `  ${
-        wrap(
-          `${chalk.cyan("-h")}, ${
-            chalk.cyan("--help")
-          }             Display usage information and exit`,
-          width() - 2,
-        )
-      }`,
+        `  ${
+          wrap(
+            `${chalk.cyan("-h")}, ${
+              chalk.cyan("--help")
+            }             Display usage information and exit`,
+            width() - 2,
+          )
+        }`,
+      ].filter(Boolean).join(EOL),
     );
-    log();
-    log(
-      wrap(
+    printline(
+      wrap([
+        null,
         `Learn more about gib:    ${
           pink("https://github.com/toebeann/gib#readme")
         }`,
-      ),
+      ]),
     );
   };
 
@@ -1427,7 +1417,7 @@ export const setup = async () => {
   }
 
   if (wantsVersion) {
-    log(version);
+    printline(version);
     return;
   }
 
@@ -1457,61 +1447,60 @@ export const setup = async () => {
     if (updateAvailable) {
       await $`echo -n ${updateCommand.trim()} | pbcopy`.nothrow().quiet();
 
-      error(wrap(`gib ${chalk.bold.underline(`v${latest}`)} is available.`));
-      log(
-        wrap(
-          `Changelog: https://github.com/toebeann/gib/releases/tag/v${latest}`,
-        ),
+      errorline(
+        wrap(`gib ${chalk.bold.underline(`v${latest}`)} is available.`),
       );
-      log(wrap("Run the following command to update and relaunch gib:"));
-      log(`  ${wrap(chalk.dim(updateCommand))}`);
-      log(
+      printline(
+        wrap([
+          `Changelog: https://github.com/toebeann/gib/releases/tag/v${latest}`,
+          "Run the following command to update and relaunch gib:",
+        ]),
+      );
+      printline(`  ${wrap(chalk.dim(updateCommand), width() - 2)}`);
+      printline(
         wrap(
           `The command has been placed in your clipboard so you can simply paste it.`,
         ),
       );
       exit(1);
     } else {
-      log(wrap("gib is up-to-date."));
+      printline(wrap("gib is up-to-date."));
       exit(0);
     }
   }
 
   if (updateAvailable) {
-    log();
-    log(wrap(`gib ${orange.bold.underline(`v${latest}`)} is available.`));
-    log(
-      wrap(
+    printline(
+      wrap([
+        null,
+        `gib ${orange.bold.underline(`v${latest}`)} is available.`,
         `Changelog: https://github.com/toebeann/gib/releases/tag/v${latest}`,
-      ),
-    );
-    log(
-      wrap(
         chalk.dim(
           `You currently have ${
             chalk.bold.underline(`v${version}`)
           } installed.`,
         ),
-      ),
+        null,
+      ]),
     );
-    log();
 
-    if (await confirm(chalk.yellowBright("Would you like to update?"))) {
+    if (confirm(chalk.yellowBright("Would you like to update?"))) {
       await $`echo -n ${updateCommand.trim()} | pbcopy`.nothrow().quiet();
 
-      log();
-      log(wrap("Run the following command to update and relaunch gib:"));
-      log(`  ${wrap(chalk.dim(updateCommand))}`);
-      log(
-        wrap(
-          `The command has been placed in your clipboard so you can simply paste it.`,
-        ),
+      printline(
+        wrap([null, "Run the following command to update and relaunch gib:"]),
       );
-      log();
+      printline(`  ${wrap(chalk.dim(updateCommand), width() - 2)}`);
+      printline(
+        wrap([
+          `The command has been placed in your clipboard so you can simply paste it.`,
+          null,
+        ]),
+      );
       return;
     }
 
-    log();
+    printline();
   }
 
   if (wantsCheckPath) {
@@ -1519,7 +1508,7 @@ export const setup = async () => {
     const commandExists = commandResult.exitCode === 0;
 
     if (!commandExists) {
-      if (!updateAvailable) log();
+      if (!updateAvailable) printline();
 
       const attemptAddCommandToPath = async () => {
         const pathText = chalk.yellowBright.bold("$PATH");
@@ -1532,24 +1521,19 @@ export const setup = async () => {
           configPath: string,
           commands: string[],
         ) => {
-          log(wrap(`${command} not found in ${pathText}.`));
-          log(
-            wrap(
+          printline(
+            wrap([
+              `${command} not found in ${pathText}.`,
               `We recommend adding ${command} to ${pathText} for ease of use.`,
-            ),
-          );
-          log();
-
-          log(
-            wrap(
+              null,
               `To do so, manually add the equivalent commands to ${
                 chalk.yellowBright.bold(configPath)
               } (or similar):`,
-            ),
+            ]),
           );
 
           for (const command of commands) {
-            log(`  ${wrap(code(command), width() - 2)}`);
+            printline(`  ${wrap(code(command), width() - 2)}`);
           }
         };
 
@@ -1578,19 +1562,17 @@ export const setup = async () => {
             ["", "# gib", ...commands, ""].join(EOL),
           );
 
-          log(
-            wrap(
+          printline(
+            wrap([
               `${command} has been added to ${pathText} in ${
                 code(configPath)
               }.`,
-            ),
+              null,
+              "The next time you want to launch gib, you can simply run:",
+            ]),
           );
-          log();
-          log(
-            wrap("The next time you want to launch gib, you can simply run:"),
-          );
-          log(`  ${wrap(code(command), width() - 2)}`);
-          log(
+          printline(`  ${wrap(code(command), width() - 2)}`);
+          printline(
             wrap(
               chalk.dim(
                 "You will need to reload your terminal for this command to be available.",
@@ -1687,9 +1669,8 @@ export const setup = async () => {
           if (!done) promptToManuallyEditConfig("~/.bashrc", commands);
         }
 
-        log();
-        await alert(wrap(chalk.yellowBright("Press enter to continue")));
-        log();
+        alert(wrap([null, chalk.yellowBright("Press enter to continue")]));
+        printline();
       };
 
       await attemptAddCommandToPath();
