@@ -1424,7 +1424,12 @@ export const setup = async () => {
     printline(wrap([null, chalk.bold("Examples:")]));
     printline(
       [
-        `  ${wrap(chalk.dim("Interactivly install BepInEx to a Unity game"))}`,
+        `  ${
+          wrap(
+            chalk.dim("Interactivly install BepInEx to a Unity game"),
+            width() - 2,
+          )
+        }`,
         `  ${wrap(`${chalk.bold.greenBright("gib")} `, width() - 2)}`,
         null,
         `  ${
@@ -1432,6 +1437,7 @@ export const setup = async () => {
             chalk.dim(
               "Install BepInEx from the provided path to the Unity game at the provided path, accepting all default options",
             ),
+            width() - 2,
           )
         }`,
         `  ${
@@ -1450,6 +1456,7 @@ export const setup = async () => {
             chalk.dim(
               "(Re-)install BepInEx from the current working directory to the Unity game at the current working directory, accepting all default options",
             ),
+            width() - 2,
           )
         }`,
         `  ${
