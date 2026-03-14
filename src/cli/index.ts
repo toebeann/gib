@@ -113,7 +113,15 @@ const wrap = (
   options?: Parameters<typeof wrapAnsi>[2],
 ) => wrapAnsi(typeof str === "string" ? str : str.join(EOL), columns, options);
 
-export const run = async () => {
+export interface Options {
+  bepinexScriptPath?: string;
+  unityAppPath?: string;
+  yes?: boolean;
+}
+
+export const run = async (options: Options = {}) => {
+  const { yes } = options;
+
   const link = (
     label: string,
     url: string = label,
@@ -163,7 +171,9 @@ export const run = async () => {
   );
 
   const pressHeartToContinue = (message = "to continue") => {
-    alert(wrap([null, chalk.yellowBright(`Press enter ${message}`)]));
+    if (!yes) {
+      alert(wrap([null, chalk.yellowBright(`Press enter ${message}`)]));
+    }
     printline();
   };
 
@@ -214,7 +224,7 @@ export const run = async () => {
     `Select it and press ${copyPath} to copy its path, then press ${paste} to paste the path here.`,
   ], false);
 
-  const bepinexScriptPath = await promptUntilValid(
+  const bepinexScriptPath = options.bepinexScriptPath || await promptUntilValid(
     wrap([
       null,
       `In Finder, locate the folder containing the ${run_bepinex_sh} (or similar) script file within your downloaded BepInEx pack, then either:`,
@@ -286,7 +296,7 @@ export const run = async () => {
     ]),
   );
 
-  const gameAppPath = await promptUntilValid(
+  const gameAppPath = options.unityAppPath || await promptUntilValid(
     wrap([
       null,
       `Open a Finder window at the game's location, (e.g. by clicking ${
@@ -607,6 +617,7 @@ export const run = async () => {
             "updating this pack to the latest BepInEx 5 release?",
           ].join(" "),
       ),
+      yes,
     );
 
     printline(
@@ -648,7 +659,7 @@ export const run = async () => {
       ]),
     );
 
-    if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
+    if (!confirm(wrap(chalk.yellowBright("Proceed?")), yes)) {
       throw wrap("User cancelled installation");
     }
 
@@ -927,16 +938,19 @@ export const run = async () => {
           : user.AccountName,
       );
 
-    shouldAddShortcut = await isInstalled() && confirm(wrap([
-      [
-        game,
-        "appears to be a non-Steam game. gib can optionally add a Steam",
-        "shortcut to launch the game modded with BepInEx. This feature is",
-        "experimental and will require Steam to be closed.",
-      ].join(" "),
-      null,
-      `Add experimental Steam shortcut to launch ${game} with BepInEx?`,
-    ]));
+    shouldAddShortcut = await isInstalled() && confirm(
+      wrap([
+        [
+          game,
+          "appears to be a non-Steam game. gib can optionally add a Steam",
+          "shortcut to launch the game modded with BepInEx. This feature is",
+          "experimental and will require Steam to be closed.",
+        ].join(" "),
+        null,
+        `Add experimental Steam shortcut to launch ${game} with BepInEx?`,
+      ]),
+      yes,
+    );
 
     printline(
       wrap(
@@ -974,7 +988,7 @@ export const run = async () => {
       ]),
     );
 
-    if (!confirm(wrap(chalk.yellowBright("Proceed?")))) {
+    if (!confirm(wrap(chalk.yellowBright("Proceed?")), yes)) {
       throw wrap("User cancelled installation");
     }
 
@@ -1327,6 +1341,7 @@ export const setup = async () => {
     wantsUpdateExitStatus,
     wantsCheckPath,
     launch: launchId,
+    yes,
     positionals,
   } = config();
 
@@ -1340,7 +1355,11 @@ export const setup = async () => {
             chalk.dim(`(${version})`)
           }`,
           null,
-          chalk.bold(`Usage: gib ${chalk.cyan("[...flags]")}`),
+          chalk.bold(
+            `Usage: gib ${chalk.cyan("[...flags]")} ${
+              chalk.greenBright.dim("[bepinexScriptPath] [unityAppPath]")
+            }`,
+          ),
           null,
           chalk.bold("Flags:"),
         ],
@@ -1386,6 +1405,14 @@ export const setup = async () => {
         }`,
         `  ${
           wrap(
+            `${chalk.cyan("-y")}, ${
+              chalk.cyan("--yes")
+            }              Accept all defaults and automatically progress`,
+            width() - 2,
+          )
+        }`,
+        `  ${
+          wrap(
             `${chalk.cyan("-h")}, ${
               chalk.cyan("--help")
             }             Display usage information and exit`,
@@ -1393,6 +1420,47 @@ export const setup = async () => {
           )
         }`,
       ].filter(Boolean).join(EOL),
+    );
+    printline(wrap([null, chalk.bold("Examples:")]));
+    printline(
+      [
+        `  ${wrap(chalk.dim("Interactivly install BepInEx to a Unity game"))}`,
+        `  ${wrap(`${chalk.bold.greenBright("gib")} `, width() - 2)}`,
+        null,
+        `  ${
+          wrap(
+            chalk.dim(
+              "Install BepInEx from the provided path to the Unity game at the provided path, accepting all default options",
+            ),
+          )
+        }`,
+        `  ${
+          wrap(
+            `${chalk.bold.greenBright("gib")} ${chalk.cyan("-y")} ${
+              chalk.blue(
+                "~/Downloads/Tobey.s.BepInEx.Pack.for.Subnautica '~/Library/Application Support/Steam/steamapps/common/Subnautica'",
+              )
+            }`,
+            width() - 2,
+          )
+        }`,
+        null,
+        `  ${
+          wrap(
+            chalk.dim(
+              "(Re-)install BepInEx from the current working directory to the Unity game at the current working directory, accepting all default options",
+            ),
+          )
+        }`,
+        `  ${
+          wrap(
+            `${chalk.bold.greenBright("gib")} ${chalk.cyan("-y")} ${
+              chalk.blue(".")
+            }`,
+            width() - 2,
+          )
+        }`,
+      ].join(EOL),
     );
     printline(
       wrap([
@@ -1489,7 +1557,7 @@ export const setup = async () => {
       ]),
     );
 
-    if (confirm(chalk.yellowBright("Would you like to update?"))) {
+    if (confirm(chalk.yellowBright("Would you like to update?"), yes)) {
       await $`echo -n ${updateCommand.trim()} | pbcopy`.nothrow().quiet();
 
       printline(
@@ -1674,7 +1742,9 @@ export const setup = async () => {
           if (!done) promptToManuallyEditConfig("~/.bashrc", commands);
         }
 
-        alert(wrap([null, chalk.yellowBright("Press enter to continue")]));
+        if (!yes) {
+          alert(wrap([null, chalk.yellowBright("Press enter to continue")]));
+        }
         printline();
       };
 
@@ -1682,7 +1752,35 @@ export const setup = async () => {
     }
   }
 
-  await run();
+  switch (positionals.length) {
+    case 0:
+      return await run({ yes });
+
+    case 1:
+      try {
+        const bepinexScriptPath = await getBepInExScriptPath(positionals[0])
+          .catch(() => getBepInExScriptPath("."));
+        const unityAppPath = await getUnityAppPath(positionals[0])
+          .catch(() => getUnityAppPath("."));
+        return await run({ bepinexScriptPath, unityAppPath, yes });
+      } catch (e) {
+        console.error(e);
+        return printHelp();
+      }
+
+    case 2:
+      try {
+        const bepinexScriptPath = await getBepInExScriptPath(positionals[0]);
+        const unityAppPath = await getUnityAppPath(positionals[1]);
+        return await run({ bepinexScriptPath, unityAppPath, yes });
+      } catch (e) {
+        console.error(e);
+        return printHelp();
+      }
+
+    default:
+      return printHelp();
+  }
 };
 
 if (import.meta.main) setup();

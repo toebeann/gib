@@ -11,6 +11,7 @@ export const config = () => {
             status: wantsUpdateExitStatus,
             update: wantsAutoUpdate,
             "path-check": wantsCheckPath,
+            yes,
             launch,
         },
         positionals,
@@ -22,6 +23,7 @@ export const config = () => {
             version: { type: "boolean", short: "v", default: false },
             status: { type: "boolean", short: "s", default: false },
             update: { type: "boolean", default: true },
+            yes: { type: "boolean", short: "y", default: false },
             launch: { type: "string" },
             ...(command === "gib"
                 ? { "path-check": { type: "boolean", default: true } }
@@ -32,6 +34,7 @@ export const config = () => {
     return {
         launch,
         positionals,
+        yes,
         wantsHelp,
         wantsVersion,
         wantsUpdateExitStatus,

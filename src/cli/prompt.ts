@@ -1,3 +1,7 @@
+import { stdin, write } from "bun";
+
+import { EOL } from "node:os";
+
 import { question } from "readline-sync";
 
 import { print } from "./print";
@@ -7,9 +11,11 @@ export const alert = (message: string) => {
   question();
 };
 
-export const confirm = (message: string) => {
+export const confirm = (message: string, yes = false) => {
   print(`${message} [Y/n] `);
-  return question()[0]?.toLowerCase() !== "n";
+  return Boolean(
+    yes ? write(stdin, `yes${EOL}`) : question()[0]?.toLowerCase() !== "n",
+  );
 };
 
 export const prompt = (message = "Prompt", defaultValue?: string) => {
