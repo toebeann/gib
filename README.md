@@ -1,6 +1,6 @@
 # gib
 
-[<img alt="Usage statistics for gib from the jsDelivr CDN" src="https://data.jsdelivr.com/v1/package/gh/toebeann/gib/badge">](https://www.jsdelivr.com/package/gh/toebeann/gib?tab=stats)
+![jsDelivr hits (GitHub)](https://img.shields.io/jsdelivr/gh/hm/toebeann/gib?style=flat-square) ![GitHub Release](https://img.shields.io/github/v/release/toebeann/gib?style=flat-square)
 
 gib _(tobey's Guided Installer for BepInEx)_ is a TUI application for automating
 the installation of [BepInEx](https://github.com/BepInEx/BepInEx), the popular
