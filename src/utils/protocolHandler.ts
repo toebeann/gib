@@ -34,7 +34,7 @@ export const getProtocolHandlerPath = async (protocol: string) => {
     return output.trim();
   } else if (platform() === "win32") {
     try {
-      const key = join("registry:hkcr", protocol, "shell", "open", "command");
+      const key = join("registry::hkcr", protocol, "shell", "open", "command");
       const output =
         await $`powershell -noprofile -noninteractive -c 'gp -path ${key} | select -expand "(default)"'`
           .text();
