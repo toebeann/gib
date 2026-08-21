@@ -1,3 +1,5 @@
+import { wrapAnsi } from "bun";
+
 import { env } from "node:process";
 
 import boxen from "boxen";
@@ -5,7 +7,6 @@ import center from "center-align";
 import chalk from "chalk";
 import cliWidth from "cli-width";
 import gradientString, { retro } from "gradient-string";
-import wrapAnsi from "wrap-ansi";
 
 import { version } from "../../package.json" with { type: "json" };
 import { logo } from "./ascii.ts" with { type: "macro" };
@@ -15,7 +16,7 @@ const width = () => cliWidth({ defaultWidth: 80 });
 const wrap = (
   str: string,
   columns = width(),
-  options?: Parameters<typeof wrapAnsi>[2],
+  options?: Parameters<typeof Bun.wrapAnsi>[2],
 ) => wrapAnsi(str, columns, options);
 
 export const createLogo = async () => {
@@ -23,10 +24,9 @@ export const createLogo = async () => {
 
   outputLines.push(
     chalk.gray(
-      `gib v${version} ${
-        typeof Bun !== "undefined"
-          ? `bun v${Bun.version}`
-          : `node ${process.version}`
+      `gib v${version} ${typeof Bun !== "undefined"
+        ? `bun v${Bun.version}`
+        : `node ${process.version}`
       }`,
     ),
   );
