@@ -1,9 +1,8 @@
-import { basename } from "node:path";
+import { basename, extname } from "node:path";
 import { execPath } from "node:process";
 import { parseArgs } from "node:util";
 
 export const config = () => {
-    const command = basename(execPath);
     const {
         values: {
             help: wantsHelp,
@@ -25,7 +24,7 @@ export const config = () => {
             update: { type: "boolean", default: true },
             yes: { type: "boolean", short: "y", default: false },
             launch: { type: "string" },
-            ...(command === "gib"
+            ...(basename(execPath, extname(execPath)) === "gib"
                 ? { "path-check": { type: "boolean", default: true } }
                 : {}),
         },
