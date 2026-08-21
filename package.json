@@ -85,7 +85,6 @@
     "open": "^11.0.1",
     "path-equal": "^1.2.5",
     "plist": "^3.1.1",
-    "readline-sync": "^1.4.10",
     "slashes": "^3.0.12",
     "steam-binary-vdf": "^0.1.0",
     "string-argv": "^0.3.2",

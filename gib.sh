@@ -90,5 +90,5 @@
 
     echo -ne "\r\033[2K"
 
-    exec "$gib"
+    exec "$gib"</dev/tty
 } # this ensures the entire script is downloaded #
