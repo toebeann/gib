@@ -39,7 +39,7 @@
  *
  *****************************************************************************/
 
-import { $, color, env, file, Glob, semver, wrapAnsi, write } from "bun";
+import { $, color, env, file, Glob, inspect, semver, wrapAnsi, write } from "bun";
 
 import { W_OK } from "node:constants";
 import { access, appendFile, chmod, mkdir } from "node:fs/promises";
@@ -104,6 +104,7 @@ import { renderLogo } from "./renderLogo.ts";
 const code = chalk.yellowBright.bold;
 const orange = chalk.hex(color("orange", "hex")!);
 const pink = chalk.hex("#ae0956");
+const err = `${chalk.red("error")}${chalk.gray(":")}`;
 
 const width = () => cliWidth({ defaultWidth: 80 });
 
@@ -140,12 +141,11 @@ export const run = async (options: Options = {}) => {
     let output = "";
     for (const [index, item] of items.entries()) {
       const n = index + 1;
-      output += `${ordered ? (`${n.toString().padStart(padding)}.`) : "  •"} ${
-        wrap(item, width() - indent)
-          .split(EOL).join(
-            `${EOL}${" ".repeat(indent)}`,
-          )
-      }`;
+      output += `${ordered ? (`${n.toString().padStart(padding)}.`) : "  •"} ${wrap(item, width() - indent)
+        .split(EOL).join(
+          `${EOL}${" ".repeat(indent)}`,
+        )
+        }`;
 
       if (n < items.length) {
         output += EOL.repeat(2);
@@ -185,8 +185,6 @@ export const run = async (options: Options = {}) => {
     ),
   );
 
-  const err = `${chalk.red("error")}${chalk.gray(":")}`;
-
   const promptUntilValid = async (
     message: string,
     validator:
@@ -202,8 +200,7 @@ export const run = async (options: Options = {}) => {
       if (!value) {
         errorline(
           wrap(
-            `${EOL}${err} No input detected. If you would like to exit gib, press ${
-              code("Control C")
+            `${EOL}${err} No input detected. If you would like to exit gib, press ${code("Control C")
             }. Otherwise, please try again.`,
           ),
         );
@@ -240,10 +237,9 @@ export const run = async (options: Options = {}) => {
         errorline(
           wrap([
             null,
-            `${err} ${
-              e instanceof Error
-                ? e.message
-                : "An unknown error was encountered processing input"
+            `${err} ${e instanceof Error
+              ? e.message
+              : "An unknown error was encountered processing input"
             }:`,
             chalk.yellowBright(
               e instanceof Error && "path" in e && typeof e.path === "string"
@@ -254,8 +250,8 @@ export const run = async (options: Options = {}) => {
             ...e instanceof Error && e.cause instanceof Error
               ? [null, chalk.dim(`${e.cause.name}: ${e.cause.message}`)]
               : e instanceof Error && e.cause
-              ? [null, chalk.dim(`${e.cause}`)]
-              : [],
+                ? [null, chalk.dim(`${e.cause}`)]
+                : [],
 
             ...e instanceof PathNotFoundError
               ? [
@@ -264,18 +260,18 @@ export const run = async (options: Options = {}) => {
                 ),
               ]
               : e instanceof DoorstopScriptMissingPlatformSupport
-              ? [
-                chalk.bold(
-                  "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
-                ),
-              ]
-              : e instanceof InvalidBepInExPack
-              ? [
-                chalk.bold(
-                  `Please make sure you are selecting the ${run_bepinex_sh} script and try again.`,
-                ),
-              ]
-              : [],
+                ? [
+                  chalk.bold(
+                    "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
+                  ),
+                ]
+                : e instanceof InvalidBepInExPack
+                  ? [
+                    chalk.bold(
+                      `Please make sure you are selecting the ${run_bepinex_sh} script and try again.`,
+                    ),
+                  ]
+                  : [],
           ]),
         );
 
@@ -299,10 +295,8 @@ export const run = async (options: Options = {}) => {
   const gameAppPath = options.unityAppPath || await promptUntilValid(
     wrap([
       null,
-      `Open a Finder window at the game's location, (e.g. by clicking ${
-        code("Manage -> Browse local files")
-      } in Steam), find the game's app (e.g. ${code("Subnautica.app")}) or ${
-        code("Contents")
+      `Open a Finder window at the game's location, (e.g. by clicking ${code("Manage -> Browse local files")
+      } in Steam), find the game's app (e.g. ${code("Subnautica.app")}) or ${code("Contents")
       } folder and do the same thing as last time - either:`,
       null,
       providePathInstructions,
@@ -316,10 +310,9 @@ export const run = async (options: Options = {}) => {
         errorline(
           wrap([
             null,
-            `${err} ${
-              e instanceof Error
-                ? e.message
-                : "An unknown error was encountered processing input"
+            `${err} ${e instanceof Error
+              ? e.message
+              : "An unknown error was encountered processing input"
             }:`,
             e instanceof MultipleUnityAppsFoundError
               ? list(e.apps.map((app) => chalk.yellowBright(app)), false)
@@ -332,8 +325,8 @@ export const run = async (options: Options = {}) => {
             ...e instanceof Error && e.cause instanceof Error
               ? [null, chalk.dim(`${e.cause.name}: ${e.cause.message}`)]
               : e instanceof Error && e.cause
-              ? [null, chalk.dim(`${e.cause}`)]
-              : [],
+                ? [null, chalk.dim(`${e.cause}`)]
+                : [],
 
             ...e instanceof PathNotFoundError
               ? [
@@ -342,24 +335,24 @@ export const run = async (options: Options = {}) => {
                 ),
               ]
               : e instanceof InvalidUnityApp || e instanceof PathNotAFolderError
-              ? [
-                chalk.bold(
-                  "Please make sure you are selecting a Unity app and try again.",
-                ),
-              ]
-              : e instanceof MultipleUnityAppsFoundError
-              ? [
-                chalk.bold(
-                  "Please specify which Unity app you would like to target by providing its path.",
-                ),
-              ]
-              : e instanceof NotAUnityAppError
-              ? [
-                chalk.bold(
-                  "BepInEx only works for Unity games. Please make sure you are selecting a Unity app and try again.",
-                ),
-              ]
-              : [],
+                ? [
+                  chalk.bold(
+                    "Please make sure you are selecting a Unity app and try again.",
+                  ),
+                ]
+                : e instanceof MultipleUnityAppsFoundError
+                  ? [
+                    chalk.bold(
+                      "Please specify which Unity app you would like to target by providing its path.",
+                    ),
+                  ]
+                  : e instanceof NotAUnityAppError
+                    ? [
+                      chalk.bold(
+                        "BepInEx only works for Unity games. Please make sure you are selecting a Unity app and try again.",
+                      ),
+                    ]
+                    : [],
           ]),
         );
 
@@ -401,11 +394,9 @@ export const run = async (options: Options = {}) => {
     const basedirIndex = output.indexOf("BASEDIR=");
     if (basedirIndex !== -1 && !output.includes('cd "$BASEDIR"')) {
       const insertIndex = output.indexOf("\n", basedirIndex);
-      output = `${
-        output.slice(0, insertIndex)
-      }\ncd "$BASEDIR" # GIB: workaround for some games only working if script is run from game dir${
-        output.slice(insertIndex)
-      }`;
+      output = `${output.slice(0, insertIndex)
+        }\ncd "$BASEDIR" # GIB: workaround for some games only working if script is run from game dir${output.slice(insertIndex)
+        }`;
     }
 
     // workaround for issue with doorstop 4 where specifying the direct path to
@@ -532,10 +523,9 @@ export const run = async (options: Options = {}) => {
   const shortcutPath = join(
     homedir(),
     "Applications",
-    `${
-      extname(gameAppPath) === ".app"
-        ? parse(gameAppPath).name
-        : plist.CFBundleName || parse(plist.CFBundleExecutable).name
+    `${extname(gameAppPath) === ".app"
+      ? parse(gameAppPath).name
+      : plist.CFBundleName || parse(plist.CFBundleExecutable).name
     } (${steamApps.length === 0 ? "BepInEx" : "Vanilla"}).app`,
   );
   let shouldAddShortcut: boolean;
@@ -660,7 +650,7 @@ export const run = async (options: Options = {}) => {
     );
 
     if (!confirm(wrap(chalk.yellowBright("Proceed?")), yes)) {
-      throw wrap("User cancelled installation");
+      throw { foo: wrap("User cancelled installation") };
     }
 
     printline();
@@ -821,8 +811,7 @@ export const run = async (options: Options = {}) => {
             [
               "#!/bin/bash",
               "# autogenerated file - do not edit",
-              `${
-                $.escape(execPath)
+              `${$.escape(execPath)
               } --launch=${id} -- --doorstop_enabled false "$@"`,
             ].join(EOL),
             { createPath: true, mode: 0o764 },
@@ -836,11 +825,10 @@ export const run = async (options: Options = {}) => {
             buildPlist(
               {
                 CFBundleIconFile: "PlayerIcon.icns",
-                CFBundleName: `${
-                  typeof plist.CFBundleName === "string"
-                    ? plist.CFBundleName
-                    : name
-                } (Vanilla)`,
+                CFBundleName: `${typeof plist.CFBundleName === "string"
+                  ? plist.CFBundleName
+                  : name
+                  } (Vanilla)`,
                 CFBundleInfoDictionaryVersion: "1.0",
                 CFBundlePackageType: "APPL",
                 CFBundleVersion: "1.0",
@@ -857,21 +845,19 @@ export const run = async (options: Options = {}) => {
               const { CFBundleIconFile } = plist;
               if (CFBundleIconFile) {
                 return Promise.all([
-                  $`sips -s format png ${
-                    join(
-                      extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
-                      "Contents",
-                      "Resources",
-                      CFBundleIconFile,
-                    )
-                  } --out ${
-                    join(
+                  $`sips -s format png ${join(
+                    extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
+                    "Contents",
+                    "Resources",
+                    CFBundleIconFile,
+                  )
+                    } --out ${join(
                       shortcutPath,
                       "Contents",
                       "Resources",
                       "PlayerIcon.png",
                     )
-                  }`.quiet(),
+                    }`.quiet(),
                   write(
                     join(
                       shortcutPath,
@@ -923,8 +909,8 @@ export const run = async (options: Options = {}) => {
     const gameName = typeof CFBundleName === "string"
       ? CFBundleName
       : extname(gameAppPath) === ".app"
-      ? parse(gameAppPath).name
-      : parse(CFBundleExecutable).name;
+        ? parse(gameAppPath).name
+        : parse(CFBundleExecutable).name;
     const game = code(gameName);
 
     const steamInstalled = await isInstalled();
@@ -997,10 +983,9 @@ export const run = async (options: Options = {}) => {
     const shortcutPath = join(
       homedir(),
       "Applications",
-      `${
-        extname(gameAppPath) === ".app"
-          ? parse(gameAppPath).name
-          : CFBundleName || parse(CFBundleExecutable).name
+      `${extname(gameAppPath) === ".app"
+        ? parse(gameAppPath).name
+        : CFBundleName || parse(CFBundleExecutable).name
       } (BepInEx).app`,
     );
 
@@ -1091,16 +1076,14 @@ export const run = async (options: Options = {}) => {
               });
               await Promise.all([
                 shouldAddShortcut &&
-                $`sips -s format png ${
-                  join(
-                    extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
-                    "Contents",
-                    "Resources",
-                    CFBundleIconFile,
-                  )
-                } --out ${
-                  join(shortcutPath, "Contents", "Resources", "PlayerIcon.png")
-                }`.quiet(),
+                $`sips -s format png ${join(
+                  extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
+                  "Contents",
+                  "Resources",
+                  CFBundleIconFile,
+                )
+                  } --out ${join(shortcutPath, "Contents", "Resources", "PlayerIcon.png")
+                  }`.quiet(),
                 write(
                   join(
                     shortcutPath,
@@ -1229,10 +1212,10 @@ export const run = async (options: Options = {}) => {
   if (!detectedGame && !detectedBepInEx) {
     throw wrap(
       `Timed out waiting for the game to launch. Test cancelled.${EOL}` +
-        chalk.reset(
-          "Unable to verify whether BepInEx is correctly installed. We " +
-            "recommend running gib again, making sure to run the right game.",
-        ),
+      chalk.reset(
+        "Unable to verify whether BepInEx is correctly installed. We " +
+        "recommend running gib again, making sure to run the right game.",
+      ),
     );
   } else if (!detectedBepInEx) {
     throw wrap([
@@ -1275,12 +1258,12 @@ export const run = async (options: Options = {}) => {
                 ].join(" ")),
               ]
               : switchSupported
-              ? []
-              : chalk.italic([
-                "We recommend running gib again with an official release of the",
-                "latest BepInEx 5, so that gib can add a Steam shortcut to",
-                "launch the game vanilla.",
-              ].join(" ")),
+                ? []
+                : chalk.italic([
+                  "We recommend running gib again with an official release of the",
+                  "latest BepInEx 5, so that gib can add a Steam shortcut to",
+                  "launch the game vanilla.",
+                ].join(" ")),
           ]
           : [
             "To launch the game modded, launch the app found at:",
@@ -1349,15 +1332,12 @@ export const setup = async () => {
     printline(
       wrap(
         [
-          `${
-            pink("gib")
-          } is a TUI app for automating the installation of BepInEx on macOS. ${
-            chalk.dim(`(${version})`)
+          `${pink("gib")
+          } is a TUI app for automating the installation of BepInEx on macOS. ${chalk.dim(`(${version})`)
           }`,
           null,
           chalk.bold(
-            `Usage: gib ${chalk.cyan("[...flags]")} ${
-              chalk.greenBright.dim("[bepinexScriptPath] [unityAppPath]")
+            `Usage: gib ${chalk.cyan("[...flags]")} ${chalk.greenBright.dim("[bepinexScriptPath] [unityAppPath]")
             }`,
           ),
           null,
@@ -1367,113 +1347,93 @@ export const setup = async () => {
     );
     printline(
       [
-        `  ${
-          wrap(
-            `${chalk.cyan("-v")}, ${
-              chalk.cyan("--version")
-            }          Print version and exit`,
-            width() - 2,
-          )
+        `  ${wrap(
+          `${chalk.cyan("-v")}, ${chalk.cyan("--version")
+          }          Print version and exit`,
+          width() - 2,
+        )
         }`,
-        `  ${
-          wrap(
-            `${chalk.cyan("-s")}, ${
-              chalk.cyan("--status")
-            }           Print update status and exit`,
-            width() - 2,
-          )
+        `  ${wrap(
+          `${chalk.cyan("-s")}, ${chalk.cyan("--status")
+          }           Print update status and exit`,
+          width() - 2,
+        )
         }`,
-        `      ${
-          wrap(
-            `${
-              chalk.cyan(`--launch${chalk.dim("=<id>")}`)
-            }      Immediately launch Steam app with the specified id and exit`,
-            width() - 6,
-          )
+        `      ${wrap(
+          `${chalk.cyan(`--launch${chalk.dim("=<id>")}`)
+          }      Immediately launch Steam app with the specified id and exit`,
+          width() - 6,
+        )
         }`,
-        `      ${
-          wrap(
-            `${chalk.cyan("--no-update")}        Disable update check`,
-            width() - 6,
-          )
+        `      ${wrap(
+          `${chalk.cyan("--no-update")}        Disable update check`,
+          width() - 6,
+        )
         }`,
-        command === "gib" && `      ${
-          wrap(
-            `${chalk.cyan("--no-path-check")}    Disable $PATH check`,
-            width() - 6,
-          )
+        command === "gib" && `      ${wrap(
+          `${chalk.cyan("--no-path-check")}    Disable $PATH check`,
+          width() - 6,
+        )
         }`,
-        `  ${
-          wrap(
-            `${chalk.cyan("-y")}, ${
-              chalk.cyan("--yes")
-            }              Accept all defaults and automatically progress`,
-            width() - 2,
-          )
+        `  ${wrap(
+          `${chalk.cyan("-y")}, ${chalk.cyan("--yes")
+          }              Accept all defaults and automatically progress`,
+          width() - 2,
+        )
         }`,
-        `  ${
-          wrap(
-            `${chalk.cyan("-h")}, ${
-              chalk.cyan("--help")
-            }             Display usage information and exit`,
-            width() - 2,
-          )
+        `  ${wrap(
+          `${chalk.cyan("-h")}, ${chalk.cyan("--help")
+          }             Display usage information and exit`,
+          width() - 2,
+        )
         }`,
       ].filter(Boolean).join(EOL),
     );
     printline(wrap([null, chalk.bold("Examples:")]));
     printline(
       [
-        `  ${
-          wrap(
-            chalk.dim("Interactivly install BepInEx to a Unity game"),
-            width() - 2,
-          )
+        `  ${wrap(
+          chalk.dim("Interactivly install BepInEx to a Unity game"),
+          width() - 2,
+        )
         }`,
         `  ${wrap(`${chalk.bold.greenBright("gib")} `, width() - 2)}`,
         null,
-        `  ${
-          wrap(
-            chalk.dim(
-              "Install BepInEx from the provided path to the Unity game at the provided path, accepting all default options",
-            ),
-            width() - 2,
-          )
+        `  ${wrap(
+          chalk.dim(
+            "Install BepInEx from the provided path to the Unity game at the provided path, accepting all default options",
+          ),
+          width() - 2,
+        )
         }`,
-        `  ${
-          wrap(
-            `${chalk.bold.greenBright("gib")} ${chalk.cyan("-y")} ${
-              chalk.blue(
-                "~/Downloads/Tobey.s.BepInEx.Pack.for.Subnautica '~/Library/Application Support/Steam/steamapps/common/Subnautica'",
-              )
-            }`,
-            width() - 2,
+        `  ${wrap(
+          `${chalk.bold.greenBright("gib")} ${chalk.cyan("-y")} ${chalk.blue(
+            "~/Downloads/Tobey.s.BepInEx.Pack.for.Subnautica '~/Library/Application Support/Steam/steamapps/common/Subnautica'",
           )
+          }`,
+          width() - 2,
+        )
         }`,
         null,
-        `  ${
-          wrap(
-            chalk.dim(
-              "(Re-)install BepInEx from the current working directory to the Unity game at the current working directory, accepting all default options",
-            ),
-            width() - 2,
-          )
+        `  ${wrap(
+          chalk.dim(
+            "(Re-)install BepInEx from the current working directory to the Unity game at the current working directory, accepting all default options",
+          ),
+          width() - 2,
+        )
         }`,
-        `  ${
-          wrap(
-            `${chalk.bold.greenBright("gib")} ${chalk.cyan("-y")} ${
-              chalk.blue(".")
-            }`,
-            width() - 2,
-          )
+        `  ${wrap(
+          `${chalk.bold.greenBright("gib")} ${chalk.cyan("-y")} ${chalk.blue(".")
+          }`,
+          width() - 2,
+        )
         }`,
       ].join(EOL),
     );
     printline(
       wrap([
         null,
-        `Learn more about gib:    ${
-          pink("https://github.com/toebeann/gib#readme")
+        `Learn more about gib:    ${pink("https://github.com/toebeann/gib#readme")
         }`,
       ]),
     );
@@ -1514,7 +1474,7 @@ export const setup = async () => {
       if (parsed.success) {
         latest = parsed.data.version;
       }
-    } catch {}
+    } catch { }
   }
 
   const updateAvailable = latest !== undefined &&
@@ -1556,8 +1516,7 @@ export const setup = async () => {
         `gib ${orange.bold.underline(`v${latest}`)} is available.`,
         `Changelog: https://github.com/toebeann/gib/releases/tag/v${latest}`,
         chalk.dim(
-          `You currently have ${
-            chalk.bold.underline(`v${version}`)
+          `You currently have ${chalk.bold.underline(`v${version}`)
           } installed.`,
         ),
         null,
@@ -1606,8 +1565,7 @@ export const setup = async () => {
               `${command} not found in ${pathText}.`,
               `We recommend adding ${command} to ${pathText} for ease of use.`,
               null,
-              `To do so, manually add the equivalent commands to ${
-                chalk.yellowBright.bold(configPath)
+              `To do so, manually add the equivalent commands to ${chalk.yellowBright.bold(configPath)
               } (or similar):`,
             ]),
           );
@@ -1644,8 +1602,7 @@ export const setup = async () => {
 
           printline(
             wrap([
-              `${command} has been added to ${pathText} in ${
-                code(configPath)
+              `${command} has been added to ${pathText} in ${code(configPath)
               }.`,
               null,
               "The next time you want to launch gib, you can simply run:",
@@ -1743,7 +1700,7 @@ export const setup = async () => {
               }
               done = true;
               break;
-            } catch {}
+            } catch { }
           }
 
           if (!done) promptToManuallyEditConfig("~/.bashrc", commands);
@@ -1771,7 +1728,10 @@ export const setup = async () => {
           .catch(() => getUnityAppPath("."));
         return await run({ bepinexScriptPath, unityAppPath, yes });
       } catch (e) {
-        console.error(e);
+        printline();
+        errorline(err);
+        errorline(typeof e === 'string' ? e : inspect(e, { colors: true }));
+        printline();
         return printHelp();
       }
 
@@ -1781,7 +1741,10 @@ export const setup = async () => {
         const unityAppPath = await getUnityAppPath(positionals[1]);
         return await run({ bepinexScriptPath, unityAppPath, yes });
       } catch (e) {
-        console.error(e);
+        printline();
+        errorline(err);
+        errorline(typeof e === 'string' ? e : inspect(e, { colors: true }));
+        printline();
         return printHelp();
       }
 
