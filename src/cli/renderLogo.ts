@@ -1,6 +1,7 @@
 import { wrapAnsi } from "bun";
 
-import { env } from "node:process";
+import { EOL } from "node:os";
+import { env, versions } from "node:process";
 
 import boxen from "boxen";
 import center from "center-align";
@@ -12,24 +13,23 @@ import { version } from "../../package.json" with { type: "json" };
 import { logo } from "./ascii.ts" with { type: "macro" };
 import { printline } from "./print.ts";
 
-const width = () => cliWidth({ defaultWidth: 80 });
+const width = () => cliWidth({ defaultWidth: 120 });
 const wrap = (
   str: string,
   columns = width(),
-  options?: Parameters<typeof Bun.wrapAnsi>[2],
+  options?: Parameters<typeof wrapAnsi>[2],
 ) => wrapAnsi(str, columns, options);
+
+const shortVersion = (version: string) =>
+  version.substring(0, (/(\.0)+?/.exec(version) ?? { index: undefined }).index);
 
 export const createLogo = async () => {
   const outputLines: string[] = [];
 
-  outputLines.push(
-    chalk.gray(
-      `gib v${version} ${typeof Bun !== "undefined"
-        ? `bun v${Bun.version}`
-        : `node ${process.version}`
-      }`,
-    ),
-  );
+  const { bun, node } = versions;
+
+  const metadata =
+    `gib v${shortVersion(version)} bun v${shortVersion(bun)} node v${shortVersion(node)}`;
 
   const gradient = env.NO_COLOR === undefined
     ? retro
@@ -37,10 +37,10 @@ export const createLogo = async () => {
 
   const title = "tobey's Guided Installer for BepInEx";
 
-  const logoLines = (await logo()).split("\n");
+  const logoLines = (await logo()).split(EOL);
 
   if (width() >= title.length + 4) {
-    const boxed = boxen(logoLines.join("\n"), {
+    const boxed = boxen(logoLines.join(EOL), {
       padding: 1,
       textAlignment: "center",
       borderStyle: "bold",
@@ -52,27 +52,29 @@ export const createLogo = async () => {
       ),
     });
 
-    const boxedLines = boxed.split("\n");
+    const boxedLines = boxed.split(EOL);
     const padding = Math.floor(
-      (Math.min(80, width()) / 2) - (boxedLines[0].length / 2),
+      (width() / 2) - (boxedLines[0].length / 2),
     );
 
     outputLines.push(
-      ...wrap(
-        gradient.multiline(boxedLines.join("\n")).split("\n").map((
-          line: string,
-        ) => `${" ".repeat(padding)}${line}`).join("\n"),
-        width(),
-        { trim: false },
-      ).split("\n"),
+      ...gradient.multiline(boxedLines.join(EOL)).split(EOL)
+        .map(line => `${" ".repeat(padding)}${line}`),
+      chalk.gray(center(metadata, boxedLines[0].length + (padding * 2))),
     );
   } else {
+    const split = metadata.split(' ');
+    const pairs = Array.from({ length: split.length / 2 }, (_, i) => split.slice(i * 2, i * 2 + 2));
+
     outputLines.push(
-      ...gradient.multiline(center(wrap(title), width())).split("\n"),
+      ...gradient.multiline(center(wrap(title), width())).split(EOL),
+      '',
+      ...pairs.map(pair => chalk.gray(center(pair.join(' '), width()))),
+      '',
     );
   }
 
-  return `${outputLines.join("\n")}${chalk.reset("")}`;
+  return `${outputLines.join(EOL)}${chalk.reset("")}`;
 };
 
 export const renderLogo = async () => printline(await createLogo());
