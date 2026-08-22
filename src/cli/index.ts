@@ -1393,7 +1393,7 @@ export const setup = async () => {
     printline(
       [
         `  ${wrap(
-          chalk.dim("Interactivly install BepInEx to a Unity game"),
+          chalk.dim("Interactively install BepInEx to a Unity game"),
           width() - 2,
         )
         }`,
