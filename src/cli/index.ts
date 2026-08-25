@@ -39,7 +39,17 @@
  *
  *****************************************************************************/
 
-import { $, color, env, file, Glob, inspect, semver, wrapAnsi, write } from "bun";
+import {
+  $,
+  color,
+  env,
+  file,
+  Glob,
+  inspect,
+  semver,
+  wrapAnsi,
+  write,
+} from "bun";
 
 import { W_OK } from "node:constants";
 import { access, appendFile, chmod, mkdir } from "node:fs/promises";
@@ -141,11 +151,12 @@ export const run = async (options: Options = {}) => {
     let output = "";
     for (const [index, item] of items.entries()) {
       const n = index + 1;
-      output += `${ordered ? (`${n.toString().padStart(padding)}.`) : "  •"} ${wrap(item, width() - indent)
-        .split(EOL).join(
-          `${EOL}${" ".repeat(indent)}`,
-        )
-        }`;
+      output += `${ordered ? `${n.toString().padStart(padding)}.` : "  •"} ${wrap(
+        item,
+        width() - indent,
+      )
+        .split(EOL)
+        .join(`${EOL}${" ".repeat(indent)}`)}`;
 
       if (n < items.length) {
         output += EOL.repeat(2);
@@ -195,19 +206,20 @@ export const run = async (options: Options = {}) => {
     let value: string | undefined;
 
     do {
-      value = (prompt(message, defaultValue))?.trim();
+      value = prompt(message, defaultValue)?.trim();
 
       if (!value) {
         errorline(
           wrap(
-            `${EOL}${err} No input detected. If you would like to exit gib, press ${code("Control C")
-            }. Otherwise, please try again.`,
+            `${EOL}${err} No input detected. If you would like to exit gib, press ${code(
+              "Control C",
+            )}. Otherwise, please try again.`,
           ),
         );
         continue;
       }
 
-      value = await validator(value) || "";
+      value = (await validator(value)) || "";
     } while (!value);
 
     return value;
@@ -216,69 +228,75 @@ export const run = async (options: Options = {}) => {
   const copyPath = code("Option Command C");
   const paste = code("Command V");
 
-  const providePathInstructions = list([
-    "Drag it into this window, or",
-    `Select it and press ${copyPath} to copy its path, then press ${paste} to paste the path here.`,
-  ], false);
+  const providePathInstructions = list(
+    [
+      "Drag it into this window, or",
+      `Select it and press ${copyPath} to copy its path, then press ${paste} to paste the path here.`,
+    ],
+    false,
+  );
 
-  const bepinexScriptPath = options.bepinexScriptPath || await promptUntilValid(
-    wrap([
-      null,
-      `In Finder, locate the folder containing the ${run_bepinex_sh} (or similar) script file within your downloaded BepInEx pack, then either:`,
-      null,
-      providePathInstructions,
-      null,
-      `Path to ${run_bepinex_sh} (or similar):`,
-    ]),
-    async (value) => {
-      try {
-        return await getBepInExScriptPath(value);
-      } catch (e) {
-        errorline(
-          wrap([
-            null,
-            `${err} ${e instanceof Error
-              ? e.message
-              : "An unknown error was encountered processing input"
-            }:`,
-            chalk.yellowBright(
-              e instanceof Error && "path" in e && typeof e.path === "string"
-                ? e.path
-                : value,
-            ),
+  const bepinexScriptPath =
+    options.bepinexScriptPath ||
+    (await promptUntilValid(
+      wrap([
+        null,
+        `In Finder, locate the folder containing the ${run_bepinex_sh} (or similar) script file within your downloaded BepInEx pack, then either:`,
+        null,
+        providePathInstructions,
+        null,
+        `Path to ${run_bepinex_sh} (or similar):`,
+      ]),
+      async (value) => {
+        try {
+          return await getBepInExScriptPath(value);
+        } catch (e) {
+          errorline(
+            wrap([
+              null,
+              `${err} ${
+                e instanceof Error
+                  ? e.message
+                  : "An unknown error was encountered processing input"
+              }:`,
+              chalk.yellowBright(
+                e instanceof Error && "path" in e && typeof e.path === "string"
+                  ? e.path
+                  : value,
+              ),
 
-            ...e instanceof Error && e.cause instanceof Error
-              ? [null, chalk.dim(`${e.cause.name}: ${e.cause.message}`)]
-              : e instanceof Error && e.cause
-                ? [null, chalk.dim(`${e.cause}`)]
-                : [],
+              ...(e instanceof Error && e.cause instanceof Error
+                ? [null, chalk.dim(`${e.cause.name}: ${e.cause.message}`)]
+                : e instanceof Error && e.cause
+                  ? [null, chalk.dim(`${e.cause}`)]
+                  : []),
 
-            ...e instanceof PathNotFoundError
-              ? [
-                chalk.bold(
-                  `Please try using ${copyPath} to copy the ${run_bepinex_sh} path from Finder, then ${paste} to paste it here.`,
-                ),
-              ]
-              : e instanceof DoorstopScriptMissingPlatformSupport
+              ...(e instanceof PathNotFoundError
                 ? [
-                  chalk.bold(
-                    "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
-                  ),
-                ]
-                : e instanceof InvalidBepInExPack
-                  ? [
                     chalk.bold(
-                      `Please make sure you are selecting the ${run_bepinex_sh} script and try again.`,
+                      `Please try using ${copyPath} to copy the ${run_bepinex_sh} path from Finder, then ${paste} to paste it here.`,
                     ),
                   ]
-                  : [],
-          ]),
-        );
+                : e instanceof DoorstopScriptMissingPlatformSupport
+                  ? [
+                      chalk.bold(
+                        "Try downloading a macOS build of BepInEx 5 from https://github.com/BepInEx/BepInEx/releases/latest and installing it with gib.",
+                      ),
+                    ]
+                  : e instanceof InvalidBepInExPack
+                    ? [
+                        chalk.bold(
+                          `Please make sure you are selecting the ${run_bepinex_sh} script and try again.`,
+                        ),
+                      ]
+                    : []),
+            ]),
+          );
 
-        return false;
-      }
-    },
-  );
+          return false;
+        }
+      },
+    ));
   let bepinexScriptName = basename(bepinexScriptPath);
   const bepinexFolderPath = dirname(bepinexScriptPath);
 
@@ -292,77 +310,89 @@ export const run = async (options: Options = {}) => {
     ]),
   );
 
-  const gameAppPath = options.unityAppPath || await promptUntilValid(
-    wrap([
-      null,
-      `Open a Finder window at the game's location, (e.g. by clicking ${code("Manage -> Browse local files")
-      } in Steam), find the game's app (e.g. ${code("Subnautica.app")}) or ${code("Contents")
-      } folder and do the same thing as last time - either:`,
-      null,
-      providePathInstructions,
-      null,
-      "Path to Unity game app:",
-    ]),
-    async (value) => {
-      try {
-        return await getUnityAppPath(value);
-      } catch (e) {
-        errorline(
-          wrap([
-            null,
-            `${err} ${e instanceof Error
-              ? e.message
-              : "An unknown error was encountered processing input"
-            }:`,
-            e instanceof MultipleUnityAppsFoundError
-              ? list(e.apps.map((app) => chalk.yellowBright(app)), false)
-              : chalk.yellowBright(
-                e instanceof Error && "path" in e && typeof e.path === "string"
-                  ? e.path
-                  : value,
-              ),
-
-            ...e instanceof Error && e.cause instanceof Error
-              ? [null, chalk.dim(`${e.cause.name}: ${e.cause.message}`)]
-              : e instanceof Error && e.cause
-                ? [null, chalk.dim(`${e.cause}`)]
-                : [],
-
-            ...e instanceof PathNotFoundError
-              ? [
-                chalk.bold(
-                  `Please try using ${copyPath} to copy the ${run_bepinex_sh} path from Finder, then ${paste} to paste it here.`,
-                ),
-              ]
-              : e instanceof InvalidUnityApp || e instanceof PathNotAFolderError
-                ? [
-                  chalk.bold(
-                    "Please make sure you are selecting a Unity app and try again.",
+  const gameAppPath =
+    options.unityAppPath ||
+    (await promptUntilValid(
+      wrap([
+        null,
+        `Open a Finder window at the game's location, (e.g. by clicking ${code(
+          "Manage -> Browse local files",
+        )} in Steam), find the game's app (e.g. ${code("Subnautica.app")}) or ${code(
+          "Contents",
+        )} folder and do the same thing as last time - either:`,
+        null,
+        providePathInstructions,
+        null,
+        "Path to Unity game app:",
+      ]),
+      async (value) => {
+        try {
+          return await getUnityAppPath(value);
+        } catch (e) {
+          errorline(
+            wrap([
+              null,
+              `${err} ${
+                e instanceof Error
+                  ? e.message
+                  : "An unknown error was encountered processing input"
+              }:`,
+              e instanceof MultipleUnityAppsFoundError
+                ? list(
+                    e.apps.map((app) => chalk.yellowBright(app)),
+                    false,
+                  )
+                : chalk.yellowBright(
+                    e instanceof Error &&
+                      "path" in e &&
+                      typeof e.path === "string"
+                      ? e.path
+                      : value,
                   ),
-                ]
-                : e instanceof MultipleUnityAppsFoundError
-                  ? [
+
+              ...(e instanceof Error && e.cause instanceof Error
+                ? [null, chalk.dim(`${e.cause.name}: ${e.cause.message}`)]
+                : e instanceof Error && e.cause
+                  ? [null, chalk.dim(`${e.cause}`)]
+                  : []),
+
+              ...(e instanceof PathNotFoundError
+                ? [
                     chalk.bold(
-                      "Please specify which Unity app you would like to target by providing its path.",
+                      `Please try using ${copyPath} to copy the ${run_bepinex_sh} path from Finder, then ${paste} to paste it here.`,
                     ),
                   ]
-                  : e instanceof NotAUnityAppError
-                    ? [
+                : e instanceof InvalidUnityApp ||
+                    e instanceof PathNotAFolderError
+                  ? [
                       chalk.bold(
-                        "BepInEx only works for Unity games. Please make sure you are selecting a Unity app and try again.",
+                        "Please make sure you are selecting a Unity app and try again.",
                       ),
                     ]
-                    : [],
-          ]),
-        );
+                  : e instanceof MultipleUnityAppsFoundError
+                    ? [
+                        chalk.bold(
+                          "Please specify which Unity app you would like to target by providing its path.",
+                        ),
+                      ]
+                    : e instanceof NotAUnityAppError
+                      ? [
+                          chalk.bold(
+                            "BepInEx only works for Unity games. Please make sure you are selecting a Unity app and try again.",
+                          ),
+                        ]
+                      : []),
+            ]),
+          );
 
-        return false;
-      }
-    },
-  );
-  const gamePath = extname(gameAppPath) === ".app"
-    ? dirname(gameAppPath)
-    : join(gameAppPath, "..", "..", "..");
+          return false;
+        }
+      },
+    ));
+  const gamePath =
+    extname(gameAppPath) === ".app"
+      ? dirname(gameAppPath)
+      : join(gameAppPath, "..", "..", "..");
 
   printline(
     wrap([
@@ -394,61 +424,68 @@ export const run = async (options: Options = {}) => {
     const basedirIndex = output.indexOf("BASEDIR=");
     if (basedirIndex !== -1 && !output.includes('cd "$BASEDIR"')) {
       const insertIndex = output.indexOf("\n", basedirIndex);
-      output = `${output.slice(0, insertIndex)
-        }\ncd "$BASEDIR" # GIB: workaround for some games only working if script is run from game dir${output.slice(insertIndex)
-        }`;
+      output = `${output.slice(
+        0,
+        insertIndex,
+      )}\ncd "$BASEDIR" # GIB: workaround for some games only working if script is run from game dir${output.slice(
+        insertIndex,
+      )}`;
     }
 
     // workaround for issue with doorstop 4 where specifying the direct path to
     // the executable only works for games correctly packaged in a .app folder
     output = output.replace(
-      String
-        .raw`if ! echo "$real_executable_name" | grep "^.*\.app/Contents/MacOS/.*";`,
-      String
-        .raw`if ! echo "$real_executable_name" | grep "^.*/Contents/MacOS/.*";`,
+      String.raw`if ! echo "$real_executable_name" | grep "^.*\.app/Contents/MacOS/.*";`,
+      String.raw`if ! echo "$real_executable_name" | grep "^.*/Contents/MacOS/.*";`,
     );
 
     // workaround to ensure the game's Content folder is packaged in an .app folder
     if (!output.includes("mkdir -p")) {
       const lines = output.split("\n");
       const runExecutablePathIndex = lines.findLastIndex((line) =>
-        line.includes("executable_path")
+        line.includes("executable_path"),
       );
       const codesignIndex = lines.findLastIndex(
         (line) => line.includes("codesign"),
         runExecutablePathIndex,
       );
-      const emptyLineIndex = lines.findLastIndex((line, i, lines) =>
-        i > 0 &&
-        i < (codesignIndex > -1 ? codesignIndex : runExecutablePathIndex) &&
-        !/\S/.test(line) && !/^\s/.test(lines[i - 1])
+      const emptyLineIndex = lines.findLastIndex(
+        (line, i, lines) =>
+          i > 0 &&
+          i < (codesignIndex > -1 ? codesignIndex : runExecutablePathIndex) &&
+          !/\S/.test(line) &&
+          !/^\s/.test(lines[i - 1]),
       );
-      output = lines.toSpliced(
-        emptyLineIndex,
-        0,
-        "",
-        "# gib: workaround to ensure game content is packaged in an .app folder",
-        'app_path="${executable_path%/Contents/MacOS*}"',
-        'if [[ $(basename "$app_path") != *.app ]]; then',
-        '    real_executable_name=$(basename "$executable_path")',
-        '    executable_path="${app_path}/${real_executable_name}.app/Contents/MacOS/${real_executable_name}"',
-        '    target_path="${app_path}/${real_executable_name}.app/Contents"',
-        '    mkdir -p "$target_path"',
-        '    cp -ca "${app_path}/Contents/" "${target_path}/"',
-        "fi",
-      ).join("\n");
+      output = lines
+        .toSpliced(
+          emptyLineIndex,
+          0,
+          "",
+          "# gib: workaround to ensure game content is packaged in an .app folder",
+          'app_path="${executable_path%/Contents/MacOS*}"',
+          'if [[ $(basename "$app_path") != *.app ]]; then',
+          '    real_executable_name=$(basename "$executable_path")',
+          '    executable_path="${app_path}/${real_executable_name}.app/Contents/MacOS/${real_executable_name}"',
+          '    target_path="${app_path}/${real_executable_name}.app/Contents"',
+          '    mkdir -p "$target_path"',
+          '    cp -ca "${app_path}/Contents/" "${target_path}/"',
+          "fi",
+        )
+        .join("\n");
     }
 
     // workaround for issue with codesigned apps preventing doorstop injection
     if (!output.includes("codesign --remove-signature")) {
       const lines = output.split("\n");
       const runExecutablePathIndex = lines.findLastIndex((line) =>
-        line.includes("executable_path")
+        line.includes("executable_path"),
       );
-      const emptyLineIndex = lines.findLastIndex((line, i, lines) =>
-        i > 0 &&
-        i < runExecutablePathIndex &&
-        !/\S/.test(line) && !/^\s/.test(lines[i - 1])
+      const emptyLineIndex = lines.findLastIndex(
+        (line, i, lines) =>
+          i > 0 &&
+          i < runExecutablePathIndex &&
+          !/\S/.test(line) &&
+          !/^\s/.test(lines[i - 1]),
       );
       output = lines
         .toSpliced(
@@ -460,7 +497,8 @@ export const run = async (options: Options = {}) => {
           'if command -v codesign &>/dev/null && codesign -d "$app_path"; then',
           '    codesign --remove-signature "$app_path"',
           "fi",
-        ).join("\n");
+        )
+        .join("\n");
     }
 
     // write the changes, if any
@@ -474,14 +512,12 @@ export const run = async (options: Options = {}) => {
   const installBepInEx = async () => {
     const i = bepinexFolderPath.split(sep).length;
     const glob = new Glob("**/*");
-    for await (
-      const origin of glob.scan({
-        absolute: true,
-        dot: true,
-        onlyFiles: true,
-        cwd: bepinexFolderPath,
-      })
-    ) {
+    for await (const origin of glob.scan({
+      absolute: true,
+      dot: true,
+      onlyFiles: true,
+      cwd: bepinexFolderPath,
+    })) {
       if (basename(origin) === ".DS_Store") continue;
 
       const destination = join(gamePath, origin.split(sep).slice(i).join(sep));
@@ -507,13 +543,16 @@ export const run = async (options: Options = {}) => {
       ),
     ),
     (async () => {
-      if (!await file(join(bepinexFolderPath, "libdoorstop.dylib")).exists()) {
+      if (
+        !(await file(join(bepinexFolderPath, "libdoorstop.dylib")).exists())
+      ) {
         return false;
       }
 
       try {
-        return (await file(bepinexScriptPath).text())
-          .includes("--doorstop_enabled)");
+        return (await file(bepinexScriptPath).text()).includes(
+          "--doorstop_enabled)",
+        );
       } catch {
         return false;
       }
@@ -523,9 +562,10 @@ export const run = async (options: Options = {}) => {
   const shortcutPath = join(
     homedir(),
     "Applications",
-    `${extname(gameAppPath) === ".app"
-      ? parse(gameAppPath).name
-      : plist.CFBundleName || parse(plist.CFBundleExecutable).name
+    `${
+      extname(gameAppPath) === ".app"
+        ? parse(gameAppPath).name
+        : plist.CFBundleName || parse(plist.CFBundleExecutable).name
     } (${steamApps.length === 0 ? "BepInEx" : "Vanilla"}).app`,
   );
   let shouldAddShortcut: boolean;
@@ -584,16 +624,16 @@ export const run = async (options: Options = {}) => {
         null,
         switchSupported
           ? [
-            "gib will set this flag in the vanilla shortcut. Steam may prompt",
-            "you about this flag whenever you launch the vanilla shortcut.",
-          ].join(" ")
+              "gib will set this flag in the vanilla shortcut. Steam may prompt",
+              "you about this flag whenever you launch the vanilla shortcut.",
+            ].join(" ")
           : [
-            "As your BepInEx pack does not support this feature, gib can",
-            "attempt to add support by downloading the latest version of",
-            "BepInEx and updating the provided pack. This will allow gib to set",
-            "up the vanilla shortcut while retaining any game-specific",
-            "customisations from the pack.",
-          ].join(" "),
+              "As your BepInEx pack does not support this feature, gib can",
+              "attempt to add support by downloading the latest version of",
+              "BepInEx and updating the provided pack. This will allow gib to set",
+              "up the vanilla shortcut while retaining any game-specific",
+              "customisations from the pack.",
+            ].join(" "),
         null,
       ]),
     );
@@ -603,9 +643,9 @@ export const run = async (options: Options = {}) => {
         switchSupported
           ? `Add experimental Steam shortcut to launch ${game} without mods?`
           : [
-            `Add experimental Steam shortcut to launch ${game} without mods by`,
-            "updating this pack to the latest BepInEx 5 release?",
-          ].join(" "),
+              `Add experimental Steam shortcut to launch ${game} without mods by`,
+              "updating this pack to the latest BepInEx 5 release?",
+            ].join(" "),
       ),
       yes,
     );
@@ -625,13 +665,14 @@ export const run = async (options: Options = {}) => {
             `configure Steam for user ${username} to launch ${game} modded`,
             "with BepInEx",
           ].join(" "),
-          shouldAddShortcut && !switchSupported &&
-          "download the latest BepInEx 5 release to update your BepInex pack",
           shouldAddShortcut &&
-          [
-            `add a Steam shortcut for user ${username} to launch ${game}`,
-            "vanilla",
-          ].join(" "),
+            !switchSupported &&
+            "download the latest BepInEx 5 release to update your BepInex pack",
+          shouldAddShortcut &&
+            [
+              `add a Steam shortcut for user ${username} to launch ${game}`,
+              "vanilla",
+            ].join(" "),
         ].filter(Boolean),
         false,
       ),
@@ -661,32 +702,42 @@ export const run = async (options: Options = {}) => {
         if (shouldAddShortcut && !switchSupported) {
           let response: Promise<Response>;
           try {
-            const releases = z.object({
-              target_commitish: z.string(),
-              prerelease: z.boolean(),
-              assets: z.object({
-                name: z.string(),
-                browser_download_url: z.string(),
-              }).array(),
-            }).array()
+            const releases = z
+              .object({
+                target_commitish: z.string(),
+                prerelease: z.boolean(),
+                assets: z
+                  .object({
+                    name: z.string(),
+                    browser_download_url: z.string(),
+                  })
+                  .array(),
+              })
+              .array()
               .parse(
-                await (await fetch(
-                  "https://api.github.com/repos/BepInEx/BepInEx/releases",
-                )).json(),
+                await (
+                  await fetch(
+                    "https://api.github.com/repos/BepInEx/BepInEx/releases",
+                  )
+                ).json(),
               );
-            const { assets } = releases
-              .find(({ target_commitish, prerelease, assets }) =>
-                !prerelease &&
-                target_commitish === "v5-lts" &&
-                assets.find(({ name }) =>
-                  name.toLowerCase().includes("macos_x64") &&
-                  name.toLowerCase().endsWith(".zip")
-                )
+            const { assets } =
+              releases.find(
+                ({ target_commitish, prerelease, assets }) =>
+                  !prerelease &&
+                  target_commitish === "v5-lts" &&
+                  assets.find(
+                    ({ name }) =>
+                      name.toLowerCase().includes("macos_x64") &&
+                      name.toLowerCase().endsWith(".zip"),
+                  ),
               ) ?? {};
-            const { browser_download_url } = assets?.find(({ name }) =>
-              name.toLowerCase().includes("macos_x64") &&
-              name.toLowerCase().endsWith(".zip")
-            ) ?? {};
+            const { browser_download_url } =
+              assets?.find(
+                ({ name }) =>
+                  name.toLowerCase().includes("macos_x64") &&
+                  name.toLowerCase().endsWith(".zip"),
+              ) ?? {};
             if (!browser_download_url) {
               throw "Couldn't get latest BepInEx 5 release asset";
             }
@@ -698,8 +749,9 @@ export const run = async (options: Options = {}) => {
           }
 
           const [archive] = await Promise.all([
-            response.then(async (response) =>
-              await JSZip.loadAsync(await response.arrayBuffer())
+            response.then(
+              async (response) =>
+                await JSZip.loadAsync(await response.arrayBuffer()),
             ),
             installing,
           ]);
@@ -714,9 +766,11 @@ export const run = async (options: Options = {}) => {
             await file(resolve(gamePath, basename(bepinexScriptPath))).delete();
           }
 
-          await Promise.all(filenames
-            .map((filename) =>
-              archive.file(filename)!.async("arraybuffer")
+          await Promise.all(
+            filenames.map((filename) =>
+              archive
+                .file(filename)!
+                .async("arraybuffer")
                 .then(async (data) => {
                   await write(resolve(gamePath, filename), data);
 
@@ -726,21 +780,22 @@ export const run = async (options: Options = {}) => {
                       gameAppPath,
                     );
                   }
-                })
-            ));
+                }),
+            ),
+          );
         } else {
           await installing;
         }
       })(),
-      isOpen()
-        .then(async (isOpen) => {
-          if (isOpen && !await quit()) {
-            throw wrap([
-              "Failed to terminate Steam",
-              chalk.reset("Please ensure Steam is fully closed and try again."),
-            ]);
-          }
-          return await Promise.all([
+      isOpen().then(async (isOpen) => {
+        if (isOpen && !(await quit())) {
+          throw wrap([
+            "Failed to terminate Steam",
+            chalk.reset("Please ensure Steam is fully closed and try again."),
+          ]);
+        }
+        return await Promise.all(
+          [
             setLaunchOptions(
               app,
               quote([
@@ -754,132 +809,132 @@ export const run = async (options: Options = {}) => {
             ).then((success) => {
               if (!success) throw wrap("Failed to set launch options");
             }),
-            shouldAddShortcut && getShortcuts(userId)
-              .then(async (shortcuts) => {
-                const shortcut = {
-                  AppName: `${name} (Vanilla)`,
-                  Exe: quote([shortcutPath]),
-                  LaunchOptions: `# gib v${version}`,
-                  icon: join(
-                    shortcutPath,
-                    "Contents",
-                    "Resources",
-                    "PlayerIcon.png",
-                  ),
-                } satisfies Shortcut;
-
-                if (shortcuts) {
-                  const key = Object.keys(shortcuts.shortcuts).find((key) => {
-                    const { AppName, LaunchOptions, Exe } =
-                      shortcuts.shortcuts[key] ?? {};
-
-                    if (
-                      AppName?.localeCompare(
-                        shortcut.AppName,
-                        undefined,
-                        { sensitivity: "accent" },
-                      ) !== 0
-                    ) return false;
-
-                    return (LaunchOptions &&
-                      /#\s*gib v.*/.test(LaunchOptions)) ||
-                      (Exe && pathEqual(Exe.trim(), shortcut.Exe.trim()));
-                  });
-
-                  return await setShortcuts(
-                    key
-                      ? updateShortcut(key, shortcut, shortcuts)
-                      : addShortcut(shortcut, shortcuts),
-                    userId,
-                  );
-                }
-
-                return await setShortcuts(
-                  { shortcuts: { 0: shortcut } },
-                  userId,
-                );
-              })
-              .then((success) => {
-                if (!success) throw wrap("Failed to add shortcut");
-              }),
-          ].filter(Boolean));
-        }),
-      shouldAddShortcut
-        ? Promise.all([
-          write(
-            join(shortcutPath, "Contents", "MacOS", "run.sh"),
-            [
-              "#!/bin/bash",
-              "# autogenerated file - do not edit",
-              `${$.escape(execPath)
-              } --launch=${id} -- --doorstop_enabled false "$@"`,
-            ].join(EOL),
-            { createPath: true, mode: 0o764 },
-          )
-            .then(() =>
-              chmod(join(shortcutPath, "Contents", "MacOS", "run.sh"), 0o764)
-            ),
-
-          write(
-            join(shortcutPath, "Contents", "Info.plist"),
-            buildPlist(
-              {
-                CFBundleIconFile: "PlayerIcon.icns",
-                CFBundleName: `${typeof plist.CFBundleName === "string"
-                  ? plist.CFBundleName
-                  : name
-                  } (Vanilla)`,
-                CFBundleInfoDictionaryVersion: "1.0",
-                CFBundlePackageType: "APPL",
-                CFBundleVersion: "1.0",
-                CFBundleExecutable: "run.sh",
-              } satisfies Plist,
-            ),
-            { createPath: true },
-          ),
-
-          mkdir(join(shortcutPath, "Contents", "Resources"), {
-            recursive: true,
-          })
-            .then(() => {
-              const { CFBundleIconFile } = plist;
-              if (CFBundleIconFile) {
-                return Promise.all([
-                  $`sips -s format png ${join(
-                    extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
-                    "Contents",
-                    "Resources",
-                    CFBundleIconFile,
-                  )
-                    } --out ${join(
+            shouldAddShortcut &&
+              getShortcuts(userId)
+                .then(async (shortcuts) => {
+                  const shortcut = {
+                    AppName: `${name} (Vanilla)`,
+                    Exe: quote([shortcutPath]),
+                    LaunchOptions: `# gib v${version}`,
+                    icon: join(
                       shortcutPath,
                       "Contents",
                       "Resources",
                       "PlayerIcon.png",
-                    )
-                    }`.quiet(),
-                  write(
-                    join(
+                    ),
+                  } satisfies Shortcut;
+
+                  if (shortcuts) {
+                    const key = Object.keys(shortcuts.shortcuts).find((key) => {
+                      const { AppName, LaunchOptions, Exe } =
+                        shortcuts.shortcuts[key] ?? {};
+
+                      if (
+                        AppName?.localeCompare(shortcut.AppName, undefined, {
+                          sensitivity: "accent",
+                        }) !== 0
+                      )
+                        return false;
+
+                      return (
+                        (LaunchOptions && /#\s*gib v.*/.test(LaunchOptions)) ||
+                        (Exe && pathEqual(Exe.trim(), shortcut.Exe.trim()))
+                      );
+                    });
+
+                    return await setShortcuts(
+                      key
+                        ? updateShortcut(key, shortcut, shortcuts)
+                        : addShortcut(shortcut, shortcuts),
+                      userId,
+                    );
+                  }
+
+                  return await setShortcuts(
+                    { shortcuts: { 0: shortcut } },
+                    userId,
+                  );
+                })
+                .then((success) => {
+                  if (!success) throw wrap("Failed to add shortcut");
+                }),
+          ].filter(Boolean),
+        );
+      }),
+      shouldAddShortcut
+        ? Promise.all([
+            write(
+              join(shortcutPath, "Contents", "MacOS", "run.sh"),
+              [
+                "#!/bin/bash",
+                "# autogenerated file - do not edit",
+                `${$.escape(
+                  execPath,
+                )} --launch=${id} -- --doorstop_enabled false "$@"`,
+              ].join(EOL),
+              { createPath: true, mode: 0o764 },
+            ).then(() =>
+              chmod(join(shortcutPath, "Contents", "MacOS", "run.sh"), 0o764),
+            ),
+
+            write(
+              join(shortcutPath, "Contents", "Info.plist"),
+              buildPlist({
+                CFBundleIconFile: "PlayerIcon.icns",
+                CFBundleName: `${
+                  typeof plist.CFBundleName === "string"
+                    ? plist.CFBundleName
+                    : name
+                } (Vanilla)`,
+                CFBundleInfoDictionaryVersion: "1.0",
+                CFBundlePackageType: "APPL",
+                CFBundleVersion: "1.0",
+                CFBundleExecutable: "run.sh",
+              } satisfies Plist),
+              { createPath: true },
+            ),
+
+            mkdir(join(shortcutPath, "Contents", "Resources"), {
+              recursive: true,
+            }).then(() => {
+              const { CFBundleIconFile } = plist;
+              if (CFBundleIconFile) {
+                return Promise.all(
+                  [
+                    $`sips -s format png ${join(
+                      extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
+                      "Contents",
+                      "Resources",
+                      CFBundleIconFile,
+                    )} --out ${join(
                       shortcutPath,
                       "Contents",
                       "Resources",
-                      "PlayerIcon.icns",
-                    ),
-                    file(
+                      "PlayerIcon.png",
+                    )}`.quiet(),
+                    write(
                       join(
-                        extname(gameAppPath) === ".app"
-                          ? gameAppPath
-                          : gamePath,
+                        shortcutPath,
                         "Contents",
                         "Resources",
-                        CFBundleIconFile,
+                        "PlayerIcon.icns",
+                      ),
+                      file(
+                        join(
+                          extname(gameAppPath) === ".app"
+                            ? gameAppPath
+                            : gamePath,
+                          "Contents",
+                          "Resources",
+                          CFBundleIconFile,
+                        ),
                       ),
                     ),
-                  ),
-                ].filter(Boolean));
+                  ].filter(Boolean),
+                );
               }
             }),
-        ])
+          ])
         : Promise.resolve(),
     );
   } else if (steamApps.length > 1) {
@@ -906,37 +961,41 @@ export const run = async (options: Options = {}) => {
      *   - get current shortcuts, add new shortcut
      */
     const { CFBundleName, CFBundleIconFile, CFBundleExecutable } = plist;
-    const gameName = typeof CFBundleName === "string"
-      ? CFBundleName
-      : extname(gameAppPath) === ".app"
-        ? parse(gameAppPath).name
-        : parse(CFBundleExecutable).name;
+    const gameName =
+      typeof CFBundleName === "string"
+        ? CFBundleName
+        : extname(gameAppPath) === ".app"
+          ? parse(gameAppPath).name
+          : parse(CFBundleExecutable).name;
     const game = code(gameName);
 
     const steamInstalled = await isInstalled();
     const [userId, user] = steamInstalled
       ? await getMostRecentUser()
       : [undefined, undefined];
-    const username = user &&
+    const username =
+      user &&
       code(
         typeof user.PersonaName === "string"
           ? user.PersonaName
           : user.AccountName,
       );
 
-    shouldAddShortcut = await isInstalled() && confirm(
-      wrap([
-        [
-          game,
-          "appears to be a non-Steam game. gib can optionally add a Steam",
-          "shortcut to launch the game modded with BepInEx. This feature is",
-          "experimental and will require Steam to be closed.",
-        ].join(" "),
-        null,
-        `Add experimental Steam shortcut to launch ${game} with BepInEx?`,
-      ]),
-      yes,
-    );
+    shouldAddShortcut =
+      (await isInstalled()) &&
+      confirm(
+        wrap([
+          [
+            game,
+            "appears to be a non-Steam game. gib can optionally add a Steam",
+            "shortcut to launch the game modded with BepInEx. This feature is",
+            "experimental and will require Steam to be closed.",
+          ].join(" "),
+          null,
+          `Add experimental Steam shortcut to launch ${game} with BepInEx?`,
+        ]),
+        yes,
+      );
 
     printline(
       wrap(
@@ -950,13 +1009,14 @@ export const run = async (options: Options = {}) => {
         [
           "install and configure BepInEx for the selected Unity app",
           shouldAddShortcut && "quit Steam if it is open",
-          shouldAddShortcut && [
-            "add a Steam shortcut for user",
-            username,
-            "to launch",
-            game,
-            "with BepInEx",
-          ].join(" "),
+          shouldAddShortcut &&
+            [
+              "add a Steam shortcut for user",
+              username,
+              "to launch",
+              game,
+              "with BepInEx",
+            ].join(" "),
         ].filter(Boolean),
         false,
       ),
@@ -983,9 +1043,10 @@ export const run = async (options: Options = {}) => {
     const shortcutPath = join(
       homedir(),
       "Applications",
-      `${extname(gameAppPath) === ".app"
-        ? parse(gameAppPath).name
-        : CFBundleName || parse(CFBundleExecutable).name
+      `${
+        extname(gameAppPath) === ".app"
+          ? parse(gameAppPath).name
+          : CFBundleName || parse(CFBundleExecutable).name
       } (BepInEx).app`,
     );
 
@@ -993,58 +1054,58 @@ export const run = async (options: Options = {}) => {
       installBepInEx(),
       shouldAddShortcut
         ? isOpen()
-          .then(async (isOpen) => {
-            if (isOpen && !await quit()) {
-              throw wrap([
-                "Failed to terminate Steam",
-                chalk.reset(
-                  "Please ensure Steam is fully closed and try again.",
+            .then(async (isOpen) => {
+              if (isOpen && !(await quit())) {
+                throw wrap([
+                  "Failed to terminate Steam",
+                  chalk.reset(
+                    "Please ensure Steam is fully closed and try again.",
+                  ),
+                ]);
+              }
+              const shortcut = {
+                AppName: `${gameName} (BepInEx)`,
+                Exe: quote([shortcutPath]),
+                LaunchOptions: `# gib v${version}`,
+                icon: join(
+                  shortcutPath,
+                  "Contents",
+                  "Resources",
+                  "PlayerIcon.png",
                 ),
-              ]);
-            }
-            const shortcut = {
-              AppName: `${gameName} (BepInEx)`,
-              Exe: quote([shortcutPath]),
-              LaunchOptions: `# gib v${version}`,
-              icon: join(
-                shortcutPath,
-                "Contents",
-                "Resources",
-                "PlayerIcon.png",
-              ),
-            } satisfies Shortcut;
-            const shortcuts = await getShortcuts(userId);
-            if (shortcuts) {
-              const key = Object.keys(shortcuts.shortcuts).find((key) => {
-                const { AppName, LaunchOptions, Exe } =
-                  shortcuts.shortcuts[key] ?? {};
+              } satisfies Shortcut;
+              const shortcuts = await getShortcuts(userId);
+              if (shortcuts) {
+                const key = Object.keys(shortcuts.shortcuts).find((key) => {
+                  const { AppName, LaunchOptions, Exe } =
+                    shortcuts.shortcuts[key] ?? {};
 
-                if (
-                  AppName?.localeCompare(
-                    shortcut.AppName,
-                    undefined,
-                    { sensitivity: "accent" },
-                  ) !== 0
-                ) return false;
+                  if (
+                    AppName?.localeCompare(shortcut.AppName, undefined, {
+                      sensitivity: "accent",
+                    }) !== 0
+                  )
+                    return false;
 
-                return (LaunchOptions &&
-                  /#\s*gib v.*/.test(LaunchOptions)) ||
-                  (Exe && pathEqual(Exe.trim(), shortcut.Exe.trim()));
-              });
+                  return (
+                    (LaunchOptions && /#\s*gib v.*/.test(LaunchOptions)) ||
+                    (Exe && pathEqual(Exe.trim(), shortcut.Exe.trim()))
+                  );
+                });
 
-              return await setShortcuts(
-                key
-                  ? updateShortcut(key, shortcut, shortcuts)
-                  : addShortcut(shortcut, shortcuts),
-                userId,
-              );
-            }
+                return await setShortcuts(
+                  key
+                    ? updateShortcut(key, shortcut, shortcuts)
+                    : addShortcut(shortcut, shortcuts),
+                  userId,
+                );
+              }
 
-            return await setShortcuts({ shortcuts: { 0: shortcut } }, userId);
-          })
-          .then((success) => {
-            if (!success) throw wrap("Failed to add shortcut");
-          })
+              return await setShortcuts({ shortcuts: { 0: shortcut } }, userId);
+            })
+            .then((success) => {
+              if (!success) throw wrap("Failed to add shortcut");
+            })
         : Promise.resolve(),
       Promise.all([
         write(
@@ -1061,29 +1122,30 @@ export const run = async (options: Options = {}) => {
             ]),
           ].join(EOL),
           { createPath: true, mode: 0o764 },
-        )
-          .then(() =>
-            chmod(
-              join(shortcutPath, "Contents", "MacOS", "run.sh"),
-              0o764,
-            )
-          ),
-        mkdir(join(shortcutPath, "Contents", "Resources"), { recursive: true })
-          .then(async () => {
-            if (CFBundleIconFile) {
-              await mkdir(join(shortcutPath, "Contents", "Resources"), {
-                recursive: true,
-              });
-              await Promise.all([
+        ).then(() =>
+          chmod(join(shortcutPath, "Contents", "MacOS", "run.sh"), 0o764),
+        ),
+        mkdir(join(shortcutPath, "Contents", "Resources"), {
+          recursive: true,
+        }).then(async () => {
+          if (CFBundleIconFile) {
+            await mkdir(join(shortcutPath, "Contents", "Resources"), {
+              recursive: true,
+            });
+            await Promise.all(
+              [
                 shouldAddShortcut &&
-                $`sips -s format png ${join(
-                  extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
-                  "Contents",
-                  "Resources",
-                  CFBundleIconFile,
-                )
-                  } --out ${join(shortcutPath, "Contents", "Resources", "PlayerIcon.png")
-                  }`.quiet(),
+                  $`sips -s format png ${join(
+                    extname(gameAppPath) === ".app" ? gameAppPath : gamePath,
+                    "Contents",
+                    "Resources",
+                    CFBundleIconFile,
+                  )} --out ${join(
+                    shortcutPath,
+                    "Contents",
+                    "Resources",
+                    "PlayerIcon.png",
+                  )}`.quiet(),
                 write(
                   join(
                     shortcutPath,
@@ -1102,20 +1164,19 @@ export const run = async (options: Options = {}) => {
                 ),
                 write(
                   join(shortcutPath, "Contents", "Info.plist"),
-                  buildPlist(
-                    {
-                      CFBundleIconFile,
-                      CFBundleName: `${gameName} (BepInEx)`,
-                      CFBundleInfoDictionaryVersion: "1.0",
-                      CFBundlePackageType: "APPL",
-                      CFBundleVersion: "1.0",
-                      CFBundleExecutable: "run.sh",
-                    } satisfies Plist,
-                  ),
+                  buildPlist({
+                    CFBundleIconFile,
+                    CFBundleName: `${gameName} (BepInEx)`,
+                    CFBundleInfoDictionaryVersion: "1.0",
+                    CFBundlePackageType: "APPL",
+                    CFBundleVersion: "1.0",
+                    CFBundleExecutable: "run.sh",
+                  } satisfies Plist),
                 ),
-              ].filter(Boolean));
-            }
-          }),
+              ].filter(Boolean),
+            );
+          }
+        }),
       ]),
     );
   }
@@ -1142,80 +1203,79 @@ export const run = async (options: Options = {}) => {
     await open(shortcutPath);
   }
 
-  var { detectedGame, detectedBepInEx } = await new Promise<
-    { detectedGame: boolean; detectedBepInEx: boolean }
-  >(
-    (resolve) => {
-      const watcher = watch(join(gamePath, "BepInEx", "LogOutput.log"), {
-        ignoreInitial: true,
-        ignorePermissionErrors: true,
-      });
-      let detectedGame = false, detectedBepInEx = false;
+  var { detectedGame, detectedBepInEx } = await new Promise<{
+    detectedGame: boolean;
+    detectedBepInEx: boolean;
+  }>((resolve) => {
+    const watcher = watch(join(gamePath, "BepInEx", "LogOutput.log"), {
+      ignoreInitial: true,
+      ignorePermissionErrors: true,
+    });
+    let detectedGame = false,
+      detectedBepInEx = false;
 
-      const getProcesses = async () => {
-        const processes = await find(
-          "name",
-          plist.CFBundleExecutable ?? basename(gameAppPath),
-        );
+    const getProcesses = async () => {
+      const processes = await find(
+        "name",
+        plist.CFBundleExecutable ?? basename(gameAppPath),
+      );
 
-        return processes.filter(
-          (process) => {
-            if (!("bin" in process) || typeof process.bin !== "string") {
-              return false;
-            }
-
-            const { bin } = process;
-            const relativePath = relative(gamePath, bin);
-            return relativePath && !relativePath.startsWith("..") &&
-              !isAbsolute(relativePath);
-          },
-        );
-      };
-
-      const finish = async () => {
-        await watcher.removeAllListeners().close();
-        clearTimeout(timeout);
-        clearInterval(interval);
-        (await getProcesses()).map(({ pid }) => kill(pid, "SIGKILL"));
-        resolve({ detectedGame, detectedBepInEx });
-      };
-      let timeout = setTimeout(finish, 30_000);
-
-      const interval = setInterval(async () => {
-        const processes = await getProcesses();
-
-        if (!detectedGame && processes.length) {
-          clearTimeout(timeout);
-          detectedGame = true;
-          timeout = setTimeout(finish, 30_000);
-          printline(`${code(basename(gameAppPath))} running...`);
-        } else if (detectedGame && !processes.length) {
-          printline(`${code(basename(gameAppPath))} closed.`);
-          await finish();
+      return processes.filter((process) => {
+        if (!("bin" in process) || typeof process.bin !== "string") {
+          return false;
         }
-      }, 200);
 
-      const handleChange = async () => {
-        detectedBepInEx = true;
-        (await getProcesses()).map(({ pid }) => kill(pid, "SIGKILL"));
-        await watcher.removeAllListeners().close();
-      };
+        const { bin } = process;
+        const relativePath = relative(gamePath, bin);
+        return (
+          relativePath &&
+          !relativePath.startsWith("..") &&
+          !isAbsolute(relativePath)
+        );
+      });
+    };
 
-      watcher
-        .on("add", handleChange)
-        .on("change", handleChange);
-    },
-  );
+    const finish = async () => {
+      await watcher.removeAllListeners().close();
+      clearTimeout(timeout);
+      clearInterval(interval);
+      (await getProcesses()).map(({ pid }) => kill(pid, "SIGKILL"));
+      resolve({ detectedGame, detectedBepInEx });
+    };
+    let timeout = setTimeout(finish, 30_000);
+
+    const interval = setInterval(async () => {
+      const processes = await getProcesses();
+
+      if (!detectedGame && processes.length) {
+        clearTimeout(timeout);
+        detectedGame = true;
+        timeout = setTimeout(finish, 30_000);
+        printline(`${code(basename(gameAppPath))} running...`);
+      } else if (detectedGame && !processes.length) {
+        printline(`${code(basename(gameAppPath))} closed.`);
+        await finish();
+      }
+    }, 200);
+
+    const handleChange = async () => {
+      detectedBepInEx = true;
+      (await getProcesses()).map(({ pid }) => kill(pid, "SIGKILL"));
+      await watcher.removeAllListeners().close();
+    };
+
+    watcher.on("add", handleChange).on("change", handleChange);
+  });
 
   printline();
 
   if (!detectedGame && !detectedBepInEx) {
     throw wrap(
       `Timed out waiting for the game to launch. Test cancelled.${EOL}` +
-      chalk.reset(
-        "Unable to verify whether BepInEx is correctly installed. We " +
-        "recommend running gib again, making sure to run the right game.",
-      ),
+        chalk.reset(
+          "Unable to verify whether BepInEx is correctly installed. We " +
+            "recommend running gib again, making sure to run the right game.",
+        ),
     );
   } else if (!detectedBepInEx) {
     throw wrap([
@@ -1239,77 +1299,78 @@ export const run = async (options: Options = {}) => {
         null,
         "Congratulations, you're now ready to go wild installing mods!",
         null,
-        ...steamApp
+        ...(steamApp
           ? [
-            "To launch the game modded, simply launch it from Steam as usual.",
-            ...shouldAddShortcut
-              ? [
-                null,
-                [
-                  "We also added a Steam shortcut to launch the vanilla game.",
-                  "You can find it in your Steam library named",
-                  code(`${steamApp.name} (Vanilla)`),
-                ].join(" "),
-                chalk.italic([
-                  "Please be aware this feature is experimental.",
-                  "Steam may prompt you about the",
-                  code("--doorstop_enabled"),
-                  "flag whenever you launch the vanilla shortcut.",
-                ].join(" ")),
-              ]
-              : switchSupported
-                ? []
-                : chalk.italic([
-                  "We recommend running gib again with an official release of the",
-                  "latest BepInEx 5, so that gib can add a Steam shortcut to",
-                  "launch the game vanilla.",
-                ].join(" ")),
-          ]
+              "To launch the game modded, simply launch it from Steam as usual.",
+              ...(shouldAddShortcut
+                ? [
+                    null,
+                    [
+                      "We also added a Steam shortcut to launch the vanilla game.",
+                      "You can find it in your Steam library named",
+                      code(`${steamApp.name} (Vanilla)`),
+                    ].join(" "),
+                    chalk.italic(
+                      [
+                        "Please be aware this feature is experimental.",
+                        "Steam may prompt you about the",
+                        code("--doorstop_enabled"),
+                        "flag whenever you launch the vanilla shortcut.",
+                      ].join(" "),
+                    ),
+                  ]
+                : switchSupported
+                  ? []
+                  : chalk.italic(
+                      [
+                        "We recommend running gib again with an official release of the",
+                        "latest BepInEx 5, so that gib can add a Steam shortcut to",
+                        "launch the game vanilla.",
+                      ].join(" "),
+                    )),
+            ]
           : [
-            "To launch the game modded, launch the app found at:",
-            chalk.green(shortcutPath),
-            null,
-            ...shouldAddShortcut
-              ? [
-                [
-                  "We also added a shortcut to Steam to launch the game with",
-                  "BepInEx. You can find it in your Steam library named",
-                  code(parse(shortcutPath).name),
-                ].join(" "),
-                null,
-              ]
-              : [],
-            [
-              "Please be aware that platform-specific features such as",
-              "achievements or in-game overlays will be unavailable when",
-              "running mods with non-Steam games.",
-            ].join(" "),
-            null,
-            [
-              "To launch the game vanilla, simply launch it as you normally",
-              "would, e.g. via the Epic Games launcher, etc.",
-            ].join(" "),
-          ],
+              "To launch the game modded, launch the app found at:",
+              chalk.green(shortcutPath),
+              null,
+              ...(shouldAddShortcut
+                ? [
+                    [
+                      "We also added a shortcut to Steam to launch the game with",
+                      "BepInEx. You can find it in your Steam library named",
+                      code(parse(shortcutPath).name),
+                    ].join(" "),
+                    null,
+                  ]
+                : []),
+              [
+                "Please be aware that platform-specific features such as",
+                "achievements or in-game overlays will be unavailable when",
+                "running mods with non-Steam games.",
+              ].join(" "),
+              null,
+              [
+                "To launch the game vanilla, simply launch it as you normally",
+                "would, e.g. via the Epic Games launcher, etc.",
+              ].join(" "),
+            ]),
         null,
         "If you found gib helpful, please consider donating:",
         null,
       ]),
     );
     printline(
-      list([
-        link(
-          chalk.hex("#00457C")("PayPal"),
-          "https://paypal.me/tobeyblaber",
-        ),
-        link(
-          chalk.hex("#ff5e5b")("Ko-fi"),
-          "https://ko-fi.com/toebean_",
-        ),
-        link(
-          chalk.hex("#4078c0")("GitHub"),
-          "https://github.com/sponsors/toebeann",
-        ),
-      ], false),
+      list(
+        [
+          link(chalk.hex("#00457C")("PayPal"), "https://paypal.me/tobeyblaber"),
+          link(chalk.hex("#ff5e5b")("Ko-fi"), "https://ko-fi.com/toebean_"),
+          link(
+            chalk.hex("#4078c0")("GitHub"),
+            "https://github.com/sponsors/toebeann",
+          ),
+        ],
+        false,
+      ),
     );
     printline(wrap([null, pink("- tobey ♥"), null]));
   }
@@ -1330,64 +1391,66 @@ export const setup = async () => {
 
   const printHelp = () => {
     printline(
-      wrap(
-        [
-          `${pink("gib")
-          } is a TUI app for automating the installation of BepInEx on macOS. ${chalk.dim(`(${version})`)
-          }`,
-          null,
-          chalk.bold(
-            `Usage: gib ${chalk.cyan("[...flags]")} ${chalk.greenBright.dim("[bepinexScriptPath] [unityAppPath]")
-            }`,
-          ),
-          null,
-          chalk.bold("Flags:"),
-        ],
-      ),
+      wrap([
+        `${pink(
+          "gib",
+        )} is a TUI app for automating the installation of BepInEx on macOS. ${chalk.dim(
+          `(${version})`,
+        )}`,
+        null,
+        chalk.bold(
+          `Usage: gib ${chalk.cyan("[...flags]")} ${chalk.greenBright.dim(
+            "[bepinexScriptPath] [unityAppPath]",
+          )}`,
+        ),
+        null,
+        chalk.bold("Flags:"),
+      ]),
     );
     printline(
       [
         `  ${wrap(
-          `${chalk.cyan("-v")}, ${chalk.cyan("--version")
-          }          Print version and exit`,
+          `${chalk.cyan("-v")}, ${chalk.cyan(
+            "--version",
+          )}          Print version and exit`,
           width() - 2,
-        )
-        }`,
+        )}`,
         `  ${wrap(
-          `${chalk.cyan("-s")}, ${chalk.cyan("--status")
-          }           Print update status and exit`,
+          `${chalk.cyan("-s")}, ${chalk.cyan(
+            "--status",
+          )}           Print update status and exit`,
           width() - 2,
-        )
-        }`,
+        )}`,
         `      ${wrap(
-          `${chalk.cyan(`--launch${chalk.dim("=<id>")}`)
-          }      Immediately launch Steam app with the specified id and exit`,
+          `${chalk.cyan(
+            `--launch${chalk.dim("=<id>")}`,
+          )}      Immediately launch Steam app with the specified id and exit`,
           width() - 6,
-        )
-        }`,
+        )}`,
         `      ${wrap(
           `${chalk.cyan("--no-update")}        Disable update check`,
           width() - 6,
-        )
-        }`,
-        command === "gib" && `      ${wrap(
-          `${chalk.cyan("--no-path-check")}    Disable $PATH check`,
-          width() - 6,
-        )
-        }`,
+        )}`,
+        command === "gib" &&
+          `      ${wrap(
+            `${chalk.cyan("--no-path-check")}    Disable $PATH check`,
+            width() - 6,
+          )}`,
         `  ${wrap(
-          `${chalk.cyan("-y")}, ${chalk.cyan("--yes")
-          }              Accept all defaults and automatically progress`,
+          `${chalk.cyan("-y")}, ${chalk.cyan(
+            "--yes",
+          )}              Accept all defaults and automatically progress`,
           width() - 2,
-        )
-        }`,
+        )}`,
         `  ${wrap(
-          `${chalk.cyan("-h")}, ${chalk.cyan("--help")
-          }             Display usage information and exit`,
+          `${chalk.cyan("-h")}, ${chalk.cyan(
+            "--help",
+          )}             Display usage information and exit`,
           width() - 2,
-        )
-        }`,
-      ].filter(Boolean).join(EOL),
+        )}`,
+      ]
+        .filter(Boolean)
+        .join(EOL),
     );
     printline(wrap([null, chalk.bold("Examples:")]));
     printline(
@@ -1395,8 +1458,7 @@ export const setup = async () => {
         `  ${wrap(
           chalk.dim("Interactively install BepInEx to a Unity game"),
           width() - 2,
-        )
-        }`,
+        )}`,
         `  ${wrap(`${chalk.bold.greenBright("gib")} `, width() - 2)}`,
         null,
         `  ${wrap(
@@ -1404,37 +1466,34 @@ export const setup = async () => {
             "Install BepInEx from the provided path to the Unity game at the provided path, accepting all default options",
           ),
           width() - 2,
-        )
-        }`,
+        )}`,
         `  ${wrap(
           `${chalk.bold.greenBright("gib")} ${chalk.cyan("-y")} ${chalk.blue(
             "~/Downloads/Tobey.s.BepInEx.Pack.for.Subnautica '~/Library/Application Support/Steam/steamapps/common/Subnautica'",
-          )
-          }`,
+          )}`,
           width() - 2,
-        )
-        }`,
+        )}`,
         null,
         `  ${wrap(
           chalk.dim(
             "(Re-)install BepInEx from the current working directory to the Unity game at the current working directory, accepting all default options",
           ),
           width() - 2,
-        )
-        }`,
+        )}`,
         `  ${wrap(
-          `${chalk.bold.greenBright("gib")} ${chalk.cyan("-y")} ${chalk.blue(".")
-          }`,
+          `${chalk.bold.greenBright("gib")} ${chalk.cyan("-y")} ${chalk.blue(
+            ".",
+          )}`,
           width() - 2,
-        )
-        }`,
+        )}`,
       ].join(EOL),
     );
     printline(
       wrap([
         null,
-        `Learn more about gib:    ${pink("https://github.com/toebeann/gib#readme")
-        }`,
+        `Learn more about gib:    ${pink(
+          "https://github.com/toebeann/gib#readme",
+        )}`,
       ]),
     );
   };
@@ -1474,14 +1533,13 @@ export const setup = async () => {
       if (parsed.success) {
         latest = parsed.data.version;
       }
-    } catch { }
+    } catch {}
   }
 
-  const updateAvailable = latest !== undefined &&
-    semver.satisfies(version, `<${latest}`);
+  const updateAvailable =
+    latest !== undefined && semver.satisfies(version, `<${latest}`);
 
-  const updateCommand =
-    `curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib@v${latest}/gib.sh | bash -s v${latest}`;
+  const updateCommand = `curl -fsSL https://cdn.jsdelivr.net/gh/toebeann/gib@v${latest}/gib.sh | bash -s v${latest}`;
 
   if (wantsUpdateExitStatus) {
     if (updateAvailable) {
@@ -1516,8 +1574,9 @@ export const setup = async () => {
         `gib ${orange.bold.underline(`v${latest}`)} is available.`,
         `Changelog: https://github.com/toebeann/gib/releases/tag/v${latest}`,
         chalk.dim(
-          `You currently have ${chalk.bold.underline(`v${version}`)
-          } installed.`,
+          `You currently have ${chalk.bold.underline(
+            `v${version}`,
+          )} installed.`,
         ),
         null,
       ]),
@@ -1565,8 +1624,9 @@ export const setup = async () => {
               `${command} not found in ${pathText}.`,
               `We recommend adding ${command} to ${pathText} for ease of use.`,
               null,
-              `To do so, manually add the equivalent commands to ${chalk.yellowBright.bold(configPath)
-              } (or similar):`,
+              `To do so, manually add the equivalent commands to ${chalk.yellowBright.bold(
+                configPath,
+              )} (or similar):`,
             ]),
           );
 
@@ -1602,8 +1662,9 @@ export const setup = async () => {
 
           printline(
             wrap([
-              `${command} has been added to ${pathText} in ${code(configPath)
-              }.`,
+              `${command} has been added to ${pathText} in ${code(
+                configPath,
+              )}.`,
               null,
               "The next time you want to launch gib, you can simply run:",
             ]),
@@ -1668,10 +1729,7 @@ export const setup = async () => {
           }
         } else if (basename(SHELL) === "bash") {
           const { XDG_CONFIG_HOME } = env;
-          const configs = [
-            join("~", ".bash_profile"),
-            join("~", ".bashrc"),
-          ];
+          const configs = [join("~", ".bash_profile"), join("~", ".bashrc")];
           if (XDG_CONFIG_HOME) {
             configs.concat(
               join(XDG_CONFIG_HOME, ".bash_profile"),
@@ -1700,7 +1758,7 @@ export const setup = async () => {
               }
               done = true;
               break;
-            } catch { }
+            } catch {}
           }
 
           if (!done) promptToManuallyEditConfig("~/.bashrc", commands);
@@ -1722,15 +1780,17 @@ export const setup = async () => {
 
     case 1:
       try {
-        const bepinexScriptPath = await getBepInExScriptPath(positionals[0])
-          .catch(() => getBepInExScriptPath("."));
-        const unityAppPath = await getUnityAppPath(positionals[0])
-          .catch(() => getUnityAppPath("."));
+        const bepinexScriptPath = await getBepInExScriptPath(
+          positionals[0],
+        ).catch(() => getBepInExScriptPath("."));
+        const unityAppPath = await getUnityAppPath(positionals[0]).catch(() =>
+          getUnityAppPath("."),
+        );
         return await run({ bepinexScriptPath, unityAppPath, yes });
       } catch (e) {
         printline();
         errorline(err);
-        errorline(typeof e === 'string' ? e : inspect(e, { colors: true }));
+        errorline(typeof e === "string" ? e : inspect(e, { colors: true }));
         printline();
         return printHelp();
       }
@@ -1743,7 +1803,7 @@ export const setup = async () => {
       } catch (e) {
         printline();
         errorline(err);
-        errorline(typeof e === 'string' ? e : inspect(e, { colors: true }));
+        errorline(typeof e === "string" ? e : inspect(e, { colors: true }));
         printline();
         return printHelp();
       }

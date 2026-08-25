@@ -7,11 +7,13 @@ export const confirm = (message: string, yes = false) => {
   return Boolean(
     yes
       ? printline(`${message} [${defaultValue}] yes`)
-      : (globalThis.prompt(message, defaultValue) as string)[0]?.toLowerCase() !== 'n'
+      : (
+          globalThis.prompt(message, defaultValue) as string
+        )[0]?.toLowerCase() !== "n",
   );
 };
 
 export const prompt = (message = "Prompt", defaultValue?: string) =>
-  typeof defaultValue === 'string'
+  typeof defaultValue === "string"
     ? globalThis.prompt(message, defaultValue)
     : globalThis.prompt(message);

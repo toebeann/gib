@@ -28,12 +28,10 @@ export const createLogo = async () => {
 
   const { bun, node } = versions;
 
-  const metadata =
-    `gib v${shortVersion(version)} bun v${shortVersion(bun)} node v${shortVersion(node)}`;
+  const metadata = `gib v${shortVersion(version)} bun v${shortVersion(bun)} node v${shortVersion(node)}`;
 
-  const gradient = env.NO_COLOR === undefined
-    ? retro
-    : gradientString(["white", "white"]);
+  const gradient =
+    env.NO_COLOR === undefined ? retro : gradientString(["white", "white"]);
 
   const title = "tobey's Guided Installer for BepInEx";
 
@@ -53,24 +51,26 @@ export const createLogo = async () => {
     });
 
     const boxedLines = boxed.split(EOL);
-    const padding = Math.floor(
-      (width() / 2) - (boxedLines[0].length / 2),
-    );
+    const padding = Math.floor(width() / 2 - boxedLines[0].length / 2);
 
     outputLines.push(
-      ...gradient.multiline(boxedLines.join(EOL)).split(EOL)
-        .map(line => `${" ".repeat(padding)}${line}`),
-      chalk.gray(center(metadata, boxedLines[0].length + (padding * 2))),
+      ...gradient
+        .multiline(boxedLines.join(EOL))
+        .split(EOL)
+        .map((line) => `${" ".repeat(padding)}${line}`),
+      chalk.gray(center(metadata, boxedLines[0].length + padding * 2)),
     );
   } else {
-    const split = metadata.split(' ');
-    const pairs = Array.from({ length: split.length / 2 }, (_, i) => split.slice(i * 2, i * 2 + 2));
+    const split = metadata.split(" ");
+    const pairs = Array.from({ length: split.length / 2 }, (_, i) =>
+      split.slice(i * 2, i * 2 + 2),
+    );
 
     outputLines.push(
       ...gradient.multiline(center(wrap(title), width())).split(EOL),
-      '',
-      ...pairs.map(pair => chalk.gray(center(pair.join(' '), width()))),
-      '',
+      "",
+      ...pairs.map((pair) => chalk.gray(center(pair.join(" "), width()))),
+      "",
     );
   }
 

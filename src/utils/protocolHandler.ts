@@ -36,8 +36,7 @@ export const getProtocolHandlerPath = async (protocol: string) => {
     try {
       const key = join("registry::hkcr", protocol, "shell", "open", "command");
       const output =
-        await $`powershell -noprofile -noninteractive -c 'gp -path ${key} | select -expand "(default)"'`
-          .text();
+        await $`powershell -noprofile -noninteractive -c 'gp -path ${key} | select -expand "(default)"'`.text();
       return stringArgv(output)[0];
     } catch {}
   }
