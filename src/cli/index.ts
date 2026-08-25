@@ -46,6 +46,7 @@ import {
   file,
   Glob,
   inspect,
+  isStandaloneExecutable,
   semver,
   wrapAnsi,
   write,
@@ -1431,7 +1432,7 @@ export const setup = async () => {
           `${chalk.cyan("--no-update")}        Disable update check`,
           width() - 6,
         )}`,
-        command === "gib" &&
+        isStandaloneExecutable &&
           `      ${wrap(
             `${chalk.cyan("--no-path-check")}    Disable $PATH check`,
             width() - 6,

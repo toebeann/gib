@@ -1,5 +1,4 @@
-import { basename, extname } from "node:path";
-import { execPath } from "node:process";
+import { isStandaloneExecutable } from "bun";
 import { parseArgs } from "node:util";
 
 export const config = () => {
@@ -24,7 +23,7 @@ export const config = () => {
       update: { type: "boolean", default: true },
       yes: { type: "boolean", short: "y", default: false },
       launch: { type: "string" },
-      ...(basename(execPath, extname(execPath)) === "gib"
+      ...(isStandaloneExecutable
         ? { "path-check": { type: "boolean", default: true } }
         : {}),
     },
