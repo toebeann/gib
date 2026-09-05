@@ -58,7 +58,6 @@ Apple Silicon processors are supported, provided you are running on macOS 13
   actually loading when you run the game, so you know that everything is working
   as it's supposed to!
 - Nifty Steam integrations:
-
   - Automatically configures the launch options to run Steam games with BepInEx!
   - Optionally adds Steam shortcuts to run Steam games vanilla (without mods) or
     non-Steam games with mods!
@@ -89,14 +88,14 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 
 ### Walkthrough
 
-> [!TIP]\
+> [!TIP]
 > If you run into any unexpected issues while following these instructions or
 > need further assistance, please feel free to
 > [open an issue](https://github.com/toebeann/gib/issues/new/choose) describing
 > what happened, ideally providing the output from running gib, and I'll help
 > when I can.
 
-> [!NOTE]\
+> [!NOTE]
 > These usage instructions were originally written with macOS Sonoma in mind.
 > The instructions below should work for other versions of macOS, but there may
 > be some slight differences.
@@ -104,7 +103,6 @@ If you get stuck, refer to the below [walkthrough](#walkthrough).
 #### Prerequisites
 
 - You'll want a Finder window open at the folder where the game is installed.
-
   - If you own the game on Steam, find the game in your library, then
     right-click it and select `Manage` -> `Browse local files`.
 
@@ -245,7 +243,7 @@ automate, but it is fairly straightforward:
      [remove the vanilla shortcut added during instalation](#removing-steam-shortcuts),
      if applicable.
    - **Non-Steam games:**
-     [remove the Steam shortcut to launch the game with BepInEx]((#removing-steam-shortcuts)),
+     [remove the Steam shortcut to launch the game with BepInEx](<(#removing-steam-shortcuts)>),
      if applicable.
 2. You should also
    [remove the shortcuts added to your Applications folder by gib for the game](#removing-shortcuts-from-applications).
@@ -257,7 +255,7 @@ automate, but it is fairly straightforward:
 
 #### Clearing Steam launch options
 
-> [!NOTE]\
+> [!NOTE]
 > Please note that this section only applies to Steam games.
 
 To uninstall BepInEx from Steam games, we need to clear the launch options for
@@ -307,7 +305,7 @@ these steps:
 
 #### Removing BepInEx from the game folder
 
-> [!IMPORTANT]\
+> [!IMPORTANT]
 > Make sure you follow the first two steps of
 > [Uninstalling BepInEx](#uninstalling-bepinex) section before doing this.
 
@@ -333,7 +331,7 @@ mods from the game folder:
 
 ### Uninstalling gib
 
-> [!NOTE]\
+> [!NOTE]
 > Uninstalling gib itself is entirely optional and will not uninstall BepInEx,
 > nor any mods you have installed for any games. For that, see
 > [Uninstalling BepInEx](#uninstalling-bepinex).
@@ -363,14 +361,13 @@ rm -rf ~/.gib
   [temporarily disable mods for the game](#temporarily-disabling-mods-for-a-game).
 
 - Only native macOS applications are currently supported.
-
   - Support for Windows apps on macOS (e.g. via Wine-based solutions like
     CrossOver) is being considered.
 
   - Support for other operating systems is being considered.
 
 - Only BepInEx 5 is currently supported. Support for BepInEx 6 is being
-  considered, but is unlikely to happen soon. It's worth noting  that the
+  considered, but is unlikely to happen soon. It's worth noting that the
   primary use of BepInEx 6 is for IL2CPP games, and modding IL2CPP games on
   macOS is almost impossible with current tech.
 
